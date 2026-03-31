@@ -6,7 +6,6 @@ from django.utils import timezone
 from datetime import timedelta
 import json
 from .models import *
-
 # Create your views here.
 def home(request):
     userid = request.session.get('userid')
@@ -1242,5 +1241,6 @@ def delete_story(request):
  d e f   b l o g _ d e t a i l ( r e q u e s t ,   b l o g _ i d ) : 
          b l o g _ o b j   =   g e t _ o b j e c t _ o r _ 4 0 4 ( b l o g ,   p k = b l o g _ i d ) 
          r e t u r n   r e n d e r ( r e q u e s t ,   ' b l o g _ d e t a i l . h t m l ' ,   { ' b l o g ' :   b l o g _ o b j } ) 
-  
+ 
+ 
  
