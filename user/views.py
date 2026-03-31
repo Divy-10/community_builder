@@ -2286,10 +2286,15 @@ def calendar_view(request):
         events.append({
             'title': m.title,
             'start': m.meeting_date.isoformat(),
+            'end': m.meeting_end_date.isoformat() if m.meeting_end_date else None,
             'allDay': False,
             'extendedProps': {
                 'meetupid': m.meetupid,
                 'meetup_type': m.meetup_type,
+                'description': m.description,
+                'location': m.location or m.meeting_link or 'N/A',
+                'date_str': m.meeting_date.strftime("%A, %B %d, %Y"),
+                'time_str': m.meeting_date.strftime("%I:%M %p"),
             }
         })
     
