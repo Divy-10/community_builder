@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact Us | UniVo - Premium Community Builder{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --contact-primary: #1c4d8d;
+        --contact-secondary: #4988c4;
+        --contact-accent: #bde8f5;
+        --glass-bg: rgba(255, 255, 255, 0.45);
+        --glass-border: rgba(255, 255, 255, 0.5);
+    }
+
+    .contact-hero {
+        position: relative;
+        padding: 50px 0 30px; 
+        background: var(--gradient-brand);
+        border-radius: 40px; 
+        overflow: hidden;
+        z-index: 1;
+        text-align: center;
+        margin: 24px 0; 
+    }
+
+    .contact-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -20%;
+        width: 140%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+        animation: rotateHero 20s linear infinite;
+    }
+
+    @keyframes rotateHero {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .contact-container {
+        position: relative;
+        z-index: 2;
+        padding: 0 15px 60px;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.75); 
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 
+            0 10px 30px rgba(28, 77, 141, 0.05),
+            0 20px 60px rgba(28, 77, 141, 0.1),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+        border-radius: 24px;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-12px) scale(1.01);
+        box-shadow: 
+            0 25px 50px rgba(28, 77, 141, 0.15),
+            0 40px 80px rgba(28, 77, 141, 0.1);
+        border-color: rgba(255, 255, 255, 1);
+        background: rgba(255, 255, 255, 0.85); 
+    }
+
+    .info-icon-wrapper {
+        width: 55px;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: var(--gradient-brand);
+        color: #fff;
+        font-size: 20px;
+        box-shadow: 0 8px 16px rgba(28, 77, 141, 0.2);
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .glass-card:hover .info-icon-wrapper {
+        transform: scale(1.1) rotate(5deg);
+        filter: brightness(1.2);
+    }
+
+    /* Fixed Textbox Visibility */
+    .form-control-premium {
+        background: rgba(255, 255, 255, 0.95) !important; /* Solid white background */
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 16px;
+        padding: 15px 20px;
+        color: var(--contact-primary);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03); /* Subtle outer shadow to lift it */
+    }
+
+    .form-control-premium:focus {
+        background: #ffffff !important;
+        border-color: var(--contact-secondary) !important;
+        box-shadow: 0 8px 16px rgba(73, 136, 196, 0.15) !important;
+        transform: translateY(-2px);
+    }
+
+    .btn-contact-submit {
+        background: var(--gradient-brand);
+        color: white;
+        border: none;
+        padding: 15px 35px;
+        border-radius: 16px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 14px;
+        box-shadow: 0 10px 25px rgba(28, 77, 141, 0.3);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-contact-submit:hover {
+        transform: scale(1.05) translateY(-3px);
+        box-shadow: 0 15px 35px rgba(28, 77, 141, 0.4);
+        filter: brightness(1.1);
+        color: white;
+    }
+
+    .animated-shape {
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        background: linear-gradient(45deg, var(--contact-secondary), var(--contact-accent));
+        filter: blur(80px);
+        opacity: 0.2;
+        z-index: 0;
+        border-radius: 50%;
+        animation: floatShape 15s ease-in-out infinite;
+    }
+
+    @keyframes floatShape {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(100px, 50px); }
+    }
+
+    .social-link-btn {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        color: var(--contact-primary);
+        margin-right: 10px;
+        transition: all 0.3s ease;
+        font-size: 16px;
+    }
+
+    .social-link-btn:hover {
+        background: var(--gradient-brand);
+        color: white;
+        transform: translateY(-5px) rotate(8deg);
+        border-color: transparent;
+    }
+
+    .entrance-anim {
+        animation: fadeInUp 0.8s cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-item {
+        margin-bottom: 25px;
+    }
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-hero entrance-anim">
+    <div class="container py-3">
+        <h1 class="display-4 fw-bold text-white mb-2">Get in Touch</h1>
+        <p class="lead text-white-50 opacity-75 mx-auto mb-0" style="max-width: 600px;">
+            We'd love to hear from you. Our team is here to help you.
+        </p>
+    </div>
+</div>
+
+<div class="contact-container">
+    <div class="container-fluid px-0">
+        <div class="row g-4 align-items-stretch">
+            <div class="animated-shape" style="top: 0; left: -100px;"></div>
+            <div class="animated-shape" style="bottom: 0; right: -100px; animation-delay: -5s;"></div>
+
+            <!-- Contact Information Column -->
+            <div class="col-lg-4 entrance-anim delay-1">
+                <div class="card glass-card p-4 p-xl-5">
+                    <h3 class="fw-bold mb-4">Contact Info</h3>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <div class="info-icon-wrapper">
+                                <i class="ri-map-pin-line"></i>
+                            </div>
+                            <h6 class="fw-bold mb-1">Our Location</h6>
+                            <p class="text-muted small mb-0">123 UniVo Street, Tech Hub District, Silicon Valley, CA 94043</p>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon-wrapper" style="background: linear-gradient(135deg, #10B981 0%, #34D399 100%);">
+                                <i class="ri-mail-send-line"></i>
+                            </div>
+                            <h6 class="fw-bold mb-1">Email Support</h6>
+                            <p class="text-muted small mb-0">hello@univo.community<br>support@univo.community</p>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon-wrapper" style="background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <h6 class="fw-bold mb-1">Phone Number</h6>
+                            <p class="text-muted small mb-0">+1 (555) 888-2026<br>Mon - Fri, 9am - 6pm EST</p>
+                        </div>
+                    </div>
+                    <div class="mt-auto pt-4 border-top">
+                        <h6 class="fw-bold mb-3">Connect With Us</h6>
+                        <div class="d-flex">
+                            <a href="#" class="social-link-btn"><i class="ri-facebook-fill"></i></a>
+                            <a href="#" class="social-link-btn"><i class="ri-twitter-fill"></i></a>
+                            <a href="#" class="social-link-btn"><i class="ri-instagram-line"></i></a>
+                            <a href="#" class="social-link-btn"><i class="ri-linkedin-fill"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form Column -->
+            <div class="col-lg-8 entrance-anim delay-2">
+                <div class="card glass-card p-4 p-xl-5">
+                    <h3 class="fw-bold mb-4">Send Us a Message</h3>
+                    <form id="contactForm" action="#">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold small text-uppercase mb-2" for="name">Your Name</label>
+                                    <input type="text" class="form-control form-control-premium" id="name" placeholder="John Doe" value="{{ current_user.username|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold small text-uppercase mb-2" for="email">Email Address</label>
+                                    <input type="email" class="form-control form-control-premium" id="email" placeholder="john@example.com" value="{{ current_user.email|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold small text-uppercase mb-2" for="subject">Subject</label>
+                                    <input type="text" class="form-control form-control-premium" id="subject" placeholder="What is this about?">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group mb-4">
+                                    <label class="form-label fw-bold small text-uppercase mb-2" for="message">Your Message</label>
+                                    <textarea class="form-control form-control-premium" id="message" rows="5" placeholder="Tell us more about your inquiry..."></textarea>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="reset" class="btn btn-light rounded-pill px-4 py-3 me-3">Clear</button>
+                                <button type="submit" class="btn btn-contact-submit">
+                                    Send Message <i class="ri-send-plane-fill ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

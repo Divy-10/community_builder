@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load user_tags %}
+{% load static %}
+
+{% block content %}
+<div class="content-inner" id="page_layout">
+    <div class="container-fluid">
+        <div class="row justify-content-center py-4">
+            <div class="col-lg-6 col-md-8">
+
+                {% if error %}
+                <!-- Error State -->
+                <div class="card shadow-sm border-0 rounded-4 text-center overflow-hidden">
+                    <div class="card-body p-5">
+                        <div class="bg-danger-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                            <i class="ri-error-warning-line text-danger" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark">Payment Error</h4>
+                        <p class="text-muted">{{ error }}</p>
+                        <a href="{% url 'group' %}" class="btn btn-primary rounded-pill px-4 fw-bold">Back to Communities</a>
+                    </div>
+                </div>
+                {% else %}
+
+                <!-- Payment Card -->
+                <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                    <!-- Header -->
+                    <div class="p-4 text-center text-white" style="background: linear-gradient(135deg, rgb(15, 40, 84), rgb(28, 77, 141));">
+                        <div class="mb-3">
+                            {% if community.thumbnail %}
+                            <img src="{{ community.thumbnail.url }}" class="rounded-circle border border-3 border-white shadow" style="width: 80px; height: 80px; object-fit: cover;" alt="community">
+                            {% else %}
+                            <div class="rounded-circle bg-white text-primary d-inline-flex align-items-center justify-content-center fw-bold shadow" style="width: 80px; height: 80px; font-size: 2rem;">
+                                {{ community.communitytitle|make_list|first|upper }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <h4 class="fw-bold mb-1">{{ community.communitytitle }}</h4>
+                        <span class="badge bg-white bg-opacity-25 rounded-pill px-3">{{ community.categoryid.categoryname }}</span>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Price Display -->
+                        <div class="text-center mb-4 py-3 bg-light rounded-4">
+                            <p class="text-muted small mb-1 fw-bold text-uppercase">Membership Fee</p>
+                            <h2 class="fw-bold mb-0" style="color: rgb(15, 40, 84);">
+                                {{ amount_display|format_currency:user_settings }}
+                            </h2>
+                            <p class="text-muted small mb-0">One-time payment</p>
+                        </div>
+
+                        <!-- What you get -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-dark mb-3"><i class="ri-shield-check-line text-success me-2"></i>What you'll get:</h6>
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex align-items-center mb-2">
+                                    <i class="ri-check-line text-success me-2"></i>
+                                    <span class="text-muted small">Full access to all community posts</span>
+                                </li>
+                                <li class="d-flex align-items-center mb-2">
+                                    <i class="ri-check-line text-success me-2"></i>
+                                    <span class="text-muted small">Participate in group chats</span>
+                                </li>
+                                <li class="d-flex align-items-center mb-2">
+                                    <i class="ri-check-line text-success me-2"></i>
+                                    <span class="text-muted small">Join exclusive meetups & events</span>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                    <i class="ri-check-line text-success me-2"></i>
+                                    <span class="text-muted small">Create & share your own posts</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <hr>
+
+                        <!-- Razorpay Payment Button -->
+                        <button id="pay-btn" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow" style="background: rgb(15, 40, 84) !important; font-size: 1.1rem;">
+                            <i class="ri-bank-card-line me-2"></i>Pay {{ amount_display|format_currency:user_settings }} & Join
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <a href="{% url 'group' %}" class="text-muted text-decoration-none small fw-bold">
+                                <i class="ri-arrow-left-line me-1"></i>Cancel & Go Back
+                            </a>
+                        </div>
+
+                        <!-- Payment Security Badge -->
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <i class="ri-lock-line text-success"></i>
+                                <span class="text-muted small">Secured by <strong>Razorpay</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not error %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById('pay-btn').addEventListener('click', function() {
+        var options = {
+            "key": "{{ razorpay_key }}",
+            "amount": "{{ amount }}",
+            "currency": "INR",
+            "name": "UniVo Communities",
+            "description": "Join {{ community.communitytitle }}",
+            "order_id": "{{ razorpay_order_id }}",
+            "handler": function (response) {
+                // Send payment details to backend for verification
+                fetch("{% url 'verify_payment' community.communityid %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        // Show success and redirect
+                        document.querySelector('.card-body').innerHTML = `
+                            <div class="text-center py-5">
+                                <div class="bg-success-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                                    <i class="ri-check-double-line text-success" style="font-size: 2.5rem;"></i>
+                                </div>
+                                <h4 class="fw-bold text-dark">Payment Successful!</h4>
+                                <p class="text-muted">You have been added to <strong>{{ community.communitytitle }}</strong>.</p>
+                                <a href="{% url 'community_detail' community.communityid %}" class="btn btn-primary rounded-pill px-4 fw-bold">Go to Community</a>
+                            </div>
+                        `;
+                    } else {
+                        alert('Payment verification failed. Please contact support.');
+                    }
+                })
+                .catch(function(err) {
+                    alert('Something went wrong. Please try again.');
+                    console.error(err);
+                });
+            },
+            "prefill": {
+                "name": "{{ current_user.username }}",
+                "email": "{{ current_user.email }}"
+            },
+            "theme": {
+                "color": "#0f2854"
+            },
+            "modal": {
+                "ondismiss": function() {
+                    console.log('Payment cancelled by user');
+                }
+            }
+        };
+        var rzp = new Razorpay(options);
+        rzp.open();
+    });
+</script>
+{% endif %}
+
+{% endblock %}

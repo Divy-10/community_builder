@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="content-inner" id="page_layout">
+    <div class="container-fluid">
+        
+        <!-- Group Header Card -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card shadow-sm border-0 mb-4 overflow-hidden rounded-4">
+                    <div class="iq-profile-cover" style="height: 250px; position: relative;">
+                        <!-- Using a custom background image if available, else fallback -->
+                        {% if community.background_image %}
+                        <img src="{{ community.background_image.url }}" alt="cover-bg" class="img-fluid w-100 h-100" style="object-fit: cover; filter: brightness(0.8);" loading="lazy">
+                        {% else %}
+                        <img src="../../assets/images/page-img/profile-bg2.jpg" alt="cover-bg" class="img-fluid w-100 h-100" style="object-fit: cover; filter: brightness(0.8);" loading="lazy">
+                        {% endif %}
+                        <div class="position-absolute w-100 h-100 top-0 start-0" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-n5 position-relative z-1" style="margin-top: -120px;">
+            <div class="col-lg-3 col-md-4 mb-4">
+                <!-- Group Info Profile Box -->
+                <div class="card shadow border-0 rounded-4 text-center pb-4" style="overflow: visible !important;">
+                    <div class="card-body pt-0">
+                        <div class="profile-img mb-4 d-inline-block" style="margin-top: -50px;">
+                            {% if community.thumbnail %}
+                            <img src="{{ community.thumbnail.url }}" alt="profile-img" class="rounded-circle avatar-130 border border-4 border-white shadow-sm" style="background: white; object-fit: cover; width: 130px; height: 130px;" loading="lazy">
+                            {% else %}
+                            <img src="../../assets/images/page-img/gi-1.jpg" alt="profile-img" class="rounded-circle avatar-130 border border-4 border-white shadow-sm" style="background: white; object-fit: cover; width: 130px; height: 130px;" loading="lazy">
+                            {% endif %}
+                        </div>
+                        <h3 class="mb-1 fw-bold">{{ community.communitytitle }}</h3>
+                        <p class="mb-3 text-muted badge bg-primary-subtle text-primary">{{ community.categoryid.categoryname }}</p>
+                        {% if community.is_paid and community.price > 0 %}
+                        <div class="mb-2"><span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="ri-vip-crown-line me-1"></i>Paid · {{ community.price|format_currency:user_settings }}</span></div>
+                        {% endif %}
+                        
+                        <p class="text-start fs-6 text-muted px-2">{{ community.discription }}</p>
+                        
+                        <div class="d-flex align-items-center justify-content-center border-top pt-3 mt-3 gap-4">
+                            <div class="text-center" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#membersModal">
+                                <h5 class="mb-0 fw-bold">{{ community.communitymember_set.count }}</h5>
+                                <span class="text-muted small">Members</span>
+                            </div>
+                            <div class="text-center">
+                                <h5 class="mb-0 fw-bold">{{ posts.count }}</h5>
+                                <span class="text-muted small">Posts</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            {% if is_admin %}
+                            <a href="{% url 'group_members' community.communityid %}" class="btn btn-warning w-100 fw-semibold rounded-pill mb-2"><i class="las la-cog me-1"></i>Manage Group</a>
+                            <a href="{% url 'create_meetup' community.communityid %}" class="btn btn-info w-100 fw-semibold rounded-pill mb-2 text-white"><i class="las la-calendar-plus me-1"></i>Set Meeting</a>
+                            {% elif is_member %}
+                            <button class="btn btn-success-subtle w-100 fw-semibold rounded-pill mb-2" disabled><i class="las la-check me-1"></i>Joined</button>
+                            {% else %}
+                            <form method="post" action="{% url 'join_group' community.communityid %}" class="mb-2">
+                                {% csrf_token %}
+                                {% if community.is_paid and community.price > 0 %}
+                                <button type="submit" class="btn btn-warning w-100 fw-semibold rounded-pill"><i class="ri-bank-card-line me-1"></i>Pay {{ community.price|format_currency:user_settings }} & Join</button>
+                                {% else %}
+                                <button type="submit" class="btn btn-primary w-100 fw-semibold rounded-pill"><i class="las la-plus me-1"></i>Join Group</button>
+                                {% endif %}
+                            </form>
+                            {% endif %}
+                            
+                            {% if is_admin or is_member %}
+                            <a href="{% url 'community_chat' community.communityid %}" class="btn btn-outline-primary w-100 fw-semibold rounded-pill"><i class="las la-comments me-1"></i>Group Chat</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Info Info -->
+                <div class="card shadow-sm border-0 rounded-4 mt-4">
+                    <div class="card-header border-bottom-0 pb-0">
+                        <h5 class="fw-bold">Created By</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            {% if community.userid.profile %}
+                            <img src="{{ community.userid.profile.url }}" alt="post" class="avatar-40 rounded-circle" style="object-fit:cover;">
+                            {% else %}
+                            <div class="avatar-40 rounded-circle bg-primary text-white d-flex align-items-center justify-content-center">
+                                {{ community.userid.username|make_list|first|upper }}
+                            </div>
+                            {% endif %}
+                            <div class="ms-3">
+                                <h6 class="mb-0 fw-bold">{{ community.userid.username }}</h6>
+                                <p class="mb-0 text-muted small">{{ community.createddt|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Admins List -->
+                <div class="card shadow-sm border-0 rounded-4 mt-4">
+                    <div class="card-header border-bottom-0 pb-0">
+                        <h5 class="fw-bold">Community Admins</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column gap-3">
+                            <!-- Owner first -->
+                            <div class="d-flex align-items-center">
+                                <a href="{% url 'user_profile' community.userid.userid %}" class="text-decoration-none d-flex align-items-center">
+                                    {% if community.userid.profile %}
+                                    <img src="{{ community.userid.profile.url }}" alt="owner" class="avatar-40 rounded-circle border shadow-sm" style="object-fit:cover;">
+                                    {% else %}
+                                    <div class="avatar-40 rounded-circle bg-danger text-white d-flex align-items-center justify-content-center fw-bold shadow-sm">
+                                        {{ community.userid.username|make_list|first|upper }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="ms-3">
+                                        <h6 class="mb-0 fw-bold text-dark">{{ community.userid.username }}</h6>
+                                        <span class="badge bg-danger-subtle text-danger small" style="font-size: 0.7rem;">Founder</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- Other Admins -->
+                            {% for admin in admins %}
+                                {% if admin.userid.userid != community.userid.userid %}
+                                <div class="d-flex align-items-center">
+                                    <a href="{% url 'user_profile' admin.userid.userid %}" class="text-decoration-none d-flex align-items-center">
+                                        {% if admin.userid.profile %}
+                                        <img src="{{ admin.userid.profile.url }}" alt="admin" class="avatar-40 rounded-circle border shadow-sm" style="object-fit:cover;">
+                                        {% else %}
+                                        <div class="avatar-40 rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center fw-bold shadow-sm">
+                                            {{ admin.userid.username|make_list|first|upper }}
+                                        </div>
+                                        {% endif %}
+                                        <div class="ms-3">
+                                            <h6 class="mb-0 fw-bold text-dark">{{ admin.userid.username }}</h6>
+                                            <span class="badge bg-warning-subtle text-warning-emphasis small" style="font-size: 0.7rem;">Admin</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Meetups Card -->
+                <div class="card shadow-sm border-0 rounded-4 mt-4">
+                    <div class="card-header border-bottom-0 pb-0 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Upcoming Meetups</h5>
+                        {% if meetup_count > 0 %}
+                        <span class="badge bg-primary rounded-pill">{{ meetup_count }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% for m in upcoming_meetups %}
+                        <div class="d-flex align-items-start gap-3 {% if not forloop.last %}mb-4 pb-2 border-bottom{% endif %}">
+                            <div class="text-center bg-primary-subtle text-primary rounded-3 px-2 py-1" style="min-width: 50px;">
+                                <div class="fw-bold" style="font-size: 1.1rem; line-height: 1;">{{ m.meeting_date|date:"d" }}</div>
+                                <div class="small text-uppercase" style="font-size: 0.7rem;">{{ m.meeting_date|date:"M" }}</div>
+                            </div>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <h6 class="mb-1 fw-bold" style="overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">
+                                    <a href="{% url 'meetup_detail' m.meetupid %}" class="text-dark text-decoration-none">{{ m.title }}</a>
+                                </h6>
+                                <p class="mb-1 text-muted small"><i class="las la-clock me-1"></i>{{ m.meeting_date|date:"h:i A" }}</p>
+                                <span class="badge {% if m.meetup_type == 'internal' %}bg-primary-subtle text-primary{% elif m.meetup_type == 'external' %}bg-info-subtle text-info{% else %}bg-success-subtle text-success{% endif %} rounded-pill px-2 py-1" style="font-size: 0.65rem;">
+                                    {% if m.meetup_type == 'internal' %}<i class="las la-video me-1"></i>Internal Video{% elif m.meetup_type == 'external' %}<i class="las la-link me-1"></i>External Link{% else %}<i class="las la-map-marker me-1"></i>Offline{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-3">
+                            <i class="las la-calendar-times text-muted fs-1"></i>
+                            <p class="text-muted small mb-0 mt-2">No upcoming meetups scheduled.</p>
+                            {% if is_admin %}
+                            <a href="{% url 'create_meetup' community.communityid %}" class="btn btn-sm btn-link text-primary mt-1 text-decoration-none fw-bold">Schedule one now</a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        
+                        {% if meetup_count > 0 %}
+                        <div class="mt-3 text-center">
+                            <a href="{% url 'meetup_list' %}?category={{ community.categoryid.categoryid }}" class="text-primary small text-decoration-none fw-bold">View all meetups <i class="las la-angle-right ms-1"></i></a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9 col-md-8">
+                <!-- Tabbed Navigation -->
+                <div class="card shadow-sm border-0 mb-4 rounded-4">
+                    <div class="card-body p-0">
+                        <ul class="nav nav-pills nav-fill p-2 gap-2" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active fw-bold rounded-pill" href="{% url 'community_detail' community.communityid %}">
+                                    <i class="las la-newspaper fs-5 me-1"></i> Posts
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold rounded-pill text-muted hover-bg-light" href="{% url 'community_chat' community.communityid %}">
+                                    <i class="las la-comments fs-5 me-1"></i> Group Chat
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Create Post options moved to separate Add Post page -->
+
+
+                <!-- Posts Feed -->
+                {% for post in posts %}
+                <div class="card shadow-sm border-0 mb-4 rounded-4 hover-shadow transition" id="post-{{ post.postid }}">
+                    <div class="card-body p-4">
+                        <!-- Post Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                {% if post.userid.profile %}
+                                <img src="{{ post.userid.profile.url }}" alt="avatar" class="avatar-50 rounded-circle border shadow-sm" style="object-fit:cover;">
+                                {% else %}
+                                <div class="avatar-50 rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fs-5 fw-bold shadow-sm">
+                                    {{ post.userid.username|make_list|first|upper }}
+                                </div>
+                                {% endif %}
+                                <div class="ms-3">
+                                    <h6 class="mb-0 fw-bold text-dark d-inline-block">{{ post.userid.username }}</h6>
+                                    <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>{{ post.createddt|timesince }} ago</p>
+                                </div>
+                            </div>
+                            <!-- Post Action Menu -->
+                            <div class="dropdown">
+                                <a href="#" class="text-secondary" id="postActionMenu{{ post.postid }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="ri-more-fill fs-4"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="postActionMenu{{ post.postid }}">
+                                    {% if request.session.userid|add:"0" == post.userid.userid %}
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2" href="javascript:void(0)" 
+                                           onclick="openEditModal('{{ post.postid }}', '{{ post.posttitle|escapejs }}', '{{ post.description|escapejs }}', '{{ community.communityid }}')">
+                                            <i class="ri-edit-line"></i> Edit Post
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="{% url 'delete_post' community.communityid post.postid %}" onclick="return confirm('Are you sure you want to delete this post?')">
+                                            <i class="ri-delete-bin-line"></i> Delete Post
+                                        </a>
+                                    </li>
+                                    {% elif is_admin %}
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="{% url 'delete_post' community.communityid post.postid %}" onclick="return confirm('Are you sure you want to delete this post?')">
+                                            <i class="ri-delete-bin-line"></i> Delete Post
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                            <i class="ri-flag-line"></i> Report
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Post Content -->
+                        <h4 class="fw-bold mb-2" style="overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">{{ post.posttitle }}</h4>
+                        
+                        {% if post.thumbnail %}
+                        <div class="post-img mb-4 rounded-3 overflow-hidden shadow-sm border bg-light">
+                            {% if post.is_video %}
+                            <video src="{{ post.thumbnail.url }}" class="img-fluid w-100" controls style="max-height: 600px; object-fit: contain;"></video>
+                            {% else %}
+                            <img src="{{ post.thumbnail.url }}" class="img-fluid w-100" alt="post-img" style="max-height: 600px; object-fit: contain;">
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Interactions (Like, Comment) -->
+                        <div class="d-flex align-items-center justify-content-between border-top border-bottom py-3 mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <!-- Like Button -->
+                                <button type="button" id="like-btn-{{ post.postid }}"
+                                    onclick="toggleLike({{ post.postid }})"
+                                    class="btn {% if post.postid in user_likes %}btn-primary-subtle text-primary{% else %}btn-light text-muted{% endif %} rounded-pill px-3 py-1 d-flex align-items-center gap-2 fw-semibold border-0 transition hover-shadow"
+                                    style="font-size: 0.95rem;">
+                                    <i id="like-icon-{{ post.postid }}"
+                                        class="{% if post.postid in user_likes %}las la-thumbs-up{% else %}lar la-thumbs-up{% endif %} fs-4 m-0"></i>
+                                    <span id="like-count-{{ post.postid }}">{{ post.like_set.count }} Likes</span>
+                                </button>
+
+                                <!-- Comment Count -->
+                                <button class="btn btn-light text-muted rounded-pill px-3 py-1 d-flex align-items-center gap-2 fw-semibold border-0 transition hover-shadow hover-primary" type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.postid }}" aria-expanded="{% if post.comment_set.count > 0 %}true{% else %}false{% endif %}" aria-controls="comments-{{ post.postid }}" style="font-size: 0.95rem;">
+                                    <i class="lar la-comment fs-4 m-0"></i>
+                                    <span>{{ post.comment_set.count }} Comments</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 post-desc-container" style="overflow-wrap: break-word; word-wrap: break-word;">
+                            <span class="text-body text-opacity-75 desc-short" style="line-height: 1.6;" id="desc-short-{{ post.postid }}">{{ post.description|truncatechars:150 }}</span>
+                            <span class="text-body text-opacity-75 desc-full d-none" style="line-height: 1.6;" id="desc-full-{{ post.postid }}">{{ post.description|linebreaksbr }}</span>
+                            {% if post.description|length > 150 %}
+                            <a href="javascript:void(0)" onclick="toggleDesc({{ post.postid }})" id="desc-toggle-{{ post.postid }}" class="text-primary text-decoration-none fw-bold ms-1" style="font-size: 0.9rem;">View more</a>
+                            {% endif %}
+                        </div>
+
+                        <!-- Comments Section -->
+                        <div class="collapse {% if post.comment_set.count > 0 %}show{% endif %}" id="comments-{{ post.postid }}">
+                            <div class="comments-list mt-3">
+                                {% for comment in post.comment_set.all|dictsortreversed:"createddt" %}
+                                <div class="d-flex mb-3">
+                                    <div class="me-3">
+                                        <img src="{% if comment.userid.profile %}{{ comment.userid.profile.url }}{% else %}../../assets/images/user/1.jpg{% endif %}" class="avatar-35 rounded-circle shadow-sm" alt="userimg" style="object-fit:cover;">
+                                    </div>
+                                    <div class="bg-light p-3 rounded-4 flex-grow-1 position-relative">
+                                        <h6 class="mb-1 fw-bold fs-6">{{ comment.userid.username }}</h6>
+                                        <p class="mb-0 text-dark small" style="line-height: 1.5;">{{ comment.comment }}</p>
+                                        <span class="text-muted" style="font-size: 0.70rem; position: absolute; top: 10px; right: 15px;">{{ comment.createddt|timesince }} ago</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Add Comment Form -->
+                            {% if is_member or is_admin %}
+                            <div class="d-flex align-items-center mt-3 pt-2 border-top">
+                                <img src="{% if current_user.profile %}{{ current_user.profile.url }}{% else %}{% static 'assets/images/user/1.jpg' %}{% endif %}" alt="user" class="avatar-35 rounded-circle shadow-sm me-3" style="object-fit:cover;">
+                                <form method="post" action="{% url 'add_comment' post.postid %}" class="flex-grow-1 d-flex align-items-center gap-2">
+                                    {% csrf_token %}
+                                    <input type="text" name="comment" class="form-control rounded-pill shadow-sm border-light bg-light" placeholder="Write a comment..." required>
+                                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+                                        <span>Send</span>
+                                        <i class="las la-paper-plane"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+                {% empty %}
+                <div class="card shadow-sm border-0 rounded-4 text-center py-5">
+                    <div class="card-body">
+                        <i class="las la-comment-slash text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="mt-3 text-muted fw-bold">No posts in this group yet.</h4>
+                        {% if is_member or is_admin %}
+                        <p class="text-muted">Be the first to create one!</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Members Modal -->
+<div class="modal fade" id="membersModal" tabindex="-1" aria-labelledby="membersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="membersModalLabel">Community Members</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for mem in community_members %}
+                    <li class="list-group-item d-flex align-items-center justify-content-between py-3">
+                        <div class="d-flex align-items-center">
+                            {% if mem.userid.profile %}
+                            <img src="{{ mem.userid.profile.url }}" class="rounded-circle me-3 shadow-sm" alt="user" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle me-3 bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 50px; height: 50px; font-weight: bold; font-size: 1.2rem;">
+                                {{ mem.userid.username|make_list|first|upper }}
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-0 fw-bold text-dark">{{ mem.userid.username }}</h6>
+                                <p class="mb-0 text-muted small">
+                                    {% if mem.userid.userid == community.userid.userid %}
+                                    <span class="badge bg-danger shadow-sm">Creator</span>
+                                    {% elif mem.role == 'admin' %}
+                                    <span class="badge bg-warning text-dark shadow-sm">Admin</span>
+                                    {% else %}
+                                    Member
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <a href="{% url 'user_profile' mem.userid.userid %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">View Profile</a>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center py-4 text-muted">No members yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+        transform: translateY(-2px);
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+    .hover-danger:hover {
+        color: #dc3545 !important;
+    }
+    .hover-primary:hover {
+        color: #0d6efd !important;
+    }
+    .upload-btn-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+    .upload-btn-wrapper input[type=file] {
+        font-size: 100px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+    }
+</style>
+{% endblock %}

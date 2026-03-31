@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Meeting Not Started - UniVo{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card border-0 shadow-lg rounded-4 text-center p-5" style="max-width: 600px;">
+        <div class="card-body">
+            <div class="mb-4">
+                <div class="d-inline-flex justify-content-center align-items-center bg-primary-subtle text-primary rounded-circle" style="width: 100px; height: 100px;">
+                    <i class="las la-clock" style="font-size: 50px;"></i>
+                </div>
+            </div>
+            
+            <h2 class="fw-bold mb-3">Meeting Hasn't Started Yet</h2>
+            <p class="text-muted fs-5 mb-4">
+                The meetup <strong>"{{ meetup.title }}"</strong> is scheduled for <br>
+                <span class="text-primary fw-semibold">{{ meetup.meeting_date|date:"F d, Y \a\t h:i A" }}</span>.
+            </p>
+            
+            <div class="alert alert-info border-0 bg-info-subtle rounded-3 mb-4 text-start">
+                <div class="d-flex align-items-start gap-3">
+                    <i class="las la-info-circle fs-4 mt-1"></i>
+                    <div>
+                        <strong>Why am I seeing this?</strong><br>
+                        Users are only allowed to join the meeting room strictly at or after the scheduled start time. Please return later!
+                    </div>
+                </div>
+            </div>
+            
+            <a href="{% url 'meetup_detail' meetup.meetupid %}" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                <i class="las la-arrow-left me-1"></i> Return to Meetup Details
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

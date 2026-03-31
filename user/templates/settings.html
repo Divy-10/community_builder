@@ -1,0 +1,475 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<style>
+    .settings-nav .nav-link {
+        font-weight: 500;
+        color: #555;
+        border-radius: 12px;
+        padding: 12px 20px;
+        margin-bottom: 5px;
+        text-align: left;
+        transition: all 0.3s ease;
+    }
+    .settings-nav .nav-link i {
+        width: 24px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    .settings-nav .nav-link.active {
+        background-color: var(--bs-primary);
+        color: #fff;
+    }
+    .settings-nav .nav-link:hover:not(.active) {
+        background-color: rgba(15, 40, 84, 0.05);
+        color: var(--bs-primary);
+    }
+    .settings-panel {
+        display: none;
+        animation: fadeIn 0.4s;
+    }
+    .settings-panel.active {
+        display: block;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .form-switch .form-check-input {
+        width: 3em;
+        height: 1.5em;
+        cursor: pointer;
+    }
+    .form-switch {
+        padding-left: 3.5em;
+    }
+    .profile-img-update {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    .profile-img-update:hover::after {
+        content: 'Change';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        text-align: center;
+        font-size: 12px;
+        padding: 5px 0;
+    }
+</style>
+
+<div class="row">
+    <!-- Sidebar Navigation -->
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 sticky-top" style="top: 80px; z-index: 100;">
+            <div class="card-body p-3">
+                <h5 class="fw-bold px-3 mb-3">Settings</h5>
+                <div class="nav flex-column nav-pills settings-nav" id="settings-tab" role="tablist" aria-orientation="vertical">
+                    <button class="nav-link active" onclick="switchTab('account')" id="tab-account" type="button"><i class="ri-user-settings-line"></i> Account</button>
+                    <button class="nav-link" onclick="switchTab('appearance')" id="tab-appearance" type="button"><i class="ri-paint-brush-line"></i> Appearance</button>
+                    <button class="nav-link" onclick="switchTab('notifications')" id="tab-notifications" type="button"><i class="ri-notification-3-line"></i> Notifications</button>
+                    <button class="nav-link" onclick="switchTab('regional')" id="tab-regional" type="button"><i class="ri-global-line"></i> Language & Region</button>
+                    <button class="nav-link" onclick="switchTab('privacy')" id="tab-privacy" type="button"><i class="ri-lock-line"></i> Privacy</button>
+                    <button class="nav-link" onclick="switchTab('advanced')" id="tab-advanced" type="button"><i class="ri-settings-4-line"></i> Advanced</button>
+                    <hr class="my-2 text-muted">
+                    <button class="nav-link text-danger" onclick="switchTab('delete')" id="tab-delete" type="button"><i class="ri-delete-bin-line"></i> Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Panels -->
+    <div class="col-lg-9">
+        
+        <!-- 1. Account Center -->
+        <div class="settings-panel active" id="panel-account">
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-header border-bottom-0 bg-transparent pt-4 px-4">
+                    <h4 class="card-title fw-bold">Edit Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_profile">
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <label class="profile-img-update me-4">
+                                {% if current_user.profile %}
+                                <img src="{{ current_user.profile.url }}" id="profilePreview" class="w-100 h-100 object-fit-cover shadow-sm">
+                                {% else %}
+                                <img src="{% static 'assets/images/user/1.jpg' %}" id="profilePreview" class="w-100 h-100 object-fit-cover shadow-sm">
+                                {% endif %}
+                                <input type="file" name="profile_pic" class="d-none" onchange="previewProfileImage(this)">
+                            </label>
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ current_user.username }}</h6>
+                                <p class="text-muted small mb-0">Update your profile picture</p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Name</label>
+                                <input type="text" name="name" class="form-control rounded-3 bg-light border-0" value="{{ current_user.username }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" name="email" class="form-control rounded-3 bg-light border-0" value="{{ current_user.email }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Phone</label>
+                                <input type="text" name="phone" class="form-control rounded-3 bg-light border-0" value="{{ current_user.phone|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Bio</label>
+                            <textarea name="bio" class="form-control rounded-3 bg-light border-0" rows="3">{{ current_user.bio }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Save Profile</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Password Change -->
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header border-bottom-0 bg-transparent pt-4 px-4">
+                    <h5 class="card-title fw-bold">Change Password</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{% url 'settings' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="change_password">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Current Password</label>
+                                <input type="password" name="current_password" class="form-control rounded-3 bg-light border-0" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">New Password</label>
+                                <input type="password" name="new_password" class="form-control rounded-3 bg-light border-0" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold mt-2">Update Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Appearance -->
+        <div class="settings-panel" id="panel-appearance">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header border-bottom-0 bg-transparent pt-4 px-4">
+                    <h4 class="card-title fw-bold">Appearance</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form id="appearanceForm" onchange="saveAjax('appearanceForm', 'update_appearance')">
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 bg-light">
+                            <div>
+                                <h6 class="fw-bold mb-1">Dark Mode</h6>
+                                <p class="text-muted small mb-0">Easier on the eyes in low light conditions</p>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="dark_mode" {% if settings.dark_mode %}checked{% endif %}>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 p-3 rounded-3 bg-light">
+                            <h6 class="fw-bold mb-3">Theme Color</h6>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="theme_color" value="blue" id="themeBlue" {% if settings.theme_color == 'blue' %}checked{% endif %}>
+                                    <label class="form-check-label fw-semibold text-primary" for="themeBlue">Ocean Blue</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="theme_color" value="purple" id="themePurple" {% if settings.theme_color == 'purple' %}checked{% endif %}>
+                                    <label class="form-check-label fw-semibold text-purple" for="themePurple" style="color: purple;">Royal Purple</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="theme_color" value="green" id="themeGreen" {% if settings.theme_color == 'green' %}checked{% endif %}>
+                                    <label class="form-check-label fw-semibold text-success" for="themeGreen">Emerald Green</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 p-3 rounded-3 bg-light">
+                            <h6 class="fw-bold mb-3">Font Size</h6>
+                            <select name="font_size" class="form-select rounded-3 border-0 shadow-sm" style="max-width: 200px;">
+                                <option value="small" {% if settings.font_size == 'small' %}selected{% endif %}>Small</option>
+                                <option value="medium" {% if settings.font_size == 'medium' %}selected{% endif %}>Medium (Default)</option>
+                                <option value="large" {% if settings.font_size == 'large' %}selected{% endif %}>Large</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Notifications -->
+        <div class="settings-panel" id="panel-notifications">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header border-bottom-0 bg-transparent pt-4 px-4">
+                    <h4 class="card-title fw-bold">Notifications</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form id="notificationsForm" onchange="saveAjax('notificationsForm', 'update_notifications')">
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded-3 bg-light">
+                            <div>
+                                <h6 class="fw-bold mb-1">Email Notifications</h6>
+                                <p class="text-muted small mb-0">Receive daily summaries and important alerts</p>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded-3 bg-light">
+                            <div>
+                                <h6 class="fw-bold mb-1">Push Notifications</h6>
+                                <p class="text-muted small mb-0">Get live alerts on your device for chats and mentions</p>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="push_notifications" {% if settings.push_notifications %}checked{% endif %}>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded-3 bg-light">
+                            <div>
+                                <h6 class="fw-bold mb-1">Meetup Reminders</h6>
+                                <p class="text-muted small mb-0">Get reminded of upcoming community meetups</p>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="meetup_reminders" {% if settings.meetup_reminders %}checked{% endif %}>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 bg-light">
+                            <div>
+                                <h6 class="fw-bold mb-1">Community Updates</h6>
+                                <p class="text-muted small mb-0">New posts and updates from communities you joined</p>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="community_updates" {% if settings.community_updates %}checked{% endif %}>
+                            </div>
+                        </div>
+
+                        <div class="mb-2 p-3 rounded-3 bg-light">
+                            <h6 class="fw-bold mb-3">Notification Frequency</h6>
+                            <select name="notification_frequency" class="form-select rounded-3 border-0 shadow-sm" style="max-width: 250px;">
+                                <option value="instant" {% if settings.notification_frequency == 'instant' %}selected{% endif %}>Instant (As it happens)</option>
+                                <option value="daily" {% if settings.notification_frequency == 'daily' %}selected{% endif %}>Daily Digest</option>
+                                <option value="weekly" {% if settings.notification_frequency == 'weekly' %}selected{% endif %}>Weekly Summary</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Language & Region -->
+        <div class="settings-panel" id="panel-regional">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header border-bottom-0 bg-transparent pt-4 px-4">
+                    <h4 class="card-title fw-bold">Language & Region</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form id="regionalForm" onchange="saveAjax('regionalForm', 'update_regional')">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">Language</label>
+                                <select name="language" class="form-select bg-light border-0 rounded-3">
+                                    <option value="English" {% if settings.language == 'English' %}selected{% endif %}>English (US)</option>
+                                    <option value="Hindi" {% if settings.language == 'Hindi' %}selected{% endif %}>Hindi / हिन्दी</option>
+                                    <option value="Gujarati" {% if settings.language == 'Gujarati' %}selected{% endif %}>Gujarati / ગુજરાતી</option>
+                                    <option value="Spanish" {% if settings.language == 'Spanish' %}selected{% endif %}>Spanish / Español</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">Currency Format</label>
+                                <select name="currency_format" class="form-select bg-light border-0 rounded-3">
+                                    <option value="INR" {% if settings.currency_format == 'INR' %}selected{% endif %}>INR (₹)</option>
+                                    <option value="USD" {% if settings.currency_format == 'USD' %}selected{% endif %}>USD ($)</option>
+                                    <option value="EUR" {% if settings.currency_format == 'EUR' %}selected{% endif %}>EUR (€)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">Date & Time Format</label>
+                                <select name="date_time_format" class="form-select bg-light border-0 rounded-3">
+                                    <option value="DD/MM/YYYY" {% if settings.date_time_format == 'DD/MM/YYYY' %}selected{% endif %}>DD/MM/YYYY (31/12/2026)</option>
+                                    <option value="MM/DD/YYYY" {% if settings.date_time_format == 'MM/DD/YYYY' %}selected{% endif %}>MM/DD/YYYY (12/31/2026)</option>
+                                    <option value="YYYY-MM-DD" {% if settings.date_time_format == 'YYYY-MM-DD' %}selected{% endif %}>YYYY-MM-DD (2026-12-31)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Privacy -->
+        <div class="settings-panel" id="panel-privacy">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header border-bottom-0 bg-transparent pt-4 px-4">
+                    <h4 class="card-title fw-bold">Privacy Settings</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form id="privacyForm" onchange="saveAjax('privacyForm', 'update_privacy')">
+                        
+                        <div class="mb-4 p-3 rounded-3 bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">Profile Visibility</h6>
+                                <p class="text-muted small mb-0">Who can see your profile details</p>
+                            </div>
+                            <select name="profile_visibility" class="form-select rounded-3 border-0 shadow-sm" style="max-width: 150px;">
+                                <option value="public" {% if settings.profile_visibility == 'public' %}selected{% endif %}>Public</option>
+                                <option value="private" {% if settings.profile_visibility == 'private' %}selected{% endif %}>Private</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded-3 bg-light">
+                            <div>
+                                <h6 class="fw-bold mb-1">Data Usage Preferences</h6>
+                                <p class="text-muted small mb-0">Allow us to use your activity to improve platform features</p>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="data_usage_consent" {% if settings.data_usage_consent %}checked{% endif %}>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Advanced -->
+        <div class="settings-panel" id="panel-advanced">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header border-bottom-0 bg-transparent pt-4 px-4">
+                    <h4 class="card-title fw-bold">Advanced Settings</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form id="advancedForm" onchange="saveAjax('advancedForm', 'update_advanced')">
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 bg-light">
+                            <div>
+                                <h6 class="fw-bold mb-1">Two-Factor Authentication (2FA)</h6>
+                                <p class="text-secondary small mb-0">Add an extra layer of security to your account.</p>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="two_factor_auth" {% if settings.two_factor_auth %}checked{% endif %}>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded-3 bg-light">
+                            <div>
+                                <h6 class="fw-bold mb-1">AI-based Recommendations</h6>
+                                <p class="text-muted small mb-0">Smart feed, community and friends suggestions</p>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="ai_recommendations" {% if settings.ai_recommendations %}checked{% endif %}>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Delete -->
+        <div class="settings-panel" id="panel-delete">
+            <div class="card shadow-sm border-0 rounded-4 border-danger border border-2">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="ri-error-warning-line text-danger" style="font-size: 60px;"></i>
+                    </div>
+                    <h4 class="fw-bold text-danger mb-3">Delete Account</h4>
+                    <p class="text-muted mb-4">Once you delete your account, there is no going back. All your data, posts, and memberships will be permanently erased. Please be certain.</p>
+                    <form action="{% url 'delete_profile' %}" method="POST" onsubmit="return confirm('Are you absolutely sure you want to delete your profile? This action cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger rounded-pill px-5 fw-bold py-2">Permanently Delete My Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Tab Switching Logic
+    function switchTab(tabId) {
+        // Reset Nav links
+        document.querySelectorAll('.settings-nav .nav-link').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+
+        // Reset Panels
+        document.querySelectorAll('.settings-panel').forEach(el => el.classList.remove('active'));
+        document.getElementById('panel-' + tabId).classList.add('active');
+    }
+
+    // Handle AJAX forms for quick toggles
+    function saveAjax(formId, actionName) {
+        const form = document.getElementById(formId);
+        const formData = new FormData(form);
+        const data = { action: actionName };
+        
+        // Handle checkboxes correctly for AJAX
+        form.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+            data[chk.name] = chk.checked;
+        });
+        
+        // Handle selects and radios
+        form.querySelectorAll('select, input[type="radio"]:checked, input[type="text"]').forEach(el => {
+            data[el.name] = el.value;
+        });
+
+        // Send fetch request
+        fetch("{% url 'settings' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(response => {
+            if(response.success) {
+                if(typeof showToast === 'function') {
+                    showToast(response.msg, 'success');
+                } else {
+                    alert(response.msg);
+                }
+            } else {
+                if(typeof showToast === 'function') {
+                    showToast(response.msg || "Error updating settings", 'danger');
+                }
+            }
+        })
+        .catch(err => {
+            console.error(err);
+        });
+    }
+
+    // Image preview helper
+    function previewProfileImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profilePreview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}

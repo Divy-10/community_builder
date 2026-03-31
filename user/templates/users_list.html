@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Find Friends{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="header-title">
+                    <h4 class="card-title">User Directory</h4>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for u in users %}
+                    <div class="col-md-6 col-lg-6 mb-3">
+                        <div class="card shadow-none border">
+                            <div class="card-body text-center">
+                                <a href="{% url 'user_profile' u.userid %}">
+                                    {% if u.profile %}
+                                    <img src="{{ u.profile.url }}" alt="profile-img" class="rounded-circle img-fluid avatar-100 mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                                    {% else %}
+                                    <img src="{% static 'assets/images/user/1.jpg' %}" alt="profile-img" class="rounded-circle img-fluid avatar-100 mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'user_profile' u.userid %}" class="text-dark fade-in text-decoration-none">
+                                    <h5 class="fw-bold">{{ u.username }}</h5>
+                                </a>
+                                {% if u.bio %}
+                                    <p class="text-muted small mb-3 px-2">{{ u.bio|truncatechars:90 }}</p>
+                                {% else %}
+                                    <p class="text-muted small mb-3 px-2 fst-italic">No bio available</p>
+                                {% endif %}
+                                
+                                <div class="d-flex justify-content-center gap-2 mt-auto">
+                                    {% if u.userid in following_ids %}
+                                        <button onclick="toggleCardFollow(this, {{ u.userid }})" class="btn btn-secondary rounded-pill px-4 flex-grow-1 shadow-sm transition">
+                                            <i class="ri-user-unfollow-line me-1"></i> Unfollow
+                                        </button>
+                                    {% else %}
+                                        <button onclick="toggleCardFollow(this, {{ u.userid }})" class="btn btn-primary rounded-pill px-4 flex-grow-1 shadow-sm transition">
+                                            <i class="ri-user-add-line me-1"></i> Follow
+                                        </button>
+                                    {% endif %}
+                                    
+                                    <button type="button" class="btn btn-success rounded-pill px-4 flex-grow-1 shadow-sm transition" data-bs-toggle="modal" data-bs-target="#inviteModal{{ u.userid }}" style="background-color: #00d2aa; border-color: #00d2aa;">
+                                        <i class="ri-mail-send-line me-1"></i> Invite
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <img src="{% static 'assets/images/user/1.jpg' %}" alt="no-users" class="img-fluid mb-3 opacity-50" style="width: 150px;">
+                        <h5 class="text-muted">No other users found.</h5>
+                        <p class="text-muted small">Try searching for a different name or clearing filters.</p>
+                        <a href="{% url 'users_list' %}" class="btn btn-primary rounded-pill px-4 mt-3">View All Users</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<!-- All Invite Modals (Moved to Global Scope) -->
+{% for u in users %}
+    <div class="modal fade" id="inviteModal{{ u.userid }}" tabindex="-1" aria-labelledby="inviteModalLabel{{ u.userid }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header bg-primary text-white border-0 py-3 px-4">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="inviteModalLabel{{ u.userid }}">
+                        <i class="ri-community-line fs-4"></i> Invite to Community
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form onsubmit="submitInvite(event, {{ u.userid }})">
+                    {% csrf_token %}
+                    <div class="modal-body p-4">
+                        <div class="text-center mb-4">
+                            {% if u.profile %}
+                                <img src="{{ u.profile.url }}" alt="user-img" class="rounded-circle border border-3 border-light shadow-sm mb-3" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'assets/images/user/1.jpg' %}" alt="user-img" class="rounded-circle border border-3 border-light shadow-sm mb-3" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% endif %}
+                            <h6 class="fw-bold mb-1">Invite {{ u.username }}</h6>
+                            <p class="text-muted small mb-0">Select one of your communities to send an invitation.</p>
+                        </div>
+
+                        {% if comms_to_invite %}
+                            <div class="mb-3">
+                                <label for="communitySelect{{ u.userid }}" class="form-label small fw-bold text-muted text-uppercase ls-1">Select Community</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 rounded-start-pill px-3"><i class="ri-group-line text-primary"></i></span>
+                                    <select class="form-select bg-light border-start-0 rounded-end-pill px-3 py-2 cursor-pointer shadow-none" id="communitySelect{{ u.userid }}" name="community_id" required>
+                                        <option value="" disabled selected>Choose a community...</option>
+                                        {% for c in comms_to_invite %}
+                                            <option value="{{ c.communityid }}">{{ c.communitytitle }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-soft-warning border-0 rounded-4 d-flex align-items-center gap-3 p-3">
+                                <i class="ri-error-warning-line fs-3 text-warning"></i>
+                                <p class="mb-0 small">You need to join or create a community first before you can invite others!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4 fw-semibold text-muted transition hover-shadow" data-bs-dismiss="modal">Cancel</button>
+                        {% if comms_to_invite %}
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold transition hover-shadow">
+                                Send Invite <i class="ri-send-plane-fill ms-1"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleCardFollow(btn, targetId) {
+    const originalContent = btn.innerHTML;
+    btn.disabled = true;
+    
+    fetch(`/follow/${targetId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            if(data.following) {
+                btn.className = 'btn btn-secondary rounded-pill px-4 flex-grow-1 shadow-sm transition';
+                btn.innerHTML = '<i class="ri-user-unfollow-line me-1"></i> Unfollow';
+                showToast(data.message, 'success');
+            } else {
+                btn.className = 'btn btn-primary rounded-pill px-4 flex-grow-1 shadow-sm transition';
+                btn.innerHTML = '<i class="ri-user-add-line me-1"></i> Follow';
+                showToast(data.message, 'info');
+            }
+        }
+    })
+    .finally(() => {
+        btn.disabled = false;
+    });
+}
+
+function submitInvite(event, targetId) {
+    event.preventDefault();
+    const form = event.target;
+    const btn = form.querySelector('button[type="submit"]');
+    const originalContent = btn.innerHTML;
+    const formData = new FormData(form);
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Sending...';
+    
+    fetch(`/invite_user/${targetId}/`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            // Close modal robustly
+            const modalEl = document.getElementById(`inviteModal${targetId}`);
+            let modal = bootstrap.Modal.getInstance(modalEl);
+            if (!modal) {
+                modal = new bootstrap.Modal(modalEl);
+            }
+            modal.hide();
+            
+            // Manually clean up any stuck backdrops
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(b => b.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.message, 'danger');
+        }
+    })
+    .catch(err => {
+        showToast('Error sending invitation. Please try again.', 'danger');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalContent;
+    });
+}
+</script>
+{% endblock %}
+
+{% block right_sidebar %}
+<div class="iq-sidebar-right sidebar-default">
+    <div class="card shadow-none h-100 mb-0 border-0 bg-transparent">
+        <div class="card-header bg-transparent py-3 px-0">
+            <h5 class="card-title fw-bold d-flex align-items-center gap-2 mb-0">
+                <i class="las la-filter text-primary"></i> Filter Users
+            </h5>
+        </div>
+        <div class="card-body px-0">
+            <form method="get" action="{% url 'users_list' %}">
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">User Name</label>
+                    <input type="text" class="filter-input transition rounded-pill px-3 py-2 w-100" name="search_name" value="{{ search_name }}" placeholder="Search by name...">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">City</label>
+                    <select class="filter-input transition rounded-pill px-3 py-2 w-100" name="search_city">
+                        <option value="">All Cities</option>
+                        {% for city in cities %}
+                        <option value="{{ city.cityid }}" {% if search_city == city.cityid|stringformat:"i" %}selected{% endif %}>{{ city.cityname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mt-4 pt-3">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold hover-shadow transition mb-2 py-2">Apply Filters</button>
+                    <a href="{% url 'users_list' %}" class="btn btn-light w-100 rounded-pill fw-bold text-muted hover-shadow transition py-2">Clear All</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block content_class %}has-right-sidebar{% endblock %}

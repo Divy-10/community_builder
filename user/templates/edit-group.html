@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-inner" id="page_layout">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-0 pt-4 pb-0 px-4">
+                        <div class="header-title">
+                            <h4 class="card-title fw-bold">Edit Community Settings</h4>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted mb-4">Update the details and images for <strong>{{ community.communitytitle }}</strong>.</p>
+                        
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="form-group mb-4">
+                                <label class="form-label fw-bold" for="title">Community Title:</label>
+                                <input type="text" class="form-control rounded-3 bg-light border-light shadow-sm" id="title" name="title" required value="{{ community.communitytitle }}">
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <label class="form-label fw-bold" for="description">Description:</label>
+                                <textarea class="form-control rounded-3 bg-light border-light shadow-sm" id="description" name="description" rows="4" required>{{ community.discription }}</textarea>
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <label class="form-label fw-bold" for="category">Category:</label>
+                                <select class="form-select rounded-3 bg-light border-light shadow-sm" id="category" name="category" required>
+                                    <option value="" disabled>Select a category</option>
+                                    {% for cat in categories %}
+                                    <option value="{{ cat.categoryid }}" {% if community.categoryid.categoryid == cat.categoryid %}selected{% endif %}>{{ cat.categoryname }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <hr class="my-4">
+                            <h5 class="mb-3 fw-bold">Community Images</h5>
+                            <p class="text-muted small">Upload new images to replace the current ones. Leave blank to keep existing images.</p>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-bold" for="thumbnail">Profile Thumbnail (Optional):</label>
+                                        <div class="d-flex align-items-center gap-3 mb-2">
+                                            {% if community.thumbnail %}
+                                            <img src="{{ community.thumbnail.url }}" alt="Current Thumbnail" class="rounded-circle shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+                                            {% endif %}
+                                            <input type="file" class="form-control form-control-sm rounded-3 bg-light border-light shadow-sm w-100" id="thumbnail" name="thumbnail">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-bold" for="background_image">Background Cover (Optional):</label>
+                                        <div class="d-flex flex-column gap-2 mb-2">
+                                            {% if community.background_image %}
+                                            <div class="rounded-3 overflow-hidden shadow-sm" style="height: 50px; width: 100%;">
+                                                <img src="{{ community.background_image.url }}" alt="Current Cover" class="w-100 h-100" style="object-fit: cover;">
+                                            </div>
+                                            {% endif %}
+                                            <input type="file" class="form-control form-control-sm rounded-3 bg-light border-light shadow-sm w-100" id="background_image" name="background_image">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2 pt-3 border-top mt-4">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Save Changes</button>
+                                <a href="{% url 'group_members' community.communityid %}" class="btn btn-light text-muted rounded-pill px-4 fw-bold">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

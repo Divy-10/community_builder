@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-inner" id="page_layout">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Create New Group</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>Fill out the form below to start a new community.</p>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label" for="title">Group Title:</label>
+                                <input type="text" class="form-control" id="title" name="title" required placeholder="Enter group title">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="thumbnail">Group Thumbnail (Profile):</label>
+                                <input type="file" class="form-control" id="thumbnail" name="thumbnail" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="background_image">Group Background Cover (Optional):</label>
+                                <input type="file" class="form-control" id="background_image" name="background_image">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="description">Description:</label>
+                                <textarea class="form-control" id="description" name="description" rows="4" required placeholder="What is this group about?"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="category">Category:</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <option value="" disabled selected>Select a category</option>
+                                    {% for cat in categories %}
+                                    <option value="{{ cat.categoryid }}">{{ cat.categoryname }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <!-- Paid Community Toggle -->
+                            <div class="form-group mb-4">
+                                <div class="form-check form-switch d-flex align-items-center">
+                                    <input class="form-check-input mt-0 me-2" type="checkbox" id="is_paid" name="is_paid" style="width: 40px; height: 20px; cursor: pointer;">
+                                    <label class="form-check-label fw-bold mb-0 text-dark" for="is_paid" style="cursor: pointer;">Paid Community</label>
+                                </div>
+                                <small class="text-muted d-block mt-1 ms-5">Require a payment to join this community.</small>
+                            </div>
+
+                            <!-- Price Input (Hidden by default) -->
+                            <div class="form-group" id="price_group" style="display: none; transition: all 0.3s ease;">
+                                <label class="form-label fw-bold" for="price">Community Price (₹):</label>
+                                <input type="number" class="form-control bg-light" id="price" name="price" min="1" placeholder="Enter amount">
+                            </div>
+                            
+                            <script>
+                                document.getElementById('is_paid').addEventListener('change', function() {
+                                    var priceGroup = document.getElementById('price_group');
+                                    var priceInput = document.getElementById('price');
+                                    if (this.checked) {
+                                        priceGroup.style.display = 'block';
+                                        priceInput.required = true;
+                                    } else {
+                                        priceGroup.style.display = 'none';
+                                        priceInput.required = false;
+                                        priceInput.value = '';
+                                    }
+                                });
+                            </script>
+
+                            <button type="submit" class="btn btn-primary mt-3">Create Group</button>
+                            <a href="{% url 'group' %}" class="btn bg-danger-subtle mt-3 text-danger">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

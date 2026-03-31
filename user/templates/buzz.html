@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Buzz Feed -->
+                <!-- Redirected to separate Add Post page -->
+
+
+                {% if has_following %}
+                <!-- Posts Feed -->
+                {% for post in posts %}
+                <div class="card shadow-sm border-0 mb-4 rounded-4 hover-shadow transition" id="post-{{ post.postid }}">
+                    <div class="card-body p-4">
+                        <!-- Post Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                {% if post.userid.profile %}
+                                <img src="{{ post.userid.profile.url }}" alt="avatar" class="avatar-50 rounded-circle border shadow-sm" style="object-fit:cover;">
+                                {% else %}
+                                <div class="avatar-50 rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fs-5 fw-bold shadow-sm">
+                                    {{ post.userid.username|make_list|first|upper }}
+                                </div>
+                                {% endif %}
+                                <div class="ms-3">
+                                    <h6 class="mb-0 fw-bold text-dark d-inline-block">{{ post.userid.username }}</h6>
+                                    <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>{{ post.createddt|timesince }} ago</p>
+                                </div>
+                            </div>
+                            <!-- Post Action Menu -->
+                            <div class="dropdown position-absolute" style="top: 20px; right: 20px; z-index: 10;">
+                                <a href="#" class="text-secondary" id="postActionMenu{{ post.postid }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="ri-more-fill fs-4"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="postActionMenu{{ post.postid }}">
+                                    {% if request.session.userid|add:"0" == post.userid.userid %}
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="javascript:void(0)" onclick="openEditModal('{{ post.postid }}', '{{ post.posttitle|escapejs }}', '{{ post.description|escapejs }}')">
+                                        <i class="ri-edit-line"></i> Edit Post
+                                    </a>
+                                    <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="{% url 'delete_buzz_post' post.postid %}" onclick="return confirm('Are you sure you want to delete this post?')">
+                                        <i class="ri-delete-bin-line"></i> Delete Post
+                                    </a>
+                                    {% else %}
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                        <i class="ri-flag-line"></i> Report
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Post Content -->
+                        <h4 class="fw-bold mb-2">{{ post.posttitle }}</h4>
+                        
+                        {% if post.thumbnail %}
+                        <div class="post-img-wrapper mb-4 rounded-3 overflow-hidden shadow-sm border bg-light" ondblclick="toggleLike({{ post.postid }}, true)">
+                            <i class="ri-heart-fill heart-overlay" id="heart-overlay-{{ post.postid }}"></i>
+                            {% if post.is_video %}
+                            <video src="{{ post.thumbnail.url }}" class="img-fluid w-100" controls style="max-height: 600px; object-fit: contain;"></video>
+                            {% else %}
+                            <img src="{{ post.thumbnail.url }}" class="img-fluid w-100" alt="post-img" style="max-height: 600px; object-fit: contain;">
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Interactions (Like, Comment) -->
+                        <div class="d-flex align-items-center justify-content-between border-top border-bottom py-3 mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <!-- Like Button -->
+                                <button type="button" id="like-btn-{{ post.postid }}"
+                                    onclick="toggleLike({{ post.postid }}, true)"
+                                    class="btn-interaction {% if post.postid in user_likes %}liked{% endif %}"
+                                    style="font-size: 0.95rem;">
+                                    <i id="like-icon-{{ post.postid }}"
+                                        class="{% if post.postid in user_likes %}ri-heart-fill{% else %}ri-heart-line{% endif %} m-0"></i>
+                                    <span id="like-count-{{ post.postid }}">{{ post.like_set.count }}</span>
+                                </button>
+
+                                <!-- Comment Count -->
+                                <button class="btn-interaction" type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.postid }}" aria-expanded="{% if post.comment_set.count > 0 %}true{% else %}false{% endif %}" aria-controls="comments-{{ post.postid }}" style="font-size: 0.95rem;">
+                                    <i class="ri-chat-3-line m-0"></i>
+                                    <span>{{ post.comment_set.count }}</span>
+                                </button>
+
+                                <!-- Share Button -->
+                                <button type="button" class="btn-interaction" onclick="openShareModal({{ post.postid }})" style="font-size: 0.95rem;">
+                                    <i class="ri-send-plane-2-line m-0"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 post-desc-container">
+                            <span class="text-body text-opacity-75 desc-short" style="line-height: 1.6;" id="desc-short-{{ post.postid }}">{{ post.description|truncatechars:150 }}</span>
+                            <span class="text-body text-opacity-75 desc-full d-none" style="line-height: 1.6;" id="desc-full-{{ post.postid }}">{{ post.description|linebreaksbr }}</span>
+                            {% if post.description|length > 150 %}
+                            <a href="javascript:void(0)" onclick="toggleDesc({{ post.postid }})" id="desc-toggle-{{ post.postid }}" class="text-primary text-decoration-none fw-bold ms-1" style="font-size: 0.9rem;">View more</a>
+                            {% endif %}
+                        </div>
+
+                        <!-- Comments Section -->
+                        <div class="collapse {% if post.comment_set.count > 0 %}show{% endif %}" id="comments-{{ post.postid }}">
+                            <div class="comments-list mt-3">
+                                {% for comment in post.comment_set.all|dictsortreversed:"createddt" %}
+                                {% if forloop.counter <= 2 %}
+                                <div class="d-flex mb-3">
+                                    <div class="me-3">
+                                        <img src="{% if comment.userid.profile %}{{ comment.userid.profile.url }}{% else %}../../assets/images/user/1.jpg{% endif %}" class="avatar-35 rounded-circle shadow-sm" alt="userimg" style="object-fit:cover;">
+                                    </div>
+                                    <div class="bg-light p-3 rounded-4 flex-grow-1 position-relative">
+                                        <h6 class="mb-1 fw-bold fs-6">{{ comment.userid.username }}</h6>
+                                        <p class="mb-0 text-dark small" style="line-height: 1.5;">{{ comment.comment }}</p>
+                                        <span class="text-muted" style="font-size: 0.70rem; position: absolute; top: 10px; right: 15px;">{{ comment.createddt|timesince }} ago</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if post.comment_set.count > 2 %}
+                                <div class="accordion accordion-flush" id="accordionComments{{ post.postid }}">
+                                    <div class="accordion-item bg-transparent border-0">
+                                        <h2 class="accordion-header" id="headingComments{{ post.postid }}">
+                                            <button class="accordion-button collapsed bg-transparent shadow-none px-0 py-2 text-muted fw-semibold small" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComments{{ post.postid }}" aria-expanded="false" aria-controls="collapseComments{{ post.postid }}">
+                                                View all {{ post.comment_set.count }} comments
+                                            </button>
+                                        </h2>
+                                        <div id="collapseComments{{ post.postid }}" class="accordion-collapse collapse" aria-labelledby="headingComments{{ post.postid }}" data-bs-parent="#accordionComments{{ post.postid }}">
+                                            <div class="accordion-body px-0 pt-2 pb-0">
+                                                {% for comment in post.comment_set.all|dictsortreversed:"createddt" %}
+                                                {% if forloop.counter > 2 %}
+                                                <div class="d-flex mb-3">
+                                                    <div class="me-3">
+                                                        <img src="{% if comment.userid.profile %}{{ comment.userid.profile.url }}{% else %}../../assets/images/user/1.jpg{% endif %}" class="avatar-35 rounded-circle shadow-sm" alt="userimg" style="object-fit:cover;">
+                                                    </div>
+                                                    <div class="bg-light p-3 rounded-4 flex-grow-1 position-relative">
+                                                        <h6 class="mb-1 fw-bold fs-6">{{ comment.userid.username }}</h6>
+                                                        <p class="mb-0 text-dark small" style="line-height: 1.5;">{{ comment.comment }}</p>
+                                                        <span class="text-muted" style="font-size: 0.70rem; position: absolute; top: 10px; right: 15px;">{{ comment.createddt|timesince }} ago</span>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Add Comment Form -->
+                            <div class="d-flex align-items-center mt-3 pt-2 border-top">
+                                <img src="{% if current_user.profile %}{{ current_user.profile.url }}{% else %}../../assets/images/user/1.jpg{% endif %}" alt="user" class="avatar-35 rounded-circle shadow-sm me-3" style="object-fit:cover;">
+                                <form method="post" action="{% url 'add_comment' post.postid %}" class="flex-grow-1 d-flex align-items-center gap-2">
+                                    {% csrf_token %}
+                                    <input type="text" name="comment" class="form-control rounded-pill shadow-sm border-light bg-light" placeholder="Write a comment..." required>
+                                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+                                        <span>Send</span>
+                                        <i class="las la-paper-plane"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                {% empty %}
+                <div class="card shadow-sm border-0 rounded-4 text-center py-5">
+                    <div class="card-body">
+                        <i class="las la-rss text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="mt-3 text-muted fw-bold">No buzz yet.</h4>
+                        <p class="text-muted">The people you follow haven't posted anything.</p>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="row">
+                    <div class="col-12 mb-4 text-center">
+                        <br>
+                        <i class="las la-user-friends text-primary" style="font-size: 4rem;"></i>
+                        <h3 class="fw-bold mt-2">No Buzz Yet!</h3>
+                        <p class="text-muted">You are not following anyone. Follow people to see their posts here.</p>
+                        <a href="{% url 'users_list' %}" class="btn btn-primary rounded-pill mt-3 px-4">Find Friends</a>
+                    </div>
+                </div>
+                {% endif %}
+
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+        transform: translateY(-2px);
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+    .hover-danger:hover {
+        color: #dc3545 !important;
+    }
+    .hover-primary:hover {
+        color: #0d6efd !important;
+    }
+</style>
+{% endblock %}

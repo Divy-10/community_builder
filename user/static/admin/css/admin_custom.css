@@ -1,0 +1,1699 @@
+/*
+  UniVo Admin Panel — Custom Theme
+  Matches client-side design: Discord-esque dark blue, blurple, Inter font
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ==========================================
+   CSS Variables — UniVo Brand Palette
+   ========================================== */
+:root {
+  --univo-primary: #8b5cf6;
+  --univo-primary-hover: #a855f7;
+  --univo-primary-light: rgba(99, 102, 241, 0.15);
+  --univo-dark-blue: rgba(18, 24, 38, 0.6);
+  --univo-cyan: #6366f1;
+  --univo-bg: #0b0f19;
+  --univo-surface: rgba(18, 24, 38, 0.6);
+  --univo-border: rgba(255, 255, 255, 0.08);
+  --univo-text-main: #f8fafc;
+  --univo-text-muted: #94a3b8;
+  --univo-text-light: #64748b;
+  --univo-success: #10b981;
+  --univo-danger: #ef4444;
+  --univo-warning: #f59e0b;
+  --univo-secondary: rgba(26, 35, 53, 0.8);
+  --univo-secondary-hover: rgba(255, 255, 255, 0.1);
+  --univo-font: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --univo-radius: 10px;
+  --univo-radius-lg: 16px;
+  --univo-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+  --univo-shadow-hover: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  
+  --bg-color: #0b0f19;
+  --surface-color: rgba(18, 24, 38, 0.6);
+  --surface-hover: rgba(26, 35, 53, 0.8);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --accent-color: #8b5cf6;
+  --danger-color: #ef4444;
+  --success-color: #10b981;
+  --glass-blur: blur(12px);
+}
+
+/* ==========================================
+   Global / Body
+   ========================================== */
+html,
+body {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+body {
+  font-family: var(--univo-font) !important;
+  background-color: var(--bg-color) !important;
+  background-image: radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 50%) !important;
+  background-attachment: fixed !important;
+  color: var(--univo-text-main) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+}
+
+#container {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+/* ==========================================
+   Header / Top Bar (#header)
+   ========================================== */
+#header {
+  background: var(--surface-color) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--border-color) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 20px rgba(0, 31, 63, 0.25) !important;
+  padding: 14px 28px !important;
+  border: none !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  z-index: 1002 !important;
+  box-sizing: border-box !important;
+}
+
+#header h1,
+#header #branding h1 {
+  font-family: var(--univo-font) !important;
+  font-weight: 800 !important;
+  font-size: 1.5rem !important;
+  letter-spacing: -0.5px;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+}
+
+#header h1 a,
+#header #branding h1 a {
+  font-family: var(--univo-font) !important;
+  font-weight: 800 !important;
+  font-size: 1.5rem !important;
+  text-decoration: none !important;
+  background: var(--accent-gradient) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  display: inline-block !important;
+}
+
+#header #branding h1 a i {
+  -webkit-text-fill-color: var(--accent-color) !important;
+  color: var(--accent-color) !important;
+}
+
+#header #branding h1 a:hover {
+  opacity: 0.9;
+}
+
+#header a:link,
+#header a:visited {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+#header a:hover,
+#header a:focus {
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+
+/* User tools (top-right area) */
+#user-tools {
+  font-family: var(--univo-font) !important;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+#user-tools a {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+}
+
+#user-tools a:hover {
+  color: #fff !important;
+  border-bottom-color: #fff;
+}
+
+/* ==========================================
+   Navigation Sidebar (nav-sidebar)
+   ========================================== */
+.main>.selector,
+nav.sticky {
+  font-family: var(--univo-font) !important;
+}
+
+#nav-sidebar {
+  background: var(--surface-color) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color) !important;
+  border-radius: 20px !important; /* Rounded all corners for a floating look */
+  margin: 15px 0 15px 15px !important; /* Margin from the left edge */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+  padding-top: 16px;
+  width: 280px !important; /* Adjusted width slightly for floating style */
+  min-width: 280px !important;
+  max-width: 280px !important;
+  flex: 0 0 280px !important;
+  box-sizing: border-box !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Shift sidebar left and ensure it is visible and scrollable */
+#main.shifted > #nav-sidebar,
+.main.shifted > #nav-sidebar,
+#nav-sidebar {
+  margin: 15px 0 15px 15px !important; /* Consistently floating gap */
+  display: block !important;
+  visibility: visible !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+  z-index: 999;
+  flex: 0 0 280px !important;
+  box-sizing: border-box !important;
+}
+
+#main {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+  min-height: 0 !important;
+}
+
+#content {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  background: var(--univo-bg) !important;
+}
+
+#nav-filter {
+  display: none !important;
+}
+
+#nav-sidebar .module {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 12px !important;
+}
+
+#nav-sidebar .module h2,
+#nav-sidebar .module caption,
+#nav-sidebar .module th,
+#nav-sidebar .module a.section {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 700;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 14px 2px !important;
+  /* Denser vertical padding */
+  border: none !important;
+  white-space: normal !important;
+  /* HEAVILY Enable wrapping */
+  line-height: 1.4 !important;
+  display: block !important;
+  word-wrap: break-word !important;
+}
+
+/* Enforce Sidebar Width on Sticky Container */
+nav.sticky {
+  width: 300px !important;
+  min-width: 300px !important;
+  flex: 0 0 300px !important;
+  box-sizing: border-box !important;
+}
+
+/* Force transparency and flex layout for sidebar table elements */
+#nav-sidebar .module,
+#nav-sidebar table,
+#nav-sidebar thead,
+#nav-sidebar tbody,
+#nav-sidebar tr {
+  width: 100% !important;
+  display: block !important;
+  background: transparent !important;
+  box-sizing: border-box !important;
+}
+
+#nav-sidebar tr {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#nav-sidebar th,
+#nav-sidebar td {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+#nav-sidebar th {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+#nav-sidebar td {
+  flex: 0 0 auto !important;
+  justify-content: flex-end !important;
+}
+
+/* ==========================================
+   Changelist Search & Actions (MATCHING PREMIUM LOOK)
+   ========================================== */
+#changelist-search {
+  padding: 24px !important;
+  background: transparent !important;
+  border-bottom: 1px solid #EDEDED !important;
+  border-radius: 20px 20px 0 0 !important;
+  margin-bottom: 0 !important;
+}
+
+#changelist-search input[id="searchbar"] {
+  padding: 14px 22px !important;
+  border-radius: 15px 0 0 15px !important;
+  border: 1px solid #D1D5DB !important;
+  background: transparent !important;
+  width: calc(100% - 120px) !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 1rem !important;
+  height: 48px !important;
+  box-sizing: border-box !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important;
+}
+
+#changelist-search input[type="submit"] {
+  background: var(--accent-color) !important; /* Force correct purple blue */
+  color: #FFFFFF !important;
+  height: 48px !important;
+  padding: 0 30px !important;
+  border-radius: 0 15px 15px 0 !important;
+  border: none !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  margin-left: -5px !important;
+  vertical-align: top !important;
+}
+
+/* ULTRA SPECIFIC - Actions Bar - Joined Styling */
+body.change-list div.actions {
+  background: transparent !important;
+  padding: 16px 24px !important;
+  border-bottom: 2px solid #F3F4F6 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0 !important; 
+  color: #4B5563 !important;
+  font-weight: 500 !important;
+  height: auto !important;
+  min-height: 80px !important;
+}
+
+body.change-list div.actions label {
+  margin-right: 15px !important;
+}
+
+body.change-list div.actions select[name="action"] {
+  border-radius: 10px 0 0 10px !important; /* Joined look */
+  border: 1px solid #D1D5DB !important;
+  border-right: none !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  height: 44px !important;
+  padding: 0 12px !important;
+  margin: 0 !important;
+  width: 260px !important;
+  vertical-align: middle !important;
+}
+
+body.change-list div.actions button.button[type="submit"] {
+  background: var(--accent-color) !important;
+  color: #FFFFFF !important;
+  height: 44px !important;
+  padding: 0 25px !important;
+  border-radius: 0 10px 10px 0 !important; /* Joined look */
+  border: 1px solid var(--accent-color) !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+}
+
+body.change-list div.actions span.action-counter {
+  margin-left: 20px !important;
+  font-size: 0.9rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 44px !important;
+}
+
+#nav-sidebar .module a {
+  display: flex !important;
+  align-items: center !important;
+  padding: 8px 18px !important; /* Slightly tighter padding */
+  color: rgba(255, 255, 255, 0.7) !important;
+  text-decoration: none !important;
+  font-size: 0.8rem !important; /* Smaller model name */
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+  border-radius: 12px !important;
+  margin: 4px 12px !important;
+  position: relative !important;
+}
+
+/* Icon Support for Admin Sidebar via Pseudo-elements */
+#nav-sidebar .module tr th a::before {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  margin-right: 12px;
+  width: 20px;
+  text-align: center;
+  font-size: 1rem;
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
+}
+
+/* Model Specific Icons */
+#nav-sidebar .module tr.model-user th a::before { content: "\f007"; } /* user */
+#nav-sidebar .module tr.model-blog th a::before { content: "\f1ea"; } /* newspaper */
+#nav-sidebar .module tr.model-post th a::before { content: "\f15c"; } /* file-alt */
+#nav-sidebar .module tr.model-comment th a::before { content: "\f075"; } /* comment */
+#nav-sidebar .module tr.model-like th a::before { content: "\f004"; } /* heart */
+#nav-sidebar .module tr.model-community th a::before { content: "\f0c0"; } /* users */
+#nav-sidebar .module tr.model-communitymember th a::before { content: "\f500"; } /* users-cog */
+#nav-sidebar .module tr.model-communityadmins th a::before { content: "\f3ed"; } /* user-shield */
+#nav-sidebar .module tr.model-category th a::before { content: "\f02c"; } /* tags */
+#nav-sidebar .module tr.model-city th a::before { content: "\f64f"; } /* city */
+#nav-sidebar .module tr.model-state th a::before { content: "\f59f"; } /* map-marked */
+#nav-sidebar .module tr.model-group th a::before { content: "\f0c0"; } /* groups */
+
+/* Styling for the 'Add' and 'Change' links (Side actions) */
+#nav-sidebar .module a.addlink, 
+#nav-sidebar .module a.changelink {
+  width: auto !important;
+  padding: 4px 8px !important;
+  margin: 0 4px !important;
+  font-size: 0.75rem !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+#nav-sidebar .module a:hover,
+#nav-sidebar .module a:focus {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+  transform: translateX(5px);
+}
+
+#nav-sidebar .module a:hover::before {
+  color: var(--univo-cyan) !important;
+}
+
+#nav-sidebar .module a.current {
+  background: var(--accent-gradient) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.4) !important;
+}
+
+/* Toggle nav-sidebar button */
+/* Toggle nav-sidebar button - Removed/Hidden as requested */
+#toggle-nav-sidebar,
+#nav-sidebar-toggle,
+.main.shifted #toggle-nav-sidebar {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#toggle-nav-sidebar:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+/* ==========================================
+   Content Area
+   ========================================== */
+#content {
+  padding: 24px 32px !important;
+  font-family: var(--univo-font) !important;
+}
+
+#content h1 {
+  font-family: var(--univo-font) !important;
+  font-weight: 700 !important;
+  font-size: 1.75rem !important;
+  color: var(--univo-text-main) !important;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px !important;
+}
+
+/* Dashboard-specific animated text override */
+#content h1.welcome-text-big {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  font-size: 3.5rem !important;
+  font-weight: 800 !important;
+  display: inline-block !important;
+}
+
+#content h2 {
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  color: var(--univo-text-main) !important;
+}
+
+/* ==========================================
+   Modules / Cards (.module)
+   ========================================== */
+.module {
+  border-radius: var(--univo-radius-lg) !important;
+  border: 1px solid var(--univo-border) !important;
+  box-shadow: var(--univo-shadow) !important;
+  background: var(--univo-surface) !important;
+  overflow: hidden;
+  margin-bottom: 24px !important;
+  transition: box-shadow 0.2s ease !important;
+}
+
+.module:hover {
+  box-shadow: var(--univo-shadow-hover) !important;
+}
+
+.module h2,
+.module caption {
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  background: var(--univo-primary-light) !important;
+  backdrop-filter: var(--glass-blur);
+  color: #FFFFFF !important;
+  padding: 14px 20px !important;
+  border: none !important;
+  letter-spacing: 0.01em;
+}
+
+.module table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+/* ==========================================
+   Dashboard Modules
+   ========================================== */
+.dashboard #content-main .module h2 {
+  background: var(--univo-primary-light) !important;
+  backdrop-filter: var(--glass-blur);
+  color: #FFFFFF !important;
+  border-radius: var(--univo-radius-lg) var(--univo-radius-lg) 0 0 !important;
+}
+
+.dashboard #content-main .module table td a {
+  color: var(--univo-primary) !important;
+  font-weight: 500;
+  text-decoration: none !important;
+  transition: color 0.2s ease;
+}
+
+.dashboard #content-main .module table td a:hover {
+  color: var(--univo-primary-hover) !important;
+  text-decoration: underline !important;
+}
+
+/* Recent actions */
+.dashboard #content-related .module h2 {
+  background: var(--univo-primary-light) !important;
+  backdrop-filter: var(--glass-blur);
+  color: #FFFFFF !important;
+}
+
+/* App entry on dashboard */
+.app-auth .module,
+.app-user .module {
+  transition: box-shadow 0.2s ease, transform 0.2s ease !important;
+}
+
+/* Dashboard table rows */
+.module table td,
+.module table th {
+  padding: 10px 16px !important;
+  font-family: var(--univo-font) !important;
+  border-bottom: 1px solid var(--univo-border) !important;
+  border-top: none !important;
+}
+
+.module table tr:last-child td {
+  border-bottom: none !important;
+}
+
+.module table th {
+  font-weight: 600 !important;
+  color: var(--univo-text-muted) !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--univo-bg) !important;
+}
+
+/* ==========================================
+   Breadcrumbs
+   ========================================== */
+.breadcrumbs,
+div.breadcrumbs {
+  background: var(--univo-dark-blue) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  padding: 12px 28px !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 500;
+  font-size: 0.85rem;
+  border: none !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  z-index: 1001 !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  visibility: visible !important;
+  min-height: 44px !important;
+  margin-bottom: 2px !important; /* Added small gap to separate from sidebar/content */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important; /* Added shadow for depth */
+}
+
+#container {
+  overflow: visible !important;
+}
+
+div.breadcrumbs a {
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease;
+}
+
+div.breadcrumbs a:hover {
+  color: #FFFFFF !important;
+}
+
+/* ==========================================
+   Buttons
+   ========================================== */
+.submit-row input,
+input[type="submit"],
+.button,
+a.button {
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 10px 20px !important;
+  cursor: pointer;
+  transition: all 0.2s ease !important;
+  text-transform: none !important;
+  letter-spacing: 0.02em;
+}
+
+/* Primary action (Save) */
+.submit-row input[type="submit"],
+input[type="submit"],
+.button.default {
+  background: var(--accent-gradient) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(88, 101, 242, 0.25);
+}
+
+.submit-row input[type="submit"]:hover,
+input[type="submit"]:hover,
+.button.default:hover {
+  background: var(--univo-primary-hover) !important;
+  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+/* Secondary/general buttons */
+.button,
+a.button {
+  background: var(--univo-secondary) !important;
+  color: var(--univo-text-main) !important;
+}
+
+.button:hover,
+a.button:hover {
+  background: var(--univo-secondary-hover) !important;
+}
+
+/* Delete (Danger) button */
+.deletelink,
+.submit-row .deletelink {
+  background: var(--univo-danger) !important;
+  color: #FFFFFF !important;
+  border-radius: 8px !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.deletelink:hover,
+.submit-row .deletelink:hover {
+  background: #c72e33 !important;
+  box-shadow: 0 4px 12px rgba(218, 55, 60, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+/* Add another / object tools links */
+.object-tools a,
+.object-tools a:link,
+.object-tools a:visited {
+  background: var(--univo-primary) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+}
+
+.object-tools a:hover,
+.object-tools a:focus {
+  background: var(--univo-primary-hover) !important;
+  box-shadow: 0 2px 8px rgba(88, 101, 242, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.object-tools a.addlink::before {
+  display: none !important;
+}
+
+/* ==========================================
+   Form Controls / Inputs
+   ========================================== */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+textarea,
+select {
+  font-family: var(--univo-font) !important;
+  border: 1px solid var(--univo-border) !important;
+  border-radius: 12px !important; /* Slightly more rounded for premium feel */
+  background: var(--univo-bg) !important;
+  color: var(--univo-text-main) !important;
+  font-size: 1.1rem !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+  width: 100% !important;
+  max-width: 610px !important;
+  box-sizing: border-box !important;
+}
+
+/* Specific centering for single-line inputs & selects */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+select {
+  height: 60px !important;
+  line-height: 60px !important;
+  padding: 0 20px !important;
+}
+
+textarea {
+  padding: 20px !important;
+  min-height: 150px !important;
+  line-height: 1.6 !important;
+  height: auto !important;
+}
+
+textarea {
+  padding: 15px 18px !important;
+  height: auto !important;
+  min-height: 120px !important;
+  line-height: 1.6 !important;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="datetime-local"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--univo-primary) !important;
+  box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.15) !important;
+  background: var(--univo-surface) !important;
+}
+
+textarea {
+  border-radius: var(--univo-radius) !important;
+  min-height: 44px !important; /* Reduced height as requested */
+  max-width: 610px !important;
+  resize: vertical !important;
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 20px center !important;
+  padding-right: 50px !important;
+  cursor: pointer;
+}
+
+/* Style the native dropdown options to match the dark theme */
+select option {
+  background-color: #1a1b26 !important; /* Dark background for options */
+  color: #ffffff !important;
+  font-family: var(--univo-font) !important;
+  padding: 12px !important;
+}
+
+/* Search bar in change list */
+#searchbar {
+  border-radius: 8px !important;
+  border: 1px solid var(--univo-border) !important;
+  padding: 10px 16px !important;
+  font-family: var(--univo-font) !important;
+  background: var(--univo-bg) !important;
+  transition: all 0.2s ease !important;
+}
+
+#searchbar:focus {
+  border-color: var(--univo-primary) !important;
+  box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.15) !important;
+  background: var(--univo-surface) !important;
+}
+
+/* ==========================================
+   Change List (Table)
+   ========================================== */
+#changelist {
+  font-family: var(--univo-font) !important;
+}
+
+#changelist table {
+  border-radius: var(--univo-radius-lg) !important;
+  overflow: hidden;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  box-shadow: var(--univo-shadow) !important;
+  border: 1px solid var(--univo-border) !important;
+}
+
+#changelist table thead th {
+  background: var(--univo-dark-blue) !important;
+  color: #FFFFFF !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 16px !important;
+  border: none !important;
+}
+
+#changelist table thead th a:link,
+#changelist table thead th a:visited {
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-decoration: none !important;
+}
+
+#changelist table thead th a:hover {
+  color: #fff !important;
+}
+
+#changelist table thead th.sorted {
+  background: rgba(88, 101, 242, 0.5) !important;
+}
+
+#changelist table thead th.sorted a {
+  color: #fff !important;
+}
+
+#changelist table tbody td {
+  padding: 10px 16px !important;
+  border-bottom: 1px solid var(--univo-border) !important;
+  font-size: 0.9rem;
+  transition: background 0.15s ease;
+}
+
+#changelist table tbody tr:hover td {
+  background: var(--univo-primary-light) !important;
+}
+
+#changelist table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+#changelist table tbody td a {
+  color: var(--univo-primary) !important;
+  font-weight: 500;
+  text-decoration: none !important;
+}
+
+#changelist table tbody td a:hover {
+  color: var(--univo-primary-hover) !important;
+  text-decoration: underline !important;
+}
+
+/* Row alternate colors */
+#changelist table tbody tr.row1 {
+  background: var(--univo-surface) !important;
+}
+
+#changelist table tbody tr.row2 {
+  background: #FAFAFA !important;
+}
+
+/* ==========================================
+   Filter Sidebar (#changelist-filter)
+   ========================================== */
+#changelist-filter {
+  background: var(--univo-surface) !important;
+  border-radius: var(--univo-radius-lg) !important;
+  border: 1px solid var(--univo-border) !important;
+  box-shadow: var(--univo-shadow) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+#changelist-filter h2 {
+  background: var(--univo-primary-light) !important;
+  backdrop-filter: var(--glass-blur);
+  color: #fff !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  padding: 14px 20px !important;
+  font-size: 0.9rem !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+#changelist-filter h3 {
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  color: var(--univo-text-muted) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 20px 6px !important;
+  margin: 0 !important;
+}
+
+#changelist-filter ul {
+  padding: 0 12px 12px !important;
+  margin: 0 !important;
+}
+
+#changelist-filter li {
+  list-style: none;
+  margin: 2px 0;
+}
+
+#changelist-filter li a {
+  display: block;
+  padding: 7px 12px !important;
+  border-radius: 8px !important;
+  color: var(--univo-text-main) !important;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: all 0.15s ease !important;
+  text-decoration: none !important;
+}
+
+#changelist-filter li a:hover {
+  background: var(--univo-primary-light) !important;
+  color: var(--univo-primary) !important;
+}
+
+#changelist-filter li.selected a {
+  background: var(--univo-primary) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+/* ==========================================
+   Pagination
+   ========================================== */
+.paginator {
+  font-family: var(--univo-font) !important;
+  background: var(--univo-surface) !important;
+  border: 1px solid var(--univo-border) !important;
+  border-radius: var(--univo-radius) !important;
+  padding: 10px 16px !important;
+  color: var(--univo-text-muted) !important;
+  font-size: 0.85rem;
+}
+
+.paginator a:link,
+.paginator a:visited {
+  color: var(--univo-primary) !important;
+  background: var(--univo-primary-light) !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+  text-decoration: none !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.paginator a:hover {
+  background: var(--univo-primary) !important;
+  color: #fff !important;
+}
+
+/* ==========================================
+   Submit Row (Bottom bar on forms)
+   ========================================== */
+.submit-row {
+  background: var(--univo-surface) !important;
+  border: 1px solid var(--univo-border) !important;
+  border-radius: var(--univo-radius-lg) !important;
+  padding: 16px 20px !important;
+  box-shadow: var(--univo-shadow) !important;
+  margin-top: 16px !important;
+}
+
+/* ==========================================
+   Inline Groups
+   ========================================== */
+.inline-group {
+  border-radius: var(--univo-radius-lg) !important;
+  overflow: hidden;
+}
+
+.inline-group h2 {
+  background: var(--univo-primary-light) !important;
+  backdrop-filter: var(--glass-blur);
+  color: #fff !important;
+  padding: 14px 20px !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+}
+
+/* ==========================================
+   Fieldsets
+   ========================================== */
+fieldset {
+  border: 1px solid var(--univo-border) !important;
+  border-radius: var(--univo-radius-lg) !important;
+  background: var(--univo-surface) !important;
+  box-shadow: var(--univo-shadow) !important;
+  margin-bottom: 20px !important;
+}
+
+fieldset h2,
+fieldset .module h2 {
+  background: var(--univo-primary-light) !important;
+  backdrop-filter: var(--glass-blur);
+  color: #fff !important;
+  border-radius: var(--univo-radius-lg) var(--univo-radius-lg) 0 0 !important;
+}
+
+/* ==========================================
+   Help Text, Error Messages
+   ========================================== */
+.help,
+.help-block,
+p.help {
+  font-family: var(--univo-font) !important;
+  color: var(--univo-text-light) !important;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.errornote,
+.errorlist li {
+  background: #FFF0F0 !important;
+  color: var(--univo-danger) !important;
+  border: 1px solid #FFCCCC !important;
+  border-radius: 8px !important;
+  padding: 10px 16px !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 500 !important;
+}
+
+ul.errorlist {
+  padding: 0 !important;
+  margin: 8px 0 !important;
+}
+
+ul.errorlist li {
+  list-style: none;
+  margin-bottom: 4px;
+}
+
+.success {
+  background: #F0FFF4 !important;
+  color: var(--univo-success) !important;
+  border: 1px solid #C6F6D5 !important;
+  border-radius: 8px !important;
+  padding: 10px 16px !important;
+  font-family: var(--univo-font) !important;
+}
+
+/* Messages (success, info, warning, error) */
+ul.messagelist {
+  padding: 0 !important;
+  margin: 0 0 20px !important;
+}
+
+ul.messagelist li {
+  font-family: var(--univo-font) !important;
+  border-radius: var(--univo-radius) !important;
+  padding: 12px 20px !important;
+  margin-bottom: 8px !important;
+  font-weight: 500;
+  border: none !important;
+}
+
+ul.messagelist li.success {
+  background: #ECFDF5 !important;
+  color: #065F46 !important;
+}
+
+ul.messagelist li.warning {
+  background: #FFFBEB !important;
+  color: #92400E !important;
+}
+
+ul.messagelist li.error {
+  background: #FEF2F2 !important;
+  color: #991B1B !important;
+}
+
+ul.messagelist li.info {
+  background: var(--univo-primary-light) !important;
+  color: var(--univo-primary) !important;
+}
+
+/* ==========================================
+   Links / General Anchors
+   ========================================== */
+a:link,
+a:visited {
+  color: var(--univo-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover,
+a:focus {
+  color: var(--univo-primary-hover);
+  text-decoration: underline;
+}
+
+/* "Add" links */
+.addlink,
+a.addlink {
+  color: var(--univo-success) !important;
+  font-weight: 600;
+}
+
+/* "Change" links */
+.changelink,
+a.changelink {
+  color: var(--univo-primary) !important;
+  font-weight: 600;
+}
+
+/* ==========================================
+   Action Bar / Toolbar
+   ========================================== */
+#changelist .actions {
+  background: var(--univo-surface) !important;
+  border: 1px solid var(--univo-border) !important;
+  border-radius: var(--univo-radius) !important;
+  padding: 12px 16px !important;
+  margin-bottom: 16px !important;
+}
+
+#changelist .actions select {
+  border-radius: 8px !important;
+  border: 1px solid var(--univo-border) !important;
+  padding: 7px 12px !important;
+  font-family: var(--univo-font) !important;
+  font-size: 0.85rem;
+  background: var(--univo-bg) !important;
+}
+
+#changelist .actions button {
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  background: var(--univo-primary) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  cursor: pointer;
+  transition: all 0.2s ease !important;
+}
+
+#changelist .actions button:hover {
+  background: var(--univo-primary-hover) !important;
+  transform: translateY(-1px);
+}
+
+/* Search form */
+#changelist-search {
+  border-radius: var(--univo-radius) !important;
+  margin-bottom: 16px;
+}
+
+#changelist-search input[type="submit"] {
+  border-radius: 0 8px 8px 0 !important;
+  background: var(--univo-primary) !important;
+  color: #fff !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  border: none !important;
+}
+
+#user-tools {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  color: #FFFFFF !important;
+  font-family: var(--univo-font) !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  gap: 12px !important;
+  padding: 6px 16px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 50px !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  margin-right: 15px !important;
+  transition: all 0.3s ease !important;
+}
+
+#user-tools:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+#user-tools a {
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  transition: color 0.2s ease !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+}
+
+#user-tools a:hover {
+  color: #FFFFFF !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Show all links but keep them clean and proper with icons */
+#user-tools a[href*="password"]::before {
+  content: "\f084"; /* key icon */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  margin-right: 6px;
+}
+
+#user-tools a[href="/"]::before {
+  content: "\f06e"; /* eye icon */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  margin-right: 6px;
+}
+
+/* Add an icon before Logout */
+#user-tools a[href*="logout"]::before {
+  content: "\f2f5"; /* logout icon */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  margin-right: 6px;
+}
+
+/* ==========================================
+   Scrollbar (matching client side) - Transparent
+   ========================================== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  border-radius: 10px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ==========================================
+   Calendar & Date Widgets
+   ========================================== */
+.calendarbox,
+.clockbox {
+  border-radius: var(--univo-radius) !important;
+  box-shadow: var(--univo-shadow-hover) !important;
+  border: 1px solid var(--univo-border) !important;
+  overflow: hidden;
+}
+
+.calendar caption {
+  background: var(--univo-dark-blue) !important;
+  color: #fff !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+}
+
+.calendar td a {
+  color: var(--univo-primary) !important;
+  font-weight: 500;
+}
+
+.calendar td.today a {
+  background: var(--univo-primary) !important;
+  color: #fff !important;
+  border-radius: 50%;
+}
+
+/* ==========================================
+   Login Page Overrides
+   ========================================== */
+body.login {
+  background-color: var(--bg-color) !important;
+  background-image: radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 50%) !important;
+  background-attachment: fixed !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100vh !important;
+}
+
+body.login #container {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  width: 100% !important;
+  max-width: 420px;
+  height: auto !important;
+  flex: 0 0 auto !important;
+  margin: 0 auto !important;
+}
+
+body.login #header {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 20px 0 !important;
+  text-align: center !important;
+}
+
+body.login #header h1 a {
+  color: #fff !important;
+  font-size: 2rem !important;
+}
+
+body.login #content {
+  background: var(--univo-surface) !important;
+  border-radius: var(--univo-radius-lg) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+  padding: 32px !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+}
+
+body.login .submit-row {
+  border: none !important;
+  box-shadow: none !important;
+  padding: 16px 0 0 !important;
+  background: transparent !important;
+}
+
+body.login .submit-row input[type="submit"] {
+  width: 100%;
+  padding: 12px !important;
+  font-size: 1rem !important;
+  border-radius: var(--univo-radius) !important;
+}
+
+body.login label {
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  color: var(--univo-text-main) !important;
+  font-size: 0.9rem;
+}
+
+/* ==========================================
+   Related Widget Wrapper (Lookups)
+   ========================================== */
+.related-widget-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.related-widget-wrapper select {
+  flex: 1;
+}
+
+.related-widget-wrapper .related-lookup,
+.related-widget-wrapper .change-related,
+.related-widget-wrapper .add-related,
+.related-widget-wrapper .delete-related {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.related-widget-wrapper .related-lookup:hover,
+.related-widget-wrapper .change-related:hover,
+.related-widget-wrapper .add-related:hover,
+.related-widget-wrapper .delete-related:hover {
+  opacity: 1;
+}
+
+/* ==========================================
+   Footer
+   ========================================== */
+#footer {
+  font-family: var(--univo-font) !important;
+  color: var(--univo-text-light) !important;
+  font-size: 0.8rem;
+  padding: 16px 28px !important;
+  text-align: center;
+  border-top: 1px solid var(--univo-border);
+}
+
+/* ==========================================
+   Subtle Animations
+   ========================================== */
+.module,
+.submit-row,
+fieldset,
+#changelist table,
+#changelist-filter {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================
+   Checkbox & Radio Styling
+   ========================================== */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--univo-primary) !important;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ==========================================
+   Tabular Inline
+   ========================================== */
+.tabular fieldset.module {
+  border-radius: var(--univo-radius-lg) !important;
+}
+
+.tabular .module table thead th {
+  background: var(--univo-dark-blue) !important;
+  color: #fff !important;
+  font-family: var(--univo-font) !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================
+   Responsive Tweaks
+   ========================================== */
+@media (max-width: 767px) {
+  #header {
+    padding: 10px 16px !important;
+  }
+
+  #content {
+    padding: 16px !important;
+  }
+
+  .module h2,
+  .module caption {
+    padding: 10px 16px !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* ==========================================
+   Header Layout & Navbar Dropdown
+   ========================================== */
+.header-container {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.admin-nav-dropdown {
+  position: relative;
+  display: inline-block;
+  margin-left: 20px;
+}
+
+.nav-dropbtn {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  padding: 8px 18px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-dropbtn:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: #ffffff !important;
+}
+
+.nav-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #ffffff !important;
+  min-width: 250px !important;
+  box-shadow: 0px 12px 36px rgba(0, 31, 63, 0.25) !important;
+  border-radius: 12px !important;
+  z-index: 99999 !important;
+  top: 100%;
+  left: 0;
+  margin-top: 12px;
+  overflow: hidden;
+  padding: 10px 0 !important;
+  border: 1px solid #e3e5e8 !important;
+  animation: fadeInDown 0.25s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#header .nav-dropdown-content a,
+#header .nav-dropdown-content a:link,
+#header .nav-dropdown-content a:visited {
+  color: #060607 !important;
+  /* Forces high-contrast black regardless of header defaults */
+  background-color: #ffffff !important;
+  padding: 12px 20px !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s ease !important;
+  border-bottom: 1px solid #f2f3f5 !important;
+}
+
+#header .nav-dropdown-content a:last-child {
+  border-bottom: none !important;
+}
+
+#header .nav-dropdown-content a:hover {
+  background-color: #f2f3f5 !important;
+  color: var(--accent-color) !important;
+  padding-left: 24px !important;
+}
+
+#header .nav-dropdown-content a i {
+  color: #5d6d7e !important;
+  font-size: 1rem;
+}
+
+#header .nav-dropdown-content a:hover i {
+  color: var(--accent-color) !important;
+}
+
+.admin-nav-dropdown:hover .nav-dropdown-content {
+  display: block !important;
+}
+
+/* Margin utilities for icons */
+.me-2 {
+  margin-right: 0.5rem !important;
+}
+
+.ms-2 {
+  margin-left: 0.5rem !important;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 991px) {
+  .header-container {
+    gap: 15px;
+  }
+
+  .nav-dropbtn {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+/* ==========================================
+   Login Page Specific Styling
+   ========================================== */
+body.login {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: var(--bg-color) !important;
+  min-height: 100vh !important;
+}
+
+body.login #container {
+  width: 100% !important;
+  max-width: 450px !important;
+  margin: 0 auto !important;
+  background: transparent !important;
+  display: block !important;
+  height: auto !important;
+}
+
+body.login #header {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 0 30px 0 !important;
+  text-align: center !important;
+  display: block !important;
+}
+
+body.login .header-container {
+  justify-content: center !important;
+}
+
+body.login #branding h1 {
+  font-size: 2rem !important;
+  margin: 0 !important;
+}
+
+body.login #content {
+  background: var(--surface-color) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--univo-radius-lg) !important;
+  padding: 40px !important;
+  box-shadow: var(--univo-shadow-hover) !important;
+}
+
+body.login .submit-row {
+  padding: 15px 0 0 0 !important;
+  background: transparent !important;
+  border: none !important;
+  text-align: center !important;
+}
+
+body.login .submit-row input {
+  width: 100% !important;
+  height: 48px !important;
+  font-size: 1rem !important;
+}

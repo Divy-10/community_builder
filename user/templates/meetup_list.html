@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load user_tags %}
+{% block title %}Meetups — UniVo{% endblock %}
+
+{% block content %}
+
+<div class="content-inner" id="page_layout">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12 p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-1 fw-bold"><i class="las la-calendar-check text-primary me-2"></i>Upcoming Meetups</h4>
+                    <p class="text-muted mb-0 small">Discover events from communities and join the ones you love</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Filters -->
+        {% if filter_type or filter_category or search_q %}
+        <div class="row mb-3">
+            <div class="col-12 px-4">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <span class="text-muted small">Active Filters:</span>
+                    {% if search_q %}
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                        <i class="las la-search me-1"></i>"{{ search_q }}"
+                    </span>
+                    {% endif %}
+                    {% if filter_type %}
+                    <span class="badge {% if filter_type == 'online' %}bg-info-subtle text-info{% else %}bg-success-subtle text-success{% endif %} rounded-pill px-3 py-2">
+                        {% if filter_type == 'online' %}<i class="las la-video me-1"></i>Online{% else %}<i class="las la-map-marker me-1"></i>Offline{% endif %}
+                    </span>
+                    {% endif %}
+                    <a href="{% url 'meetup_list' %}" class="btn btn-sm btn-outline-secondary rounded-pill ms-2">
+                        <i class="las la-times me-1"></i>Clear
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Meetup Cards -->
+        <div class="row">
+            {% for m in meetups %}
+            <div class="col-lg-6 col-md-6 mb-4">
+                <div class="card h-100 mb-0 border-0 shadow-sm" style="border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;">
+                    <!-- Meetup Thumbnail / Header -->
+                    <div class="position-relative">
+                        {% if m.thumbnail %}
+                        <img src="{{ m.thumbnail.url }}" class="card-img-top" alt="{{ m.title }}" 
+                             style="height: 180px; object-fit: cover;" loading="lazy">
+                        {% else %}
+                        <div style="height: 180px; background: linear-gradient(135deg, {% if m.meetup_type == 'online' %}#667eea 0%, #764ba2{% else %}#11998e 0%, #38ef7d{% endif %} 100%); display: flex; align-items: center; justify-content: center;">
+                            <i class="las {% if m.meetup_type == 'online' %}la-video{% else %}la-map-marked-alt{% endif %}" style="font-size: 60px; color: rgba(255,255,255,0.3);"></i>
+                        </div>
+                        {% endif %}
+                        <!-- Type Badge -->
+                        <span class="position-absolute top-0 end-0 m-3 badge {% if m.meetup_type == 'online' %}bg-info{% else %}bg-success{% endif %} rounded-pill px-3 py-2 shadow-sm" style="font-size: 12px;">
+                            <i class="las {% if m.meetup_type == 'online' %}la-video{% else %}la-map-marker{% endif %} me-1"></i>
+                            {{ m.get_meetup_type_display }}
+                        </span>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Title -->
+                        <h4 class="card-title fw-bold mb-3">
+                            <a href="{% url 'meetup_detail' m.meetupid %}" class="text-dark text-decoration-none">{{ m.title }}</a>
+                        </h4>
+                        
+                        <!-- Description -->
+                        <div class="mb-3 post-desc-container" style="overflow-wrap: break-word; word-wrap: break-word;">
+                            <span class="text-muted desc-short" style="line-height: 1.5; font-size: 0.95rem;" id="desc-short-m{{ m.meetupid }}">{{ m.description|truncatewords:50 }}</span>
+                            <span class="text-muted desc-full d-none" style="line-height: 1.5; font-size: 0.95rem;" id="desc-full-m{{ m.meetupid }}">{{ m.description|linebreaksbr }}</span>
+                            {% if m.description|wordcount > 50 %}
+                            <a href="javascript:void(0)" onclick="toggleDesc('m{{ m.meetupid }}')" id="desc-toggle-m{{ m.meetupid }}" class="text-primary text-decoration-none fw-bold ms-1" style="font-size: 0.85rem;">View more</a>
+                            {% endif %}
+                        </div>
+
+                        <!-- Info Row: Date, Time, Location -->
+                        <div class="d-flex flex-wrap align-items-center gap-3 py-2 border-top border-bottom mb-0">
+                            <div class="d-flex align-items-center gap-1 text-muted small">
+                                <i class="las la-calendar text-primary fs-5"></i>
+                                <span class="fw-semibold">{{ m.meeting_date|format_datetime:user_settings }}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-1 text-muted small">
+                                {% if m.meetup_type == 'offline' %}
+                                <i class="las la-map-marker text-success fs-5"></i>
+                                <span class="text-truncate" style="max-width: 120px;">{{ m.location }}</span>
+                                {% else %}
+                                <i class="las la-video text-info fs-5"></i>
+                                <span>Online</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer: Community info + CTA -->
+                    <div class="card-footer bg-soft-primary border-0 p-3" style="background: rgba(0, 85, 255, 0.03);">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                {% if m.communityid.thumbnail %}
+                                <img src="{{ m.communityid.thumbnail.url }}" class="rounded-circle border border-2 border-white" 
+                                     style="width: 38px; height: 38px; object-fit: cover;" alt="community">
+                                {% else %}
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center border border-2 border-white fw-bold" style="width: 38px; height: 38px; font-size: 14px;">
+                                    {{ m.communityid.communitytitle|first|upper }}
+                                </div>
+                                {% endif %}
+                                <div class="overflow-hidden" style="max-width: 120px;">
+                                    <a href="{% url 'community_detail' m.communityid.communityid %}" class="fw-bold text-dark text-decoration-none d-block text-truncate small">{{ m.communityid.communitytitle }}</a>
+                                    <p class="text-muted mb-0" style="font-size: 10px;">{{ m.communityid.communitymember_set.count }} members</p>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 align-items-center">
+                                {% if m.meetup_type == 'internal' %}
+                                <a href="{% url 'join_meeting' m.meetupid %}" class="btn btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm" style="font-size: 0.8rem;">
+                                    Join Room
+                                </a>
+                                {% elif m.meeting_link %}
+                                <a href="{{ m.meeting_link }}" target="_blank" class="btn btn-info text-white rounded-pill px-3 py-1 fw-bold shadow-sm" style="font-size: 0.8rem;">
+                                    Join
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'meetup_detail' m.meetupid %}" class="btn btn-outline-primary rounded-pill px-3 py-1 fw-bold" style="font-size: 0.8rem;">
+                                    Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="py-5">
+                    <i class="las la-calendar-times" style="font-size: 80px; color: #dee2e6;"></i>
+                    <h4 class="text-muted mt-3">No upcoming meetups found</h4>
+                    <p class="text-muted">Check back later or explore communities to find events</p>
+                    <a href="{% url 'group' %}" class="btn btn-primary rounded-pill px-4 mt-2">
+                        <i class="las la-users me-2"></i>Explore Communities
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+<div class="iq-sidebar-right sidebar-default">
+    <div class="card shadow-none h-100 mb-0 border-0 bg-transparent">
+        <div class="card-header bg-transparent py-3 px-0">
+            <h5 class="card-title fw-bold d-flex align-items-center gap-2 mb-0">
+                <i class="las la-filter text-primary"></i> Filter Meetups
+            </h5>
+        </div>
+        <div class="card-body px-0">
+            <form method="get" action="{% url 'meetup_list' %}">
+                <!-- Search -->
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">Search</label>
+                    <input type="text" class="filter-input transition rounded-pill px-3 py-2 w-100" name="q"
+                        value="{{ search_q }}" placeholder="Search meetups...">
+                </div>
+
+                <!-- Type Filter -->
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">Meeting Type</label>
+                    <select class="filter-input transition rounded-pill px-3 py-2 w-100" name="type">
+                        <option value="">All Types</option>
+                        <option value="online" {% if filter_type == 'online' %}selected{% endif %}>🖥️ Online</option>
+                        <option value="offline" {% if filter_type == 'offline' %}selected{% endif %}>📍 Offline</option>
+                    </select>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">Category</label>
+                    <select class="filter-input transition rounded-pill px-3 py-2 w-100" name="category">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.categoryid }}" {% if filter_category == cat.categoryid|stringformat:"i" %}selected{% endif %}>{{ cat.categoryname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mt-4 pt-3">
+                    <button type="submit"
+                        class="btn btn-primary w-100 rounded-pill fw-bold hover-shadow transition mb-2 py-2">Apply
+                        Filters</button>
+                    <a href="{% url 'meetup_list' %}"
+                        class="btn btn-light w-100 rounded-pill fw-bold text-muted hover-shadow transition py-2">Clear
+                        All</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content_class %}has-right-sidebar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.12) !important;
+    }
+</style>
+{% endblock %}

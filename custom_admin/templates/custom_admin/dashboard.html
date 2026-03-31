@@ -1,0 +1,221 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Dashboard Overview | Univo Super admin{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--accent-gradient);
+        opacity: 0.8;
+    }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-header i {
+        font-size: 1.25rem;
+        color: var(--accent-color);
+        background: rgba(139, 92, 246, 0.1);
+        padding: 0.5rem;
+        border-radius: 8px;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+    }
+
+    .stat-trend {
+        font-size: 0.875rem;
+        color: var(--success-color);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .lists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .list-card {
+        padding: 1.5rem;
+    }
+
+    .list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .list-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .list-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .list-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .list-item-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.05);
+        object-fit: cover;
+    }
+
+    .list-item-info {
+        flex-grow: 1;
+    }
+
+    .list-item-title {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .list-item-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="glass-panel stat-card">
+        <div class="stat-header">
+            Total Users
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-trend">
+            <i class="fa-solid fa-arrow-trend-up"></i> + Active Community
+        </div>
+    </div>
+    
+    <div class="glass-panel stat-card">
+        <div class="stat-header">
+            Total Communities
+            <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div class="stat-value">{{ total_communities }}</div>
+        <div class="stat-trend">
+            <i class="fa-solid fa-arrow-trend-up"></i> Growing Platform
+        </div>
+    </div>
+    
+    <div class="glass-panel stat-card">
+        <div class="stat-header">
+            Total Posts
+            <i class="fa-solid fa-images"></i>
+        </div>
+        <div class="stat-value">{{ total_posts }}</div>
+        <div class="stat-trend" style="color: var(--accent-color);">
+            <i class="fa-solid fa-bolt"></i> High Engagement
+        </div>
+    </div>
+</div>
+
+<div class="lists-grid">
+    <div class="glass-panel list-card">
+        <div class="list-header">
+            <h3 class="list-title">Recent Users</h3>
+            <a href="{% url 'custom_admin:users' %}" class="btn btn-primary">View All</a>
+        </div>
+        <div class="list-content">
+            {% for user in recent_users %}
+            <div class="list-item">
+                {% if user.profile %}
+                <img src="{{ user.profile.url }}" alt="{{ user.username }}" class="list-item-avatar">
+                {% else %}
+                <div class="list-item-avatar" style="display:flex; align-items:center; justify-content:center; background: var(--accent-gradient);">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                {% endif %}
+                <div class="list-item-info">
+                    <div class="list-item-title">{{ user.username }}</div>
+                    <div class="list-item-subtitle">{{ user.email }}</div>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                    {{ user.registrationdt|date:"M d, Y" }}
+                </div>
+            </div>
+            {% empty %}
+            <div style="color: var(--text-secondary); text-align: center; padding: 2rem;">No users found.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="glass-panel list-card">
+        <div class="list-header">
+            <h3 class="list-title">Recent Communities</h3>
+            <a href="{% url 'custom_admin:communities' %}" class="btn btn-primary">View All</a>
+        </div>
+        <div class="list-content">
+            {% for comm in recent_communities %}
+            <div class="list-item">
+                {% if comm.thumbnail %}
+                <img src="{{ comm.thumbnail.url }}" alt="{{ comm.communitytitle }}" class="list-item-avatar">
+                {% else %}
+                <div class="list-item-avatar" style="background: rgba(255,255,255,0.1);"></div>
+                {% endif %}
+                <div class="list-item-info">
+                    <div class="list-item-title">{{ comm.communitytitle }}</div>
+                    <div class="list-item-subtitle">By {{ comm.userid.username }}</div>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                    {{ comm.createddt|date:"M d, Y" }}
+                </div>
+            </div>
+            {% empty %}
+            <div style="color: var(--text-secondary); text-align: center; padding: 2rem;">No communities found.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

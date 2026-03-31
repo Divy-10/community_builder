@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-0" style="height: calc(100vh - 120px);">
+    <div class="row g-0 h-100 bg-white rounded-4 shadow-sm overflow-hidden">
+        
+        <!-- Left Sidebar: Contacts List -->
+        <div class="col-md-4 col-lg-3 border-end h-100 d-flex flex-column">
+            <div class="p-3 border-bottom bg-light">
+                <h5 class="fw-bold mb-0 text-dark">Direct Messages</h5>
+            </div>
+            
+            <div class="flex-grow-1 overflow-auto">
+                <div class="list-group list-group-flush">
+                    {% for item in chatted_users_list %}
+                    <a href="?u={{ item.user.userid }}" class="list-group-item list-group-item-action border-0 p-3 {% if target_user.userid == item.user.userid %}bg-primary-subtle{% endif %}">
+                        <div class="d-flex align-items-center">
+                            <div class="position-relative">
+                                <img src="{% if item.user.profile %}{{ item.user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}" 
+                                     class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover;" alt="user">
+                            </div>
+                            <div class="ms-3 flex-grow-1 overflow-hidden">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 fw-bold text-dark text-truncate">{{ item.user.username }}</h6>
+                                    {% if item.unread_count > 0 %}
+                                        <span class="badge rounded-pill bg-danger shadow-sm ms-2" style="font-size: 0.65rem;">{{ item.unread_count }}</span>
+                                    {% endif %}
+                                    {% if item.last_msg %}
+                                    <small class="text-muted ms-auto" style="font-size: 0.7rem;">{{ item.last_msg.senddt|timesince }}</small>
+                                    {% endif %}
+                                </div>
+                                <p class="mb-0 text-muted small text-truncate">
+                                    {% if item.last_msg %}
+                                        {% if item.last_msg.senderid == current_user.userid %}You: {% endif %}{{ item.last_msg.message }}
+                                    {% else %}
+                                        No messages yet
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="p-5 text-center">
+                        <i class="ri-message-3-line fs-1 text-muted opacity-50"></i>
+                        <p class="text-muted mt-2">No conversations yet.</p>
+                        <a href="{% url 'users_list' %}" class="btn btn-primary btn-sm rounded-pill px-4">Find Friends</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Active Chat -->
+        <div class="col-md-8 col-lg-9 h-100 d-flex flex-column bg-light-subtle">
+            {% if target_user %}
+                <!-- Chat Header -->
+                <div class="p-3 bg-white border-bottom d-flex align-items-center shadow-sm">
+                    <img src="{% if target_user.profile %}{{ target_user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}" 
+                         class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" alt="user">
+                    <div>
+                        <h6 class="mb-0 fw-bold">{{ target_user.username }}</h6>
+                        <small class="text-success">Personal Chat</small>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="{% url 'user_profile' target_user.userid %}" class="btn btn-light btn-sm rounded-circle"><i class="ri-user-line"></i></a>
+                    </div>
+                </div>
+
+                <!-- Messages Area -->
+                <div class="flex-grow-1 p-4 overflow-auto d-flex flex-column" id="message-container">
+                    {% for msg in messages %}
+                        <div class="mb-3 d-flex {% if msg.senderid == current_user.userid %}justify-content-end{% else %}justify-content-start{% endif %}">
+                            <div class="p-3 rounded-4 shadow-sm" 
+                                 style="max-width: 75%; {% if msg.senderid == current_user.userid %}background-color: rgb(15, 40, 84); color: white; border-bottom-right-radius: 4px;{% else %}background-color: white; color: #333; border-bottom-left-radius: 4px;{% endif %}">
+                                
+                                <!-- Rich Post Preview -->
+                                {% if msg.shared_post %}
+                                    <div class="shared-post-card bg-white rounded-3 overflow-hidden mb-2 border border-light-subtle shadow-sm mx-auto" style="width: 100%; min-width: 200px;">
+                                        {% if msg.shared_post.thumbnail %}
+                                            <img src="{{ msg.shared_post.thumbnail.url }}" class="img-fluid w-100" style="max-height: 180px; object-fit: cover;" alt="post">
+                                        {% endif %}
+                                        <div class="p-2 border-top">
+                                            <h6 class="fw-bold text-dark mb-1 small text-truncate">{{ msg.shared_post.posttitle }}</h6>
+                                            <p class="text-muted mb-2 overflow-hidden" style="font-size: 0.7rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                                {{ msg.shared_post.description }}
+                                            </p>
+                                            <a href="{% url 'buzz' %}#post-{{ msg.shared_post.postid }}" class="btn btn-primary btn-sm w-100 rounded-pill py-1 fw-bold" style="font-size: 0.75rem; background: rgb(15, 40, 84) !important;">
+                                                View Post
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <p class="mb-0" style="word-break: break-word;">{{ msg.message|urlize|linebreaksbr }}</p>
+                                <div class="text-end mt-1" style="font-size: 0.65rem; opacity: 0.7;">
+                                    {{ msg.senddt|date:"h:i A" }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-3 bg-white border-top">
+                    <form method="POST" class="d-flex align-items-center gap-2">
+                        {% csrf_token %}
+                        <input type="text" name="message" class="form-control rounded-pill border-0 bg-light px-4 shadow-none" 
+                               placeholder="Type a message..." required autocomplete="off">
+                        <button type="submit" class="btn btn-primary btn-icon rounded-circle shadow-sm" style="width: 45px; height: 45px; background: rgb(15, 40, 84) !important;">
+                            <i class="ri-send-plane-2-fill"></i>
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <!-- Empty State for Right Pane -->
+                <div class="h-100 d-flex flex-column align-items-center justify-content-center text-center p-5">
+                    <div class="bg-white rounded-circle shadow-sm p-4 mb-4">
+                        <i class="ri-message-2-line text-primary" style="font-size: 4rem; color: rgb(15, 40, 84) !important;"></i>
+                    </div>
+                    <h4 class="fw-bold">Your Direct Messages</h4>
+                    <p class="text-muted" style="max-width: 400px;">Select a friend from the list to start chatting or view shared posts privately.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Scroll to bottom of message container on load
+    window.onload = function() {
+        const container = document.getElementById('message-container');
+        if(container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    };
+</script>
+
+<style>
+    .bg-primary-subtle { background-color: rgba(13, 110, 253, 0.1) !important; }
+    .btn-icon { display: flex; align-items: center; justify-content: center; padding: 0; }
+    #message-container::-webkit-scrollbar { width: 6px; }
+    #message-container::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
+</style>
+{% endblock %}

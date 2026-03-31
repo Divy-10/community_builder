@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Calendar | UniVo{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Styling for FullCalendar to match Univo aesthetic */
+    #calendar {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        font-family: 'Inter', sans-serif;
+    }
+    .fc-toolbar-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700 !important;
+        font-size: 1.5rem !important;
+        color: #2b3445;
+    }
+    .fc-theme-standard td, .fc-theme-standard th {
+        border-color: #f1f3f5;
+    }
+    .fc-col-header-cell-cushion {
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+    .fc-daygrid-day-number {
+        color: #495057;
+        font-weight: 500;
+    }
+    .fc-event {
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 4px 8px !important;
+        margin-top: 2px !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        cursor: pointer;
+    }
+    .fc-event-title, .fc-event-time {
+        font-weight: 600 !important;
+        color: inherit !important;
+    }
+    .event-offline { background-color: rgba(255, 99, 132, 0.15) !important; color: #ff6384 !important; }
+    .event-online { background-color: rgba(54, 162, 235, 0.15) !important; color: #36a2eb !important; }
+    .event-internal { background-color: rgba(75, 192, 192, 0.15) !important; color: #4bc0c0 !important; }
+
+    .fc .fc-button-primary {
+        background-color: #f8f9fa !important;
+        border-color: #e9ecef !important;
+        color: #495057 !important;
+        text-transform: capitalize;
+        font-weight: 600;
+        border-radius: 8px;
+        box-shadow: none !important;
+    }
+    .fc .fc-button-primary:hover {
+        background-color: #e9ecef !important;
+        color: #212529 !important;
+    }
+    .fc .fc-button-primary:not(:disabled):active, .fc .fc-button-primary:not(:disabled).fc-button-active {
+        background-color: #3f6ad8 !important;
+        border-color: #3f6ad8 !important;
+        color: #fff !important;
+    }
+    .fc-today-button {
+      background-color: #eef2ff !important;
+      color: #4f46e5 !important;
+      border: none !important;
+    }
+    .fc-day-today {
+      background-color: rgba(63, 106, 216, 0.03) !important;
+    }
+    
+    .event-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .event-offline .event-dot { background-color: #ff6384; }
+    .event-online .event-dot { background-color: #36a2eb; }
+    .event-internal .event-dot { background-color: #4bc0c0; }
+
+</style>
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12 mb-4">
+        <div class="d-flex align-items-center justify-content-between">
+            <h2 class="fw-bold mb-0">Community Meetups Calendar</h2>
+            <p class="text-muted mb-0">Stay updated with all upcoming events</p>
+        </div>
+        <hr class="mt-3 mb-0">
+    </div>
+    <div class="col-sm-12 mt-4">
+        <div id='calendar'></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var meetups = {{ meetups_json|safe }};
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next title',
+                right: 'today'
+            },
+            events: meetups,
+            eventContent: function(arg) {
+                var typeClass = '';
+                if (arg.event.extendedProps.meetup_type === 'offline') typeClass = 'event-offline';
+                else if (arg.event.extendedProps.meetup_type === 'external') typeClass = 'event-online';
+                else typeClass = 'event-internal';
+
+                var timeText = '';
+                if (!arg.event.allDay) {
+                  // Format time
+                  var date = arg.event.start;
+                  var hours = date.getHours();
+                  var minutes = date.getMinutes();
+                  var ampm = hours >= 12 ? 'PM' : 'AM';
+                  hours = hours % 12;
+                  hours = hours ? hours : 12; 
+                  minutes = minutes < 10 ? '0' + minutes : minutes;
+                  timeText = hours + ':' + minutes + ' ' + ampm + ' ';
+                }
+
+                var titleStr = arg.event.title;
+
+                var outerHtml = '<div class="fc-event-main-frame d-flex align-items-center"><span class="event-dot"></span><span class="fc-event-time">' + timeText + '</span><span class="fc-event-title text-truncate ml-1">' + titleStr + '</span></div>';
+                
+                return { html: outerHtml };
+            },
+            eventClick: function(info) {
+                // Navigate to the meetup detail page when clicked
+                window.location.href = '/meetup/' + info.event.extendedProps.meetupid + '/';
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Find Friends{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <div class="header-title">
+                    <h4 class="card-title">User Directory</h4>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for u in users %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card shadow-none border">
+                            <div class="card-body text-center">
+                                <a href="{% url 'user_profile' u.userid %}">
+                                    {% if u.profile %}
+                                    <img src="{{ u.profile.url }}" alt="profile-img" class="rounded-circle img-fluid avatar-100 mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                                    {% else %}
+                                    <img src="{% static 'assets/images/user/1.jpg' %}" alt="profile-img" class="rounded-circle img-fluid avatar-100 mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'user_profile' u.userid %}" class="text-dark fade-in">
+                                    <h5>{{ u.username }}</h5>
+                                </a>
+                                <p class="mb-3">{{ u.bio|truncatechars:50 }}</p>
+                                
+                                <div class="d-flex justify-content-center gap-2">
+                                    <form action="{% url 'toggle_follow' u.userid %}" method="POST" class="d-inline">
+                                        {% csrf_token %}
+                                        {% if u.userid in following_ids %}
+                                            <button type="submit" class="btn btn-secondary">Unfollow</button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-primary">Follow</button>
+                                        {% endif %}
+                                    </form>
+                                    
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inviteModal{{ u.userid }}">
+                                        Invite
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Invite Modal -->
+                    <div class="modal fade" id="inviteModal{{ u.userid }}" tabindex="-1" aria-labelledby="inviteModalLabel{{ u.userid }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="inviteModalLabel{{ u.userid }}">Invite {{ u.username }} to Community</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{% url 'invite_user' u.userid %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        {% if comms_to_invite %}
+                                            <div class="mb-3">
+                                                <label for="communitySelect{{ u.userid }}" class="form-label">Select Community</label>
+                                                <select class="form-select" id="communitySelect{{ u.userid }}" name="community_id" required>
+                                                    <option value="" disabled selected>Choose a community...</option>
+                                                    {% for c in comms_to_invite %}
+                                                        <option value="{{ c.communityid }}">{{ c.communitytitle }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        {% else %}
+                                            <p>You need to join or create a community first before you can invite others!</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        {% if comms_to_invite %}
+                                            <button type="submit" class="btn btn-primary">Send Invite</button>
+                                        {% endif %}
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center">
+                        <p>No other users found.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

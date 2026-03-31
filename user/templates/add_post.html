@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Create Post | UniVo{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-white border-0 py-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary-subtle p-3 rounded-3 me-3">
+                        <i class="las la-plus-circle fs-2 text-primary"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">Create New Post</h3>
+                        <p class="text-muted mb-0">Share something with your communities or the buzz feed.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4 pt-0">
+                <hr class="mb-4">
+                <form action="{% url 'unified_add_post' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="post_type" class="form-label fw-bold">Where would you like to post?</label>
+                        <div class="d-flex gap-3 mt-2">
+                            <div class="form-check card-select flex-fill">
+                                <input class="form-check-input d-none" type="radio" name="post_type" id="type_buzz" value="buzz" checked>
+                                <label class="form-check-label w-100 p-3 border rounded-3 text-center cursor-pointer" for="type_buzz">
+                                    <i class="las la-bullhorn d-block fs-3 mb-1"></i>
+                                    <strong>Buzz Feed</strong>
+                                    <small class="d-block text-muted">Public feed for all followers</small>
+                                </label>
+                            </div>
+                            <div class="form-check card-select flex-fill">
+                                <input class="form-check-input d-none" type="radio" name="post_type" id="type_community" value="community">
+                                <label class="form-check-label w-100 p-3 border rounded-3 text-center cursor-pointer" for="type_community">
+                                    <i class="las la-users d-block fs-3 mb-1"></i>
+                                    <strong>Community</strong>
+                                    <small class="d-block text-muted">Post to a specific group</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="community_select_wrapper" class="mb-4 d-none">
+                        <label for="community_id" class="form-label fw-bold">Select Community</label>
+                        <select name="community_id" id="community_id" class="form-select rounded-3">
+                            <option value="">-- Choose a community --</option>
+                            {% for comm in communities %}
+                                <option value="{{ comm.communityid }}">{{ comm.communitytitle }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if not communities %}
+                            <small class="text-danger d-block mt-2">You don't have posting permissions in any community yet.</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="title" class="form-label fw-bold">Title</label>
+                        <input type="text" name="title" id="title" class="form-control rounded-3" placeholder="What's on your mind?" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="description" class="form-label fw-bold">Description</label>
+                        <textarea name="description" id="description" rows="5" class="form-control rounded-3" placeholder="Tell us more about it..." required></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="thumbnail" class="form-label fw-bold">Media (Image or Video)</label>
+                        <div class="upload-zone p-4 border-2 border-dashed rounded-4 text-center bg-light position-relative">
+                            <div id="upload-placeholder">
+                                <i class="las la-cloud-upload-alt fs-1 text-primary mb-2"></i>
+                                <p class="mb-2">Click to upload or drag and drop</p>
+                            </div>
+                            <div id="media-preview-container" class="d-none">
+                                <!-- Preview will be injected here -->
+                                <button type="button" id="remove-media" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle" style="z-index: 10;">
+                                    <i class="las la-times"></i>
+                                </button>
+                            </div>
+                            <input type="file" name="thumbnail" id="thumbnail" class="form-control" accept="image/*,video/*">
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-5">
+                        <button type="button" class="btn btn-light px-4 me-2" onclick="window.history.back()">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-5">Publish Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .cursor-pointer { cursor: pointer; }
+    .border-dashed { border-style: dashed !important; }
+    
+    .card-select input:checked + label {
+        background-color: var(--bs-primary-light);
+        border-color: var(--bs-primary) !important;
+        color: var(--bs-primary);
+    }
+    
+    .card-select label {
+        transition: all 0.2s ease;
+    }
+    
+    .card-select label:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+    }
+
+    .upload-zone {
+        transition: all 0.3s ease;
+        border: 2px dashed #dee2e6;
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .upload-zone:hover {
+        border-color: var(--bs-primary);
+        background-color: #f1f4f9 !important;
+    }
+
+    #thumbnail {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    #media-preview-container img, #media-preview-container video {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeBuzz = document.getElementById('type_buzz');
+        const typeComm = document.getElementById('type_community');
+        const commWrapper = document.getElementById('community_select_wrapper');
+        const commSelect = document.getElementById('community_id');
+
+        function toggleCommunitySelect() {
+            if (typeComm.checked) {
+                commWrapper.classList.remove('d-none');
+                commSelect.setAttribute('required', 'required');
+            } else {
+                commWrapper.classList.add('d-none');
+                commSelect.removeAttribute('required');
+            }
+        }
+
+        typeBuzz.addEventListener('change', toggleCommunitySelect);
+        typeComm.addEventListener('change', toggleCommunitySelect);
+
+        // Media Preview Logic
+        const thumbnailInput = document.getElementById('thumbnail');
+        const placeholder = document.getElementById('upload-placeholder');
+        const previewContainer = document.getElementById('media-preview-container');
+        const removeBtn = document.getElementById('remove-media');
+
+        thumbnailInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // Remove existing preview content
+                    const existingMedia = previewContainer.querySelector('img, video');
+                    if (existingMedia) existingMedia.remove();
+
+                    let mediaEl;
+                    if (file.type.startsWith('image/')) {
+                        mediaEl = document.createElement('img');
+                        mediaEl.src = event.target.result;
+                    } else if (file.type.startsWith('video/')) {
+                        mediaEl = document.createElement('video');
+                        mediaEl.src = event.target.result;
+                        mediaEl.controls = true;
+                    }
+
+                    if (mediaEl) {
+                        previewContainer.prepend(mediaEl);
+                        placeholder.classList.add('d-none');
+                        previewContainer.classList.remove('d-none');
+                        // Disable the file input overlay while previewing so controls/buttons are clickable
+                        thumbnailInput.style.pointerEvents = 'none';
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            thumbnailInput.value = '';
+            const existingMedia = previewContainer.querySelector('img, video');
+            if (existingMedia) existingMedia.remove();
+            placeholder.classList.remove('d-none');
+            previewContainer.classList.add('d-none');
+            thumbnailInput.style.pointerEvents = 'auto';
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,612 @@
+/* 
+  UniVo - Extremely Attractive & Vibrant Community Aesthetic 
+  Premium glassmorphism, soft colorful shadows, beautiful pastel gradients & elegant typography
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* requested palette */
+  --color-dark-navy: rgb(15, 40, 84);
+  --color-med-navy: rgb(28, 77, 141);
+  --color-med-blue: rgb(73, 136, 196);
+  --color-light-cyan: rgb(189, 232, 245);
+
+  /* Vibrant Brand Colors */
+  --bs-primary: var(--color-med-navy);
+  --bs-primary-hover: var(--color-dark-navy);
+  --bs-primary-light: rgba(73, 136, 196, 0.15);
+
+  --bs-secondary: rgba(255, 255, 255, 0.6); /* Glassy Secondary */
+  --bs-secondary-hover: rgba(255, 255, 255, 0.9);
+
+  --bs-success: #10B981; 
+  --bs-warning: #F59E0B; 
+  --bs-danger: #F43F5E; /* Rose */
+  --bs-info: #0EA5E9; 
+
+  /* Dynamic Gradients */
+  --gradient-brand: linear-gradient(135deg, var(--color-med-navy) 0%, var(--color-med-blue) 100%); 
+  --gradient-accent: linear-gradient(135deg, var(--color-med-blue) 0%, var(--color-light-cyan) 100%); 
+  
+  /* Playful Background */
+  --bs-body-bg-gradient: linear-gradient(135deg, var(--color-light-cyan) 0%, #ffffff 50%, var(--color-light-cyan) 100%);
+
+  /* Surface / Glassmorphism - Restored Global Look */
+  --bs-surface: rgba(255, 255, 255, 0.7); 
+  --bs-surface-glass: rgba(255, 255, 255, 0.6);
+  --bs-border-color: rgba(255, 255, 255, 0.4); 
+
+  /* Text Colors - Restored Contrast */
+  --bs-text-main: var(--color-dark-navy);
+  --bs-text-muted: #475569; 
+  --bs-text-light: #64748B; 
+
+  /* Typography */
+  --bs-font-sans-serif: 'Inter', system-ui, -apple-system, sans-serif;
+  --bs-font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
+
+  /* Shadows - Restored for Main Site Depth */
+  --shadow-sm: 0 4px 15px rgba(28, 77, 141, 0.08); 
+  --shadow-md: 0 10px 25px rgba(28, 77, 141, 0.12);
+  --shadow-lg: 0 20px 40px rgba(28, 77, 141, 0.15);
+  --shadow-hover: 0 15px 35px rgba(73, 136, 196, 0.2); 
+
+  /* Overrides for theme */
+  --iq-primary: var(--bs-primary);
+  --iq-light-primary: var(--bs-primary-light);
+  --iq-primary-hover: var(--bs-primary-hover);
+  --iq-secondary: var(--bs-secondary);
+  --iq-body-bg: transparent; /* Relying on body gradient */
+  --iq-body-text: var(--bs-text-main);
+}
+
+html, body {
+  height: 100vh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  margin: 0 !important;
+  font-family: var(--bs-font-sans-serif) !important;
+  background: var(--bs-body-bg-gradient) !important;
+  background-attachment: fixed !important;
+  color: var(--bs-text-main) !important;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* -------------------------------------
+   Header / Navigation Bar
+-------------------------------------- */
+.iq-top-navbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: var(--shadow-sm) !important;
+  height: 75px !important;
+  z-index: 2000 !important;
+}
+
+.iq-navbar-custom, .iq-navbar-custom .navbar, .iq-navbar-custom .navbar-collapse {
+  background: transparent !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.iq-top-navbar .navbar {
+  background: transparent !important;
+  padding: 0 24px !important;
+}
+
+/* Modern styling for logo text */
+.iq-navbar-logo span {
+  font-family: var(--bs-font-heading) !important;
+  font-weight: 800 !important;
+  font-size: 1.75rem !important;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+  text-transform: none;
+}
+
+/* Navbar text and icons */
+.iq-top-navbar .navbar-list li>a i {
+  color: var(--bs-primary) !important; /* Splash of color on icons */
+  font-size: 1.4rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.iq-top-navbar .navbar-list li>a:hover i {
+  color: var(--color-med-blue) !important; 
+  transform: translateY(-3px) scale(1.1);
+  text-shadow: 0 0 10px rgba(73, 136, 196, 0.4);
+}
+
+/* Navbar profile name */
+.iq-top-navbar .navbar-list li .caption h6 {
+  color: var(--bs-text-main) !important;
+  font-weight: 700 !important;
+  font-family: var(--bs-font-heading) !important;
+}
+
+/* Notif badges */
+.iq-top-navbar .nav-item span.bg-danger, 
+.iq-top-navbar .nav-item span.bg-warning, 
+.iq-top-navbar .nav-item span.bg-success {
+  background: var(--gradient-brand) !important;
+  border-color: rgba(255,255,255,0.8) !important;
+  box-shadow: 0 2px 5px rgba(28, 77, 141, 0.5) !important;
+}
+
+/* -------------------------------------
+   Glassmorphism Utilities
+-------------------------------------- */
+.glass-panel {
+  background: var(--bs-surface-glass) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid var(--bs-border-color) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Dedicated Class for Auth Pages (No Box) */
+.auth-card-clean {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.auth-card-clean .form-control,
+.auth-card-clean .form-select {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+/* Fix for invisible dropdown options on some browsers */
+.auth-card-clean .form-control option,
+.auth-card-clean .form-select option {
+  color: #fff !important;
+  background-color: var(--color-dark-navy) !important;
+}
+
+.auth-card-clean .form-label {
+  color: #fff !important;
+}
+
+.auth-card-clean h1, 
+.auth-card-clean p {
+  color: #fff !important;
+}
+
+/* -------------------------------------
+   Sidebar / Navigation Menu
+-------------------------------------- */
+.iq-sidebar {
+  position: fixed !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-right: 1px solid var(--bs-border-color) !important;
+  box-shadow: var(--shadow-sm) !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  height: calc(100vh - 75px) !important;
+  top: 75px !important;
+  transition: all 0.3s ease !important;
+  padding-top: 20px;
+  z-index: 1200 !important;
+  left: 0 !important;
+}
+
+.iq-sidebar-right {
+  position: fixed !important;
+  right: 0 !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid var(--bs-border-color) !important;
+  box-shadow: var(--shadow-md) !important;
+  margin: 20px !important;
+  border-radius: 24px !important;
+  height: calc(100vh - 110px) !important;
+  top: 75px !important;
+  transition: all 0.3s ease !important;
+  padding: 24px;
+  width: 280px;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+/* Sidebar navigation links */
+.iq-sidebar-menu .iq-menu li a {
+  border-radius: 14px !important; /* softer pill-like radius */
+  margin: 6px 16px !important;
+  padding: 12px 18px !important;
+  font-weight: 700 !important;
+  font-family: var(--bs-font-heading) !important;
+  color: var(--bs-text-muted) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  border: 1px solid transparent;
+}
+
+.iq-sidebar-menu .iq-menu li.active>a,
+.iq-sidebar-menu .iq-menu li a:hover {
+  background: rgba(255, 255, 255, 0.8) !important;
+  color: var(--color-med-navy) !important; 
+  transform: translateX(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow-sm);
+}
+
+.iq-sidebar-menu .iq-menu li.active>a i,
+.iq-sidebar-menu .iq-menu li a:hover i {
+  color: #8B5CF6 !important; /* Violet icon on hover */
+}
+
+.iq-sidebar-menu .iq-menu li a i {
+  color: var(--bs-primary) !important;
+  font-size: 1.5rem !important;
+  transition: color 0.3s ease !important;
+}
+
+/* -------------------------------------
+   Cards / Posts / Communities
+-------------------------------------- */
+.card, .iq-card {
+  border-radius: 20px !important; 
+  border: 1px solid var(--bs-border-color) !important;
+  box-shadow: var(--shadow-sm) !important;
+  background: var(--bs-surface) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  margin-bottom: 24px !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  overflow: hidden;
+}
+
+/* Interactive elements like groups hover state */
+a.card, .hover-shadow:hover, .card:hover {
+  transform: translateY(-8px) scale(1.01) !important; /* slight pop effect */
+  box-shadow: var(--shadow-hover) !important;
+  border-color: rgba(255, 255, 255, 1) !important;
+}
+
+/* -------------------------------------
+   Typography / Text Elements
+-------------------------------------- */
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--bs-font-heading) !important;
+  font-weight: 800 !important;
+  color: var(--bs-text-main) !important;
+  letter-spacing: -0.03em;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+p.text-muted, span.text-muted, small.text-muted, .text-muted {
+  color: var(--bs-text-muted) !important;
+  overflow-wrap: break-word;
+}
+
+a {
+  color: var(--bs-primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-med-blue) !important;
+}
+
+/* -------------------------------------
+   Buttons
+-------------------------------------- */
+.btn {
+  font-family: var(--bs-font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+  border-radius: 14px !important;
+  padding: 12px 24px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+  background: var(--gradient-brand) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 4px 15px rgba(28, 77, 141, 0.4) !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(28, 77, 141, 0.6) !important;
+  filter: brightness(115%);
+}
+
+.btn-secondary, .btn-light {
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: var(--bs-text-main) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+.btn-secondary:hover, .btn-light:hover {
+  background: rgba(255, 255, 255, 1) !important;
+  color: var(--bs-primary) !important;
+  border-color: #fff !important;
+  box-shadow: 0 5px 15px rgba(139, 92, 246, 0.2) !important;
+  transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+  border: 2px solid transparent !important;
+  background-clip: padding-box, border-box !important;
+  background-origin: padding-box, border-box !important;
+  background-image: linear-gradient(to right, #fff, #fff), var(--gradient-brand) !important;
+  color: var(--bs-primary) !important;
+}
+
+.btn-outline-primary:hover {
+  background-image: var(--gradient-brand), var(--gradient-brand) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.alert {
+  border: none !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px);
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.alert-danger {
+  background: rgba(244, 63, 94, 0.2) !important;
+  color: #fff !important;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #fff !important;
+}
+
+.rounded-pill {
+  border-radius: 9999px !important;
+}
+
+/* -------------------------------------
+   Forms / Inputs
+-------------------------------------- */
+.form-control, .form-select {
+  border-radius: 16px !important;
+  border: 1px solid var(--bs-border-color) !important;
+  padding: 14px 20px !important;
+  background: rgba(255, 255, 255, 0.6) !important; 
+  backdrop-filter: blur(15px);
+  color: var(--bs-text-main) !important;
+  font-size: 1rem;
+  transition: all 0.3s ease !important;
+  font-family: var(--bs-font-sans-serif);
+  box-shadow: none !important;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  outline: none !important;
+  transform: translateY(-1px);
+}
+
+.form-control::placeholder {
+  color: var(--bs-text-muted) !important;
+  font-weight: 500;
+}
+
+/* -------------------------------------
+   Images & Media
+-------------------------------------- */
+.post-img img {
+  border-radius: 16px !important;
+}
+
+.group-box .top-bg-image img {
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+}
+
+.img-fluid.rounded-circle {
+  border: 3px solid rgba(255,255,255,0.8) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+/* -------------------------------------
+   Comments section styling
+-------------------------------------- */
+.comments-list .bg-light {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.5);
+}
+
+hr {
+  border-top: 1px solid rgba(28, 77, 141, 0.15) !important;
+  opacity: 1 !important;
+  margin: 24px 0 !important;
+}
+
+/* -------------------------------------
+   Global scrollbar (Modern style)
+-------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(73, 136, 196, 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(73, 136, 196, 0.6);
+}
+
+/* Story Ring */
+.story-ring {
+  background: var(--gradient-brand) !important;
+  display: inline-block;
+  padding: 4px;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(28, 77, 141, 0.4);
+}
+
+.badge.bg-primary-subtle {
+  background: var(--gradient-brand) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 10px;
+  padding: 6px 14px;
+  box-shadow: 0 2px 8px rgba(28, 77, 141, 0.3) !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.70rem;
+}
+
+/* Layout Core Adjustments */
+.content-page {
+  /* Using transparent backgrounds because body handles gradients */
+  background: transparent !important;
+  height: calc(100vh - 75px - 60px) !important;
+  margin-top: 75px !important;
+  margin-left: 280px !important;
+  margin-right: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding-bottom: 80px !important;
+}
+
+.wrapper {
+  height: 100vh !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  display: block !important;
+}
+
+.content-page.has-right-sidebar {
+  margin-right: 320px !important;
+}
+
+.iq-footer {
+  position: fixed !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  height: 60px !important;
+  padding: 0 24px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(25px) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+  z-index: 2000 !important;
+  display: flex !important;
+  align-items: center;
+  width: 100% !important;
+}
+
+.iq-footer .list-inline-item a,
+.iq-footer a {
+  color: #1E293B !important;
+  font-weight: 600;
+}
+
+@media (max-width: 1290px) {
+  .iq-sidebar-right {
+    display: none !important;
+  }
+  .content-page.has-right-sidebar {
+    margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .content-page {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  .iq-sidebar {
+    left: -320px !important;
+  }
+/* -------------------------------------
+   Soft Alerts & Transitions
+-------------------------------------- */
+.alert-soft-warning {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  color: #B45309 !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+}
+
+.alert-soft-success {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: #065F46 !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+.alert-soft-primary {
+  background-color: rgba(73, 136, 196, 0.1) !important;
+  color: var(--color-med-navy) !important;
+  border: 1px solid rgba(73, 136, 196, 0.2) !important;
+}
+
+.transition {
+  transition: all 0.3s ease !important;
+}
+
+.ls-1 {
+  letter-spacing: 1px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Modal Enhancements */
+.modal-content {
+  border: none !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.modal-header .btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.input-group-text {
+  border-color: var(--bs-border-color) !important;
+}
+}
