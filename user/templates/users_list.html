@@ -214,37 +214,65 @@ function submitInvite(event, targetId) {
 {% endblock %}
 
 {% block right_sidebar %}
-<div class="iq-sidebar-right sidebar-default">
-    <div class="card shadow-none h-100 mb-0 border-0 bg-transparent">
-        <div class="card-header bg-transparent py-3 px-0">
-            <h5 class="card-title fw-bold d-flex align-items-center gap-2 mb-0">
-                <i class="las la-filter text-primary"></i> Filter Users
+<div class="iq-sidebar-right sidebar-default bg-transparent shadow-none p-0 overflow-visible" style="border: none !important;">
+    <!-- Floating Background Elements (Eco-Premium Accent) -->
+    <div class="premium-bg-container">
+        <div class="floating-element floating-1"></div>
+        <div class="floating-element floating-2"></div>
+    </div>
+
+    <!-- Main Filter Box (Premium Card) -->
+    <div class="premium-sidebar-card h-100">
+        <div class="border-bottom border-light pb-4 mb-4">
+            <h5 class="fw-bold d-flex align-items-center gap-3 mb-0">
+                <i class="ri-sound-module-line text-primary fs-3"></i>
+                <span class="ls-1">FILTER USERS</span>
             </h5>
+            <p class="text-muted small mb-0 mt-2">Find members by name or city</p>
         </div>
-        <div class="card-body px-0">
-            <form method="get" action="{% url 'users_list' %}">
-                <div class="mb-4">
-                    <label class="form-label text-muted small fw-bold">User Name</label>
-                    <input type="text" class="filter-input transition rounded-pill px-3 py-2 w-100" name="search_name" value="{{ search_name }}" placeholder="Search by name...">
-                </div>
-                <div class="mb-4">
-                    <label class="form-label text-muted small fw-bold">City</label>
-                    <select class="filter-input transition rounded-pill px-3 py-2 w-100" name="search_city">
-                        <option value="">All Cities</option>
-                        {% for city in cities %}
-                        <option value="{{ city.cityid }}" {% if search_city == city.cityid|stringformat:"i" %}selected{% endif %}>{{ city.cityname }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+
+        <form method="get" action="{% url 'users_list' %}" class="position-relative" style="z-index: 20;">
+            <!-- Name Filter -->
+            <div class="mb-4 pt-1">
+                <label class="form-label text-dark fs-7 fw-bold text-uppercase ls-1 mb-3 d-block">
+                    <i class="ri-user-search-line me-1 opacity-50"></i> User Name
+                </label>
+                <input type="text" 
+                       class="premium-input-field" 
+                       name="search_name" 
+                       value="{{ search_name }}" 
+                       placeholder="Enter name...">
+            </div>
+            
+            <!-- City Filter -->
+            <div class="mb-5">
+                <label class="form-label text-dark fs-7 fw-bold text-uppercase ls-1 mb-3 d-block">
+                    <i class="ri-map-pin-2-line me-1 opacity-50"></i> Location / City
+                </label>
+                <select class="premium-input-field premium-select-field" name="search_city">
+                    <option value="">All Regions</option>
+                    {% for city in cities %}
+                    <option value="{{ city.cityid }}" {% if search_city == city.cityid|stringformat:"i" %}selected{% endif %}>{{ city.cityname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="mt-5 pt-3">
+                <button type="submit" class="btn-premium-eco w-100 mb-3 d-flex align-items-center justify-content-center gap-2">
+                    <span>APPLY FILTERS</span>
+                    <i class="ri-arrow-right-line"></i>
+                </button>
                 
-                <div class="mt-4 pt-3">
-                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold hover-shadow transition mb-2 py-2">Apply Filters</button>
-                    <a href="{% url 'users_list' %}" class="btn btn-light w-100 rounded-pill fw-bold text-muted hover-shadow transition py-2">Clear All</a>
-                </div>
-            </form>
-        </div>
+                <a href="{% url 'users_list' %}" class="btn-premium-ghost w-100 d-flex align-items-center justify-content-center gap-2">
+                    <i class="ri-restart-line"></i>
+                    <span>RESET ALL</span>
+                </a>
+            </div>
+        </form>
     </div>
 </div>
-
 {% endblock %}
+
+
 {% block content_class %}has-right-sidebar{% endblock %}
