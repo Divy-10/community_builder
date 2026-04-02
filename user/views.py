@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime, timedelta
 import json
 from .models import *
 
@@ -1727,22 +1727,24 @@ def chats_list(request):
     # Combined set of ALL potential chat users (chatted or in network)
     all_potential_ids = chatted_user_ids | set(following_ids) | set(follower_ids)
 
-    # Search functionality
+    # 3. BUILD CONTACT LIST
     search_query = request.GET.get('search', '').strip()
-
-    # Build a list of users with their last message/stats for the sidebar
     chatted_users_list = []
     
-    # If searching, look through everyone in the potential contact list
-    # If NOT searching, only show existing chats to keep the sidebar clean
-    target_ids_to_process = all_potential_ids if search_query else chatted_user_ids
+    if search_query:
+        # Search ALL users in the system (limiting to 20 for performance)
+        # Exclude self and prioritize those in social network or existing chats if needed
+        search_results = user.objects.filter(
+            username__icontains=search_query
+        ).exclude(pk=userid)[:20]
+        target_ids_to_process = [u.userid for u in search_results]
+    else:
+        # Normal view: only those with existing chats
+        target_ids_to_process = chatted_user_ids
 
     for uid in target_ids_to_process:
         c_user = user.objects.filter(pk=uid).first()
         if c_user:
-            # Apply search filter if query is provided
-            if search_query and search_query.lower() not in c_user.username.lower():
-                continue
 
             # Fetch last message with this user
             last_msg = chat.objects.filter(
@@ -1757,11 +1759,11 @@ def chats_list(request):
                 'user': c_user,
                 'last_msg': last_msg,
                 'unread_count': unread_count,
-                'sort_date': last_msg.senddt if last_msg else datetime.min
+                'sort_date': last_msg.senddt if last_msg else timezone.make_aware(datetime(1970, 1, 1))
             })
     
     # Sort contacts: Most recent messages first, others at the end
-    chatted_users_list.sort(key=lambda x: x['sort_date'] or datetime.min, reverse=True)
+    chatted_users_list.sort(key=lambda x: x['sort_date'], reverse=True)
 
 
 

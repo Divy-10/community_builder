@@ -6,8 +6,8 @@
     <div class="row g-0 h-100 bg-white rounded-4 shadow-sm overflow-hidden">
         
         <!-- Left Sidebar: Contacts List -->
-        <div class="col-md-4 col-lg-3 border-end h-100 d-flex flex-column">
-            <div class="p-3 border-bottom bg-light">
+        <div class="col-md-4 col-lg-3 border-end h-100 d-flex flex-column" style="background: white;">
+            <div class="p-3 border-bottom bg-white">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold mb-0 text-dark">Direct Messages</h5>
                 </div>
@@ -15,8 +15,8 @@
                 <!-- Search Bar -->
                 <form method="GET" action="{% url 'chats' %}" class="position-relative">
                     <input type="text" name="search" value="{{ search_query|default:'' }}" 
-                           class="form-control rounded-pill border-0 bg-white px-4 shadow-sm" 
-                           placeholder="Search contacts..." style="padding-left: 40px !important;">
+                           class="form-control rounded-pill border-0 bg-light px-4 shadow-none" 
+                           placeholder="Search contacts..." style="padding-left: 40px !important; font-size: 0.9rem; background-color: #f0f2f5 !important;">
                     <i class="ri-search-line position-absolute top-50 translate-middle-y text-muted" 
                        style="left: 15px; font-size: 1.1rem;"></i>
                     {% if search_query %}
@@ -56,9 +56,18 @@
                 <div class="flex-grow-1 p-4 overflow-auto d-flex flex-column" id="message-container">
                     {% for msg in messages %}
 
-                        <div class="mb-3 d-flex {% if msg.senderid == current_user.userid %}justify-content-end{% else %}justify-content-start{% endif %}">
-                            <div class="p-3 rounded-4 shadow-sm" 
-                                 style="max-width: 75%; {% if msg.senderid == current_user.userid %}background-color: rgb(15, 40, 84); color: white; border-bottom-right-radius: 4px;{% else %}background-color: white; color: #333; border-bottom-left-radius: 4px;{% endif %}">
+                        <div class="mb-2 d-flex {% if msg.senderid == current_user.userid %}justify-content-end{% else %}justify-content-start{% endif %}">
+                            <div class="px-3 py-2 shadow-sm" 
+                                 style="max-width: 70%; border-radius: 16px; font-size: 0.95rem;
+                                 {% if msg.senderid == current_user.userid %}
+                                    background: linear-gradient(135deg, rgb(15, 40, 84) 0%, rgb(30, 60, 110) 100%); 
+                                    color: white; 
+                                    border-bottom-right-radius: 4px;
+                                 {% else %}
+                                    background-color: #f0f2f5; 
+                                    color: #050505; 
+                                    border-bottom-left-radius: 4px;
+                                 {% endif %}">
                                 
                                 <!-- Rich Post Preview -->
                                 {% if msg.shared_post %}
