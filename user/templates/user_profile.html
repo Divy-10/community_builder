@@ -37,11 +37,7 @@
 
                         <!-- Action Buttons and Navigation -->
                         <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap mt-2 mb-2">
-                            {% if is_own_profile %}
-                                <div class="d-flex align-items-center gap-2 m-0">
-                                    <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary px-4 rounded-pill fw-bold">Edit Profile</a>
-                                </div>
-                            {% else %}
+                            {% if not is_own_profile %}
                                 <form action="{% url 'toggle_follow' user_profile.userid %}" method="POST" class="d-inline m-0">
                                     {% csrf_token %}
                                     {% if is_following %}

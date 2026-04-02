@@ -147,6 +147,18 @@ html, body {
   box-shadow: 0 2px 5px rgba(28, 77, 141, 0.5) !important;
 }
 
+/* Rotating Logo Animation */
+@keyframes rotate-logo {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.rotating-logo {
+  animation: rotate-logo 10s linear infinite;
+  display: inline-block;
+  transform-origin: center;
+}
+
 /* -------------------------------------
    Glassmorphism Utilities
 -------------------------------------- */
@@ -195,38 +207,70 @@ html, body {
 -------------------------------------- */
 .iq-sidebar {
   position: fixed !important;
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(25px) !important;
-  -webkit-backdrop-filter: blur(25px) !important;
-  border-right: 1px solid var(--bs-border-color) !important;
-  box-shadow: var(--shadow-sm) !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
-  height: calc(100vh - 75px) !important;
-  top: 75px !important;
-  transition: all 0.3s ease !important;
-  padding-top: 20px;
-  z-index: 1200 !important;
-  left: 0 !important;
-}
-
-.iq-sidebar-right {
-  position: fixed !important;
-  right: 0 !important;
-  background: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.25) !important;
   backdrop-filter: blur(25px) !important;
   -webkit-backdrop-filter: blur(25px) !important;
   border: 1px solid var(--bs-border-color) !important;
   box-shadow: var(--shadow-md) !important;
-  margin: 20px !important;
+  margin: 0 !important;
   border-radius: 24px !important;
-  height: calc(100vh - 110px) !important;
-  top: 75px !important;
+  height: calc(100vh - 75px - 35px - 40px) !important;
+  top: 95px !important;
+  transition: all 0.3s ease !important;
+  padding-top: 20px;
+  z-index: 800 !important;
+  left: 20px !important;
+  overflow-y: auto !important;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.iq-sidebar::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari and Opera */
+}
+
+.iq-sidebar-right {
+  position: fixed !important;
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid var(--bs-border-color) !important;
+  box-shadow: var(--shadow-md) !important;
+  margin: 0 !important;
+  border-radius: 24px !important;
+  height: calc(100vh - 75px - 35px - 40px) !important;
+  top: 95px !important;
   transition: all 0.3s ease !important;
   padding: 24px;
   width: 280px;
-  z-index: 1000;
-  overflow-y: auto;
+  z-index: 1200 !important;
+  right: 20px !important;
+  overflow-y: auto !important;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Sidebar inner content padding for scrolling past footer */
+.iq-sidebar-right > div, .iq-sidebar > div {
+  padding-bottom: 80px !important;
+}
+
+/* Filter Input Styling */
+.filter-input {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    color: var(--bs-text-main) !important;
+    outline: none !important;
+}
+
+.filter-input:focus {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: var(--bs-primary) !important;
+    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.1) !important;
+}
+
+.iq-sidebar-right::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari and Opera */
 }
 
 /* Sidebar navigation links */
@@ -460,21 +504,19 @@ hr {
 }
 
 /* -------------------------------------
-   Global scrollbar (Modern style)
+   Global scrollbar (Universal Removal)
 -------------------------------------- */
+*::-webkit-scrollbar {
+  display: none !important;
+}
+
+* {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(73, 136, 196, 0.3);
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(73, 136, 196, 0.6);
+  display: none !important;
 }
 
 /* Story Ring */
@@ -502,16 +544,20 @@ hr {
 .content-page {
   /* Using transparent backgrounds because body handles gradients */
   background: transparent !important;
-  height: calc(100vh - 75px - 60px) !important;
+  height: calc(100vh - 75px - 45px) !important;
   margin-top: 75px !important;
-  margin-left: 280px !important;
-  margin-right: 0 !important;
+  margin-left: 310px !important; /* 280px sidebar + 20px left gap + 10px breathing room */
+  margin-right: 10px !important; /* breathing room */
   overflow-y: auto !important;
   overflow-x: hidden !important;
   transition: all 0.3s ease !important;
   display: flex !important;
   flex-direction: column !important;
-  padding-bottom: 80px !important;
+  padding-bottom: 100px !important;
+}
+
+.content-page.has-right-sidebar {
+  margin-right: 310px !important; /* 280px sidebar + 20px right gap + 10px breathing room */
 }
 
 .wrapper {
@@ -529,7 +575,7 @@ hr {
   position: fixed !important;
   bottom: 0 !important;
   right: 0 !important;
-  height: 60px !important;
+  height: 45px !important;
   padding: 0 24px !important;
   background: rgba(255, 255, 255, 0.3) !important;
   backdrop-filter: blur(25px) !important;
@@ -543,7 +589,8 @@ hr {
 .iq-footer .list-inline-item a,
 .iq-footer a {
   color: #1E293B !important;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 14px !important;
 }
 
 @media (max-width: 1290px) {
@@ -609,4 +656,38 @@ hr {
 .input-group-text {
   border-color: var(--bs-border-color) !important;
 }
+}
+
+/* Sidebars inner card and content fix */
+.iq-sidebar .card, .iq-sidebar-right .card {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  height: auto !important; /* Remove h-100 constraint */
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+.iq-sidebar-right .card-body, .iq-sidebar .card-body {
+    padding-bottom: 10px !important; /* Minimal room for buttons and shadows */
+    overflow: visible !important;
+}
+
+.iq-sidebar-right > div, .iq-sidebar > div {
+  padding-bottom: 0 !important; /* Moving padding to card-body for better scroll */
+}
+
+/* Ensuring form doesn't clip shadows */
+.iq-sidebar-right form {
+    overflow: visible !important;
+    display: block !important;
+}
+
+.text-truncate-sidebar {
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
 }

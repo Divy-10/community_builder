@@ -316,7 +316,7 @@ def delete_buzz_post(request, post_id):
 def signup(request):
     import re
     data={
-        "states":state.objects.all()
+        "states":state.objects.all().order_by('statename')
     }
     if request.POST.get('sign-up-btn'):
         username=request.POST.get('name')
@@ -369,7 +369,7 @@ def signup(request):
     return render(request,'sign-up.html',data)
 
 def get_cities_by_state(request, state_id):
-    cities = city.objects.filter(stateid_id=state_id).values('cityid', 'cityname')
+    cities = city.objects.filter(stateid_id=state_id).order_by('cityname').values('cityid', 'cityname')
     return JsonResponse(list(cities), safe=False)
 
 def signin(request):
@@ -448,7 +448,7 @@ def logout_view(request):
         except Exception:
             pass
     request.session.flush()
-    return redirect('signup')
+    return redirect('signin')
 
 def forgot_password(request):
     if request.method == 'POST':
@@ -1090,8 +1090,8 @@ def edit_profile(request):
         
     u = user.objects.get(pk=userid)
     data = {
-        "states": state.objects.all(),
-        "cities": city.objects.all(),
+        "states": state.objects.all().order_by('statename'),
+        "cities": city.objects.all().order_by('cityname'),
         "user_profile": u,
         "user_state_id": u.cityid.stateid.stateid if u.cityid else None,
     }
@@ -1799,7 +1799,7 @@ def activity(request):
             'post': l.postid,
             # like model doesn't have a date, we will use the post date as a fallback, or we can just sort by likeid as a proxy for time
             # Since like model lacks addeddt, we'll assign a mock date or None
-            'date': getattr(l, 'addeddt', None), 
+            'date': getattr(l, 'createddt', None), 
             'id': l.likeid
         })
         
@@ -1820,7 +1820,7 @@ def activity(request):
             'type': 'follow',
             'user': follower,
             # No date on follow model natively, use fallback or None
-            'date': getattr(f, 'addeddt', None),
+            'date': getattr(f, 'createddt', None),
             'id': f.followid
         })
 
@@ -2000,8 +2000,23 @@ def settings_view(request):
         if action == 'update_profile':
             u.username = request.POST.get('name', u.username)
             u.email = request.POST.get('email', u.email)
-            u.phone = request.POST.get('phone', u.phone)
+            
+            phone = request.POST.get('phone', u.phone)
+            if phone and len(phone) != 10:
+                messages.error(request, "Phone number must be exactly 10 digits.")
+                return redirect('settings')
+            u.phone = phone
+            
             u.bio = request.POST.get('bio', u.bio)
+            u.gender = request.POST.get('gender', u.gender)
+            u.dob = request.POST.get('dob', u.dob)
+            
+            city_id = request.POST.get('city')
+            if city_id:
+                try:
+                    u.cityid = city.objects.get(pk=city_id)
+                except city.DoesNotExist:
+                    pass
             
             if 'profile_pic' in request.FILES:
                 u.profile = request.FILES['profile_pic']
@@ -2022,7 +2037,15 @@ def settings_view(request):
                 messages.error(request, "Current password is incorrect.")
             return redirect('settings')
 
-    return render(request, 'settings.html', {'current_user': u, 'settings': settings})
+    states_list = state.objects.all().order_by('statename')
+    user_state_id = u.cityid.stateid.stateid if u.cityid else None
+    
+    return render(request, 'settings.html', {
+        'current_user': u, 
+        'settings': settings,
+        'states': states_list,
+        'user_state_id': user_state_id
+    })
 
 # ─── Meetups ───────────────────────────────────────────────────────
 

@@ -65,6 +65,53 @@
         font-size: 12px;
         padding: 5px 0;
     }
+
+    /* Enhanced Form Styling */
+    .form-control, .form-select {
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1.5px solid transparent !important;
+    }
+    
+    .form-control.bg-light, .form-select.bg-light {
+        background-color: #f8f9fa !important;
+        border-color: #f1f3f5 !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background-color: #fff !important;
+        border-color: var(--bs-primary) !important;
+        box-shadow: 0 0 0 4px rgba(var(--bs-primary-rgb), 0.1) !important;
+        transform: translateY(-1px);
+    }
+    
+    .form-control:hover:not(:focus), .form-select:hover:not(:focus) {
+        background-color: #f1f3f5 !important;
+        border-color: #e9ecef !important;
+    }
+
+    /* Dark Mode Form Styling */
+    body.dark-mode .form-control, body.dark-mode .form-select {
+        background-color: #2a2a2a !important;
+        border-color: #333 !important;
+        color: #e0e0e0 !important;
+    }
+    
+    body.dark-mode .form-control:focus, body.dark-mode .form-select:focus {
+        background-color: #333 !important;
+        border-color: var(--bs-primary) !important;
+    }
+
+    .form-label {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        color: #495057;
+    }
+    
+    body.dark-mode .form-label {
+        color: #adb5bd;
+    }
 </style>
 
 <div class="row">
@@ -75,6 +122,7 @@
                 <h5 class="fw-bold px-3 mb-3">Settings</h5>
                 <div class="nav flex-column nav-pills settings-nav" id="settings-tab" role="tablist" aria-orientation="vertical">
                     <button class="nav-link active" onclick="switchTab('account')" id="tab-account" type="button"><i class="ri-user-settings-line"></i> Account</button>
+                    <button class="nav-link" onclick="switchTab('security')" id="tab-security" type="button"><i class="ri-shield-keyhole-line"></i> Security</button>
                     <button class="nav-link" onclick="switchTab('appearance')" id="tab-appearance" type="button"><i class="ri-paint-brush-line"></i> Appearance</button>
                     <button class="nav-link" onclick="switchTab('notifications')" id="tab-notifications" type="button"><i class="ri-notification-3-line"></i> Notifications</button>
                     <button class="nav-link" onclick="switchTab('regional')" id="tab-regional" type="button"><i class="ri-global-line"></i> Language & Region</button>
@@ -119,43 +167,87 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">Name</label>
-                                <input type="text" name="name" class="form-control rounded-3 bg-light border-0" value="{{ current_user.username }}" required>
+                                <input type="text" name="name" class="form-control rounded-3 bg-light" value="{{ current_user.username }}" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">Email</label>
-                                <input type="email" name="email" class="form-control rounded-3 bg-light border-0" value="{{ current_user.email }}" required>
+                                <input type="email" name="email" class="form-control rounded-3 bg-light" value="{{ current_user.email }}" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">Phone</label>
-                                <input type="text" name="phone" class="form-control rounded-3 bg-light border-0" value="{{ current_user.phone|default:'' }}">
+                                <input type="text" name="phone" class="form-control rounded-3 bg-light" 
+                                    value="{{ current_user.phone|default:'' }}" 
+                                    pattern="[0-9]{10}" 
+                                    maxlength="10" 
+                                    minlength="10" 
+                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                    title="Please enter a valid 10-digit phone number">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Date of Birth</label>
+                                <input type="date" name="dob" id="dob" class="form-control rounded-3 bg-light" value="{{ current_user.dob|date:'Y-m-d' }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Gender</label>
+                                <div class="d-flex gap-3 mt-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="gender" id="genderM" value="male" {% if current_user.gender|lower == 'male' %}checked{% endif %}>
+                                        <label class="form-check-label" for="genderM">Male</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="gender" id="genderF" value="female" {% if current_user.gender|lower == 'female' %}checked{% endif %}>
+                                        <label class="form-check-label" for="genderF">Female</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label fw-semibold">Bio</label>
-                            <textarea name="bio" class="form-control rounded-3 bg-light border-0" rows="3">{{ current_user.bio }}</textarea>
+                            <textarea name="bio" class="form-control rounded-3 bg-light" rows="3">{{ current_user.bio }}</textarea>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">State</label>
+                                <select name="state" id="state" class="form-select rounded-3 bg-light" required>
+                                    <option value="">-- Select State --</option>
+                                    {% for s in states %}
+                                    <option value="{{ s.stateid }}" {% if user_state_id == s.stateid %}selected{% endif %}>{{ s.statename }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">City</label>
+                                <select name="city" id="city" class="form-select rounded-3 bg-light" required disabled>
+                                    <option value="">-- Select State First --</option>
+                                </select>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Save Profile</button>
                     </form>
                 </div>
             </div>
+        </div>
 
-            <!-- Password Change -->
+        <!-- 1.5 Security (Moved) -->
+        <div class="settings-panel" id="panel-security">
             <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-header border-bottom-0 bg-transparent pt-4 px-4">
-                    <h5 class="card-title fw-bold">Change Password</h5>
+                    <h4 class="card-title fw-bold">Security Settings</h4>
                 </div>
                 <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Change Password</h5>
                     <form action="{% url 'settings' %}" method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="change_password">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">Current Password</label>
-                                <input type="password" name="current_password" class="form-control rounded-3 bg-light border-0" required>
+                                <input type="password" name="current_password" class="form-control rounded-3 bg-light" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">New Password</label>
-                                <input type="password" name="new_password" class="form-control rounded-3 bg-light border-0" required>
+                                <input type="password" name="new_password" class="form-control rounded-3 bg-light" required>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold mt-2">Update Password</button>
@@ -171,7 +263,7 @@
                     <h4 class="card-title fw-bold">Appearance</h4>
                 </div>
                 <div class="card-body p-4">
-                    <form id="appearanceForm" onchange="saveAjax('appearanceForm', 'update_appearance')">
+                    <form id="appearanceForm" onchange="applyAppearance(); saveAjax('appearanceForm', 'update_appearance')">
                         
                         <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 bg-light">
                             <div>
@@ -203,7 +295,7 @@
 
                         <div class="mb-4 p-3 rounded-3 bg-light">
                             <h6 class="fw-bold mb-3">Font Size</h6>
-                            <select name="font_size" class="form-select rounded-3 border-0 shadow-sm" style="max-width: 200px;">
+                            <select name="font_size" class="form-select rounded-3 border bg-white shadow-sm" style="max-width: 200px;">
                                 <option value="small" {% if settings.font_size == 'small' %}selected{% endif %}>Small</option>
                                 <option value="medium" {% if settings.font_size == 'medium' %}selected{% endif %}>Medium (Default)</option>
                                 <option value="large" {% if settings.font_size == 'large' %}selected{% endif %}>Large</option>
@@ -265,7 +357,7 @@
 
                         <div class="mb-2 p-3 rounded-3 bg-light">
                             <h6 class="fw-bold mb-3">Notification Frequency</h6>
-                            <select name="notification_frequency" class="form-select rounded-3 border-0 shadow-sm" style="max-width: 250px;">
+                            <select name="notification_frequency" class="form-select rounded-3 border bg-white shadow-sm" style="max-width: 250px;">
                                 <option value="instant" {% if settings.notification_frequency == 'instant' %}selected{% endif %}>Instant (As it happens)</option>
                                 <option value="daily" {% if settings.notification_frequency == 'daily' %}selected{% endif %}>Daily Digest</option>
                                 <option value="weekly" {% if settings.notification_frequency == 'weekly' %}selected{% endif %}>Weekly Summary</option>
@@ -287,7 +379,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-4">
                                 <label class="form-label fw-bold">Language</label>
-                                <select name="language" class="form-select bg-light border-0 rounded-3">
+                                <select name="language" class="form-select bg-light rounded-3">
                                     <option value="English" {% if settings.language == 'English' %}selected{% endif %}>English (US)</option>
                                     <option value="Hindi" {% if settings.language == 'Hindi' %}selected{% endif %}>Hindi / हिन्दी</option>
                                     <option value="Gujarati" {% if settings.language == 'Gujarati' %}selected{% endif %}>Gujarati / ગુજરાતી</option>
@@ -296,7 +388,7 @@
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label class="form-label fw-bold">Currency Format</label>
-                                <select name="currency_format" class="form-select bg-light border-0 rounded-3">
+                                <select name="currency_format" class="form-select bg-light rounded-3">
                                     <option value="INR" {% if settings.currency_format == 'INR' %}selected{% endif %}>INR (₹)</option>
                                     <option value="USD" {% if settings.currency_format == 'USD' %}selected{% endif %}>USD ($)</option>
                                     <option value="EUR" {% if settings.currency_format == 'EUR' %}selected{% endif %}>EUR (€)</option>
@@ -304,7 +396,7 @@
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label class="form-label fw-bold">Date & Time Format</label>
-                                <select name="date_time_format" class="form-select bg-light border-0 rounded-3">
+                                <select name="date_time_format" class="form-select bg-light rounded-3">
                                     <option value="DD/MM/YYYY" {% if settings.date_time_format == 'DD/MM/YYYY' %}selected{% endif %}>DD/MM/YYYY (31/12/2026)</option>
                                     <option value="MM/DD/YYYY" {% if settings.date_time_format == 'MM/DD/YYYY' %}selected{% endif %}>MM/DD/YYYY (12/31/2026)</option>
                                     <option value="YYYY-MM-DD" {% if settings.date_time_format == 'YYYY-MM-DD' %}selected{% endif %}>YYYY-MM-DD (2026-12-31)</option>
@@ -330,7 +422,7 @@
                                 <h6 class="fw-bold mb-1">Profile Visibility</h6>
                                 <p class="text-muted small mb-0">Who can see your profile details</p>
                             </div>
-                            <select name="profile_visibility" class="form-select rounded-3 border-0 shadow-sm" style="max-width: 150px;">
+                            <select name="profile_visibility" class="form-select rounded-3 border bg-white shadow-sm" style="max-width: 150px;">
                                 <option value="public" {% if settings.profile_visibility == 'public' %}selected{% endif %}>Public</option>
                                 <option value="private" {% if settings.profile_visibility == 'private' %}selected{% endif %}>Private</option>
                             </select>
@@ -416,6 +508,41 @@
         document.getElementById('panel-' + tabId).classList.add('active');
     }
 
+    // Real-time Appearance Application
+    function applyAppearance() {
+        const form = document.getElementById('appearanceForm');
+        const darkMode = form.querySelector('input[name="dark_mode"]').checked;
+        const themeColor = form.querySelector('input[name="theme_color"]:checked').value;
+        const fontSize = form.querySelector('select[name="font_size"]').value;
+
+        // 1. Dark Mode
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+
+        // 2. Theme Color
+        let primaryColor = "rgb(15, 40, 84)";
+        let primaryRGB = "15, 40, 84";
+        if (themeColor === 'purple') {
+            primaryColor = "rgb(102, 51, 153)";
+            primaryRGB = "102, 51, 153";
+        } else if (themeColor === 'green') {
+            primaryColor = "rgb(34, 139, 34)";
+            primaryRGB = "34, 139, 34";
+        }
+
+        document.documentElement.style.setProperty('--bs-primary', primaryColor, 'important');
+        document.documentElement.style.setProperty('--bs-primary-rgb', primaryRGB, 'important');
+
+        // 3. Font Size
+        let fs = "16px";
+        if (fontSize === 'small') fs = "14px";
+        else if (fontSize === 'large') fs = "18px";
+        document.documentElement.style.fontSize = fs;
+    }
+
     // Handle AJAX forms for quick toggles
     function saveAjax(formId, actionName) {
         const form = document.getElementById(formId);
@@ -470,6 +597,67 @@
             }
             reader.readAsDataURL(input.files[0]);
         }
+    }
+
+    // Dynamic City Loading Logic
+    var currentCityId = "{{ current_user.cityid.cityid }}";
+
+    function loadCities(stateId, preselect) {
+        var citySelect = document.getElementById('city');
+        if (!citySelect) return;
+        
+        citySelect.innerHTML = '<option value="">-- Loading... --</option>';
+        citySelect.disabled = true;
+
+        if (!stateId) {
+            citySelect.innerHTML = '<option value="">-- Select State First --</option>';
+            return;
+        }
+
+        const url = "{% url 'get_cities_by_state' state_id=0 %}".replace('0', stateId);
+        fetch(url)
+            .then(function (response) { 
+                if (!response.ok) throw new Error('API Error: ' + response.status);
+                return response.json(); 
+            })
+            .then(function (data) {
+                citySelect.innerHTML = '<option value="">-- Select City --</option>';
+                if (data.length === 0) {
+                    citySelect.innerHTML = '<option value="">-- No Cities Found --</option>';
+                }
+                data.forEach(function (c) {
+                    var opt = document.createElement('option');
+                    opt.value = c.cityid;
+                    opt.textContent = c.cityname;
+                    if (preselect && String(c.cityid) === String(preselect)) {
+                        opt.selected = true;
+                    }
+                    citySelect.appendChild(opt);
+                });
+                citySelect.disabled = false;
+            })
+            .catch(function(error) {
+                console.error('Fetch Error:', error);
+                citySelect.innerHTML = '<option value="">-- Error Loading Cities --</option>';
+            });
+    }
+
+    const stateEl = document.getElementById('state');
+    if (stateEl) {
+        stateEl.addEventListener('change', function () {
+            loadCities(this.value, null);
+        });
+
+        // Auto-load cities for pre-selected state
+        if (stateEl.value) {
+            loadCities(stateEl.value, currentCityId);
+        }
+    }
+
+    // DOB Max Date Constraint
+    const dobEl = document.getElementById('dob');
+    if (dobEl) {
+        dobEl.max = new Date().toISOString().split('T')[0];
     }
 </script>
 {% endblock %}
