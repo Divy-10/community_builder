@@ -1710,20 +1710,41 @@ def chats_list(request):
             )
         return redirect(f"{request.path}?u={target_userid}")
 
-    # Fetch unique users the current user has chatted with
+    # 1. Fetch unique users the current user HAS ALREADY chatted with
     all_user_chats = chat.objects.filter(Q(senderid=userid) | Q(receiverid=userid))
-    user_ids = set()
+    chatted_user_ids = set()
     for c in all_user_chats:
         if c.senderid != int(userid):
-            user_ids.add(c.senderid)
+            chatted_user_ids.add(c.senderid)
         if c.receiverid != int(userid):
-            user_ids.add(c.receiverid)
+            chatted_user_ids.add(c.receiverid)
 
-    # Build a list of users with their last message for the sidebar
+    # 2. Fetch users the current user FOLLOWS or is FOLLOWED BY (their social network)
+    # This allows discovering users to start a new chat with.
+    following_ids = follow.objects.filter(followerid=userid).values_list('userid_id', flat=True)
+    follower_ids = follow.objects.filter(userid=u).values_list('followerid', flat=True)
+    
+    # Combined set of ALL potential chat users (chatted or in network)
+    all_potential_ids = chatted_user_ids | set(following_ids) | set(follower_ids)
+
+    # Search functionality
+    search_query = request.GET.get('search', '').strip()
+
+    # Build a list of users with their last message/stats for the sidebar
     chatted_users_list = []
-    for uid in user_ids:
+    
+    # If searching, look through everyone in the potential contact list
+    # If NOT searching, only show existing chats to keep the sidebar clean
+    target_ids_to_process = all_potential_ids if search_query else chatted_user_ids
+
+    for uid in target_ids_to_process:
         c_user = user.objects.filter(pk=uid).first()
         if c_user:
+            # Apply search filter if query is provided
+            if search_query and search_query.lower() not in c_user.username.lower():
+                continue
+
+            # Fetch last message with this user
             last_msg = chat.objects.filter(
                 (Q(senderid=userid) & Q(receiverid=uid)) |
                 (Q(senderid=uid) & Q(receiverid=userid))
@@ -1739,8 +1760,10 @@ def chats_list(request):
                 'sort_date': last_msg.senddt if last_msg else datetime.min
             })
     
-    # Sort contacts by most recent interaction
+    # Sort contacts: Most recent messages first, others at the end
     chatted_users_list.sort(key=lambda x: x['sort_date'] or datetime.min, reverse=True)
+
+
 
     messages = []
     target_user = None
@@ -1762,8 +1785,14 @@ def chats_list(request):
         'chatted_users_list': chatted_users_list,
         'messages': messages,
         'target_user': target_user,
+        'search_query': search_query,
     }
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render(request, 'chats_sidebar_items.html', data)
+
     return render(request, 'chats_list.html', data)
+
 
 # ─── Activity Page ────────────────────────────────────────────────────
 

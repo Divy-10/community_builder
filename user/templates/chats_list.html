@@ -8,45 +8,30 @@
         <!-- Left Sidebar: Contacts List -->
         <div class="col-md-4 col-lg-3 border-end h-100 d-flex flex-column">
             <div class="p-3 border-bottom bg-light">
-                <h5 class="fw-bold mb-0 text-dark">Direct Messages</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-dark">Direct Messages</h5>
+                </div>
+                
+                <!-- Search Bar -->
+                <form method="GET" action="{% url 'chats' %}" class="position-relative">
+                    <input type="text" name="search" value="{{ search_query|default:'' }}" 
+                           class="form-control rounded-pill border-0 bg-white px-4 shadow-sm" 
+                           placeholder="Search contacts..." style="padding-left: 40px !important;">
+                    <i class="ri-search-line position-absolute top-50 translate-middle-y text-muted" 
+                       style="left: 15px; font-size: 1.1rem;"></i>
+                    {% if search_query %}
+                        <a href="{% url 'chats' %}" class="position-absolute top-50 translate-middle-y text-muted" 
+                           style="right: 15px; cursor: pointer;">
+                            <i class="ri-close-circle-fill"></i>
+                        </a>
+                    {% endif %}
+                </form>
             </div>
+
             
             <div class="flex-grow-1 overflow-auto">
-                <div class="list-group list-group-flush">
-                    {% for item in chatted_users_list %}
-                    <a href="?u={{ item.user.userid }}" class="list-group-item list-group-item-action border-0 p-3 {% if target_user.userid == item.user.userid %}bg-primary-subtle{% endif %}">
-                        <div class="d-flex align-items-center">
-                            <div class="position-relative">
-                                <img src="{% if item.user.profile %}{{ item.user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}" 
-                                     class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover;" alt="user">
-                            </div>
-                            <div class="ms-3 flex-grow-1 overflow-hidden">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0 fw-bold text-dark text-truncate">{{ item.user.username }}</h6>
-                                    {% if item.unread_count > 0 %}
-                                        <span class="badge rounded-pill bg-danger shadow-sm ms-2" style="font-size: 0.65rem;">{{ item.unread_count }}</span>
-                                    {% endif %}
-                                    {% if item.last_msg %}
-                                    <small class="text-muted ms-auto" style="font-size: 0.7rem;">{{ item.last_msg.senddt|timesince }}</small>
-                                    {% endif %}
-                                </div>
-                                <p class="mb-0 text-muted small text-truncate">
-                                    {% if item.last_msg %}
-                                        {% if item.last_msg.senderid == current_user.userid %}You: {% endif %}{{ item.last_msg.message }}
-                                    {% else %}
-                                        No messages yet
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                    {% empty %}
-                    <div class="p-5 text-center">
-                        <i class="ri-message-3-line fs-1 text-muted opacity-50"></i>
-                        <p class="text-muted mt-2">No conversations yet.</p>
-                        <a href="{% url 'users_list' %}" class="btn btn-primary btn-sm rounded-pill px-4">Find Friends</a>
-                    </div>
-                    {% endfor %}
+                <div class="list-group list-group-flush" id="contacts-list">
+                    {% include 'chats_sidebar_items.html' %}
                 </div>
             </div>
         </div>
@@ -70,6 +55,7 @@
                 <!-- Messages Area -->
                 <div class="flex-grow-1 p-4 overflow-auto d-flex flex-column" id="message-container">
                     {% for msg in messages %}
+
                         <div class="mb-3 d-flex {% if msg.senderid == current_user.userid %}justify-content-end{% else %}justify-content-start{% endif %}">
                             <div class="p-3 rounded-4 shadow-sm" 
                                  style="max-width: 75%; {% if msg.senderid == current_user.userid %}background-color: rgb(15, 40, 84); color: white; border-bottom-right-radius: 4px;{% else %}background-color: white; color: #333; border-bottom-left-radius: 4px;{% endif %}">
@@ -135,7 +121,57 @@
             container.scrollTop = container.scrollHeight;
         }
     };
+
+    // Live Search Logic
+    const searchInput = document.querySelector('input[name="search"]');
+    const contactsList = document.getElementById('contacts-list');
+    const searchForm = searchInput.closest('form');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+        
+        // Toggle Clear Button
+        let clearBtn = searchForm.querySelector('.ri-close-circle-fill');
+        if (query.length > 0) {
+            if (!clearBtn) {
+                const a = document.createElement('a');
+                a.href = "{% url 'chats' %}";
+                a.className = "position-absolute top-50 translate-middle-y text-muted";
+                a.style.right = "15px";
+                a.style.cursor = "pointer";
+                a.innerHTML = '<i class="ri-close-circle-fill"></i>';
+                searchForm.appendChild(a);
+            }
+        } else {
+            if (clearBtn) clearBtn.parentElement.remove();
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`{% url 'chats' %}?search=${encodeURIComponent(query)}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                contactsList.innerHTML = html;
+                
+                // Update URL without reloading (optional, but good for UX)
+                const newUrl = window.location.pathname + (query ? `?search=${encodeURIComponent(query)}` : '');
+                window.history.replaceState({path: newUrl}, '', newUrl);
+            })
+            .catch(error => console.error('Error fetching search results:', error));
+        }, 300);
+    });
+
+    // Prevent form submission on Enter (handled by live search)
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+    });
 </script>
+
 
 <style>
     .bg-primary-subtle { background-color: rgba(13, 110, 253, 0.1) !important; }

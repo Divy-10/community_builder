@@ -502,7 +502,7 @@ hr {
 .content-page {
   /* Using transparent backgrounds because body handles gradients */
   background: transparent !important;
-  height: calc(100vh - 75px - 60px) !important;
+  height: calc(100vh - 75px - 40px) !important;
   margin-top: 75px !important;
   margin-left: 280px !important;
   margin-right: 0 !important;
@@ -511,7 +511,7 @@ hr {
   transition: all 0.3s ease !important;
   display: flex !important;
   flex-direction: column !important;
-  padding-bottom: 80px !important;
+  padding-bottom: 60px !important;
 }
 
 .wrapper {
@@ -529,7 +529,7 @@ hr {
   position: fixed !important;
   bottom: 0 !important;
   right: 0 !important;
-  height: 60px !important;
+  height: 40px !important;
   padding: 0 24px !important;
   background: rgba(255, 255, 255, 0.3) !important;
   backdrop-filter: blur(25px) !important;
@@ -539,6 +539,7 @@ hr {
   align-items: center;
   width: 100% !important;
 }
+
 
 .iq-footer .list-inline-item a,
 .iq-footer a {
@@ -563,6 +564,8 @@ hr {
   .iq-sidebar {
     left: -320px !important;
   }
+}
+
 /* -------------------------------------
    Soft Alerts & Transitions
 -------------------------------------- */
@@ -609,4 +612,156 @@ hr {
 .input-group-text {
   border-color: var(--bs-border-color) !important;
 }
+
+/* -------------------------------------
+   Premium SaaS UI Extensions 
+-------------------------------------- */
+:root {
+  --eco-primary: #10B981; /* Emerald */
+  --eco-primary-glow: rgba(16, 185, 129, 0.2);
+  --eco-secondary: #F0FDF4; /* Light Mint */
+  --premium-blue: #3B82F6; /* Sky Blue */
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --premium-shadow-soft: 0 10px 40px rgba(15, 40, 84, 0.08);
+  --premium-inner-glow: inset 0 0 15px rgba(255, 255, 255, 0.3);
 }
+
+/* Animations */
+@keyframes float {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(15px, 25px) rotate(10deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 var(--eco-primary-glow); }
+  70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Premium Sidebar Card */
+.premium-sidebar-card {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--premium-inner-glow), var(--premium-shadow-soft);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 30px !important;
+  z-index: 10;
+}
+
+.premium-sidebar-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--premium-inner-glow), 0 20px 50px rgba(15, 40, 84, 0.12);
+}
+
+/* Premium Inputs */
+.premium-input-field {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1.5px solid rgba(15, 40, 84, 0.05) !important;
+  border-radius: 16px !important;
+  padding: 12px 20px !important;
+  width: 100% !important;
+  color: var(--bs-text-main) !important;
+  font-weight: 500 !important;
+  outline: none !important;
+  transition: all 0.3s ease !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+}
+
+.premium-input-field:focus {
+  background: #fff !important;
+  border-color: var(--eco-primary) !important;
+  box-shadow: 0 0 0 4px var(--eco-primary-glow) !important;
+  transform: translateY(-2px);
+}
+
+.premium-input-field::placeholder {
+  color: #94A3B8 !important;
+  font-weight: 400;
+}
+
+/* Premium Select with Custom Arrow */
+.premium-select-field {
+  appearance: none !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 15px center !important;
+  background-size: 18px !important;
+  cursor: pointer !important;
+  border: 1.5px solid rgba(15, 40, 84, 0.05) !important;
+  border-radius: 16px !important;
+  padding: 12px 20px !important;
+  width: 100% !important;
+}
+
+/* Premium Primary Button */
+.btn-premium-eco {
+  background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 14px 28px !important;
+  border-radius: 99px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2) !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.btn-premium-eco:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3) !important;
+  filter: brightness(1.1) !important;
+}
+
+.btn-premium-eco:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+/* Premium Ghost Button */
+.btn-premium-ghost {
+  background: transparent !important;
+  color: var(--bs-text-light) !important;
+  border: 1.5px solid rgba(15, 40, 84, 0.1) !important;
+  padding: 12px 24px !important;
+  border-radius: 99px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-premium-ghost:hover {
+  background: rgba(15, 40, 84, 0.03) !important;
+  border-color: rgba(15, 40, 84, 0.2) !important;
+  color: var(--bs-text-main) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Background floating elements - scoped to parent with position relative */
+.premium-bg-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.floating-element {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.15;
+  animation: float 15s infinite alternate ease-in-out;
+}
+
+.floating-1 { width: 150px; height: 150px; background: #10B981; top: 10%; right: -20px; }
+.floating-2 { width: 200px; height: 200px; background: #3B82F6; bottom: 20%; left: -30px; animation-duration: 20s; }
