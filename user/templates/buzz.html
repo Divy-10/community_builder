@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Buzz Feed -->
-                <!-- Redirected to separate Add Post page -->
+<!-- Buzz Feed Header Card matching reference -->
+<div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+    <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h3 class="fw-bold text-dark mb-1" style="color: #0f2854 !important;">Buzz</h3>
+            <p class="text-muted small mb-0">Stay updated with the latest in your friends.</p>
+        </div>
+    </div>
+</div>
 
 
                 {% if has_following %}
@@ -183,6 +190,14 @@
 
 
 <style>
+    .header-accent-line {
+        width: 5px;
+        height: 45px;
+        background: linear-gradient(to bottom, #0f2854, #2b6cb0);
+        border-radius: 10px;
+    }
+    .ls-sm { letter-spacing: -0.5px; }
+
     .hover-shadow:hover {
         box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
         transform: translateY(-2px);

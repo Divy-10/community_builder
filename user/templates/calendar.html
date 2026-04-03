@@ -116,14 +116,20 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-sm-12 mb-4">
-        <div class="d-flex align-items-center justify-content-between">
-            <h2 class="fw-bold mb-0">Community Meetups Calendar</h2>
-            <p class="text-muted mb-0">Stay updated with all upcoming events</p>
+    <div class="col-12 mb-2">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1" style="color: #0f2854 !important;">Meetup Calendar</h3>
+                    <p class="text-muted small mb-0">Stay updated with all upcoming events in your community</p>
+                </div>
+                <div class="d-none d-md-block">
+                    <i class="las la-calendar text-primary opacity-25" style="font-size: 3rem;"></i>
+                </div>
+            </div>
         </div>
-        <hr class="mt-3 mb-0">
     </div>
-    <div class="col-sm-12 mt-4">
+    <div class="col-sm-12 mt-1">
         <div id='calendar'></div>
     </div>
 </div>

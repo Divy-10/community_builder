@@ -6,24 +6,32 @@
 <div class="content-inner" id="page_layout">
     <div class="container-fluid">
 
-        <!-- Header Card -->
-        <div class="card mb-4">
-            <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <div>
-                    <h4 class="mb-1">{{ community.communitytitle }}</h4>
-                    <p class="mb-0 text-muted">{{ members|length }} member{{ members|length|pluralize }}</p>
+        <!-- Page Header -->
+        <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, white 0%, rgba(15, 40, 84, 0.02) 100%);">
+            <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-4 py-4 px-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary-subtle p-3 rounded-4">
+                        <i class="ri-community-line text-primary fs-2"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0" style="font-family: 'Outfit', sans-serif;">{{ community.communitytitle }}</h3>
+                        <div class="d-flex align-items-center gap-3 mt-1">
+                            <span class="text-muted small fw-bold"><i class="ri-user-3-line me-1"></i>{{ members|length }} Members</span>
+                            <span class="badge bg-success-subtle text-success rounded-pill px-3">{{ community.categoryid.categoryname }}</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="d-flex gap-2">
                     {% if is_admin %}
-                    <a href="{% url 'edit_community' community.communityid %}" class="btn btn-outline-primary">
-                        <i class="las la-pen me-1"></i>Edit Group Details
+                    <a href="{% url 'edit_community' community.communityid %}" class="btn btn-light border px-4">
+                        <i class="ri-edit-line me-2"></i>Edit Group
                     </a>
-                    <a href="{% url 'add_member' community.communityid %}" class="btn btn-primary">
-                        <i class="las la-user-plus me-1"></i>Add Member
+                    <a href="{% url 'add_member' community.communityid %}" class="btn btn-primary px-4 shadow">
+                        <i class="ri-user-add-line me-2"></i>Add Member
                     </a>
                     {% endif %}
-                    <a href="{% url 'group' %}" class="btn btn-outline-secondary">
-                        <i class="las la-arrow-left me-1"></i>Back to Groups
+                    <a href="{% url 'group' %}" class="btn btn-light border px-4">
+                        <i class="ri-arrow-left-line me-2"></i>Back
                     </a>
                 </div>
             </div>
@@ -31,55 +39,48 @@
 
         <!-- Pending Join Requests (Admin Only) -->
         {% if is_admin and pending %}
-        <div class="card mb-4 border-warning">
-            <div class="card-header bg-warning-subtle">
-                <h5 class="mb-0"><i class="las la-clock me-2"></i>Pending Join Requests ({{ pending|length }})</h5>
+        <div class="card border-0 shadow-lg mb-4 overflow-hidden">
+            <div class="card-header bg-warning-subtle border-bottom border-warning-subtle py-3">
+                <h5 class="mb-0 fw-bold text-dark"><i class="ri-time-line me-2"></i>Join Requests ({{ pending|length }})</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
                             <tr>
-                                <th style="width:50px;"></th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Requested On</th>
-                                <th class="text-end">Actions</th>
+                                <th class="ps-4 py-3 text-muted text-uppercase small fw-bold" style="width: 250px; letter-spacing: 1px;">Member</th>
+                                <th class="py-3 text-muted text-uppercase small fw-bold" style="letter-spacing: 1px;">Email</th>
+                                <th class="py-3 text-muted text-uppercase small fw-bold">Date</th>
+                                <th class="pe-4 py-3 text-end text-muted text-uppercase small fw-bold">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for p in pending %}
                             <tr>
-                                <td>
-                                    {% if p.userid.profile %}
-                                    <img src="{{ p.userid.profile.url }}" class="rounded-circle" alt=""
-                                        style="width:36px;height:36px;object-fit:cover;">
-                                    {% else %}
-                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white fw-bold"
-                                        style="width:36px;height:36px;font-size:14px;">
-                                        {{ p.userid.username|first|upper }}
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        {% if p.userid.profile %}
+                                        <img src="{{ p.userid.profile.url }}" class="rounded-circle border border-2 border-white shadow-sm" alt=""
+                                            style="width:40px;height:40px;object-fit:cover;">
+                                        {% else %}
+                                        <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                            style="width:40px;height:40px;font-size:14px;">
+                                            {{ p.userid.username|first|upper }}
+                                        </div>
+                                        {% endif %}
+                                        <div class="fw-bold text-dark">{{ p.userid.username }}</div>
                                     </div>
-                                    {% endif %}
                                 </td>
-                                <td class="align-middle">{{ p.userid.username }}</td>
-                                <td class="align-middle text-muted">{{ p.userid.email }}</td>
-                                <td class="align-middle text-muted">{{ p.addeddt|date:"M d, Y" }}</td>
-                                <td class="align-middle text-end">
-                                    <form method="post"
-                                        action="{% url 'accept_join_request' community.communityid p.communitymemberid %}"
-                                        class="d-inline">
+                                <td class="py-3 text-muted">{{ p.userid.email }}</td>
+                                <td class="py-3 text-muted small">{{ p.addeddt|date:"M d, Y" }}</td>
+                                <td class="pe-4 py-3 text-end">
+                                    <form method="post" action="{% url 'accept_join_request' community.communityid p.communitymemberid %}" class="d-inline">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-success" title="Accept">
-                                            <i class="las la-check"></i> Accept
-                                        </button>
+                                        <button type="submit" class="btn btn-sm btn-success px-3 rounded-pill fw-bold">Accept</button>
                                     </form>
-                                    <form method="post"
-                                        action="{% url 'reject_join_request' community.communityid p.communitymemberid %}"
-                                        class="d-inline">
+                                    <form method="post" action="{% url 'reject_join_request' community.communityid p.communitymemberid %}" class="d-inline">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Reject">
-                                            <i class="las la-times"></i> Reject
-                                        </button>
+                                        <button type="submit" class="btn btn-sm btn-light border px-3 rounded-pill fw-bold ms-1">Reject</button>
                                     </form>
                                 </td>
                             </tr>
@@ -93,55 +94,46 @@
 
         <!-- Pending Posting Requests (Admin Only) -->
         {% if is_admin and pending_posting_requests %}
-        <div class="card mb-4 border-info">
-            <div class="card-header bg-info-subtle">
-                <h5 class="mb-0"><i class="las la-hand-paper me-2"></i>Pending Posting Requests ({{
-                    pending_posting_requests|length }})</h5>
+        <div class="card border-0 shadow-lg mb-4 overflow-hidden">
+            <div class="card-header bg-info-subtle border-bottom border-info-subtle py-3">
+                <h5 class="mb-0 fw-bold text-dark"><i class="ri-hand-coin-line me-2"></i>Posting Permission Requests ({{ pending_posting_requests|length }})</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
                             <tr>
-                                <th>User</th>
-                                <th>Email</th>
-                                <th class="text-end">Actions</th>
+                                <th class="ps-4 py-3 text-muted text-uppercase small fw-bold" style="width: 250px; letter-spacing: 1px;">Member</th>
+                                <th class="py-3 text-muted text-uppercase small fw-bold" style="letter-spacing: 1px;">Email</th>
+                                <th class="pe-4 py-3 text-end text-muted text-uppercase small fw-bold">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for req in pending_posting_requests %}
                             <tr>
-                                <td class="align-middle">
-                                    <div class="d-flex align-items-center">
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
                                         {% if req.userid.profile %}
-                                        <img src="{{ req.userid.profile.url }}" class="rounded-circle me-2" alt=""
-                                            style="width:36px;height:36px;object-fit:cover;">
+                                        <img src="{{ req.userid.profile.url }}" class="rounded-circle border border-2 border-white shadow-sm" alt=""
+                                            style="width:40px;height:40px;object-fit:cover;">
                                         {% else %}
-                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white fw-bold me-2"
-                                            style="width:36px;height:36px;font-size:14px;">
+                                        <div class="rounded-circle bg-info-subtle text-info d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                            style="width:40px;height:40px;font-size:14px;">
                                             {{ req.userid.username|first|upper }}
                                         </div>
                                         {% endif %}
-                                        {{ req.userid.username }}
+                                        <div class="fw-bold text-dark">{{ req.userid.username }}</div>
                                     </div>
                                 </td>
-                                <td class="align-middle text-muted">{{ req.userid.email }}</td>
-                                <td class="align-middle text-end">
-                                    <form method="post"
-                                        action="{% url 'approve_post_permission' community.communityid req.communitymemberid %}"
-                                        class="d-inline">
+                                <td class="py-3 text-muted">{{ req.userid.email }}</td>
+                                <td class="pe-4 py-3 text-end">
+                                    <form method="post" action="{% url 'approve_post_permission' community.communityid req.communitymemberid %}" class="d-inline">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-success" title="Approve Request">
-                                            <i class="las la-check"></i> Grant Access
-                                        </button>
+                                        <button type="submit" class="btn btn-sm btn-primary px-3 rounded-pill fw-bold">Allow</button>
                                     </form>
-                                    <form method="post"
-                                        action="{% url 'reject_post_permission' community.communityid req.communitymemberid %}"
-                                        class="d-inline">
+                                    <form method="post" action="{% url 'reject_post_permission' community.communityid req.communitymemberid %}" class="d-inline">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Reject Request">
-                                            <i class="las la-times"></i> Reject
-                                        </button>
+                                        <button type="submit" class="btn btn-sm btn-light border px-3 rounded-pill fw-bold ms-1">Deny</button>
                                     </form>
                                 </td>
                             </tr>
@@ -152,127 +144,129 @@
             </div>
         </div>
         {% endif %}
-
         <!-- Members Table -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="las la-users me-2"></i>Members</h5>
+        <div class="card border-0 shadow-lg overflow-hidden">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 fw-bold d-flex align-items-center">
+                    <i class="ri-group-line me-2 text-primary"></i>Members
+                </h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background: rgba(15, 40, 84, 0.05);">
                             <tr>
-                                <th style="width:50px;"></th>
-                                <th>Username</th>
-                                <th>Role</th>
-                                <th>Posting Permissions</th>
+                                <th class="ps-4 py-3 text-muted text-uppercase small fw-bold" style="width: 250px; letter-spacing: 1px;">Member</th>
+                                <th class="py-3 text-muted text-uppercase small fw-bold" style="letter-spacing: 1px;">Role</th>
+                                <th class="py-3 text-muted text-uppercase small fw-bold" style="letter-spacing: 1px;">Posting Rights</th>
                                 {% if is_admin %}
-                                <th class="text-end">Actions</th>
+                                <th class="pe-4 py-3 text-end text-muted text-uppercase small fw-bold" style="letter-spacing: 1px;">Actions</th>
                                 {% endif %}
                             </tr>
                         </thead>
                         <tbody>
                             {% for m in members %}
-                            <tr>
-                                <td>
-                                    {% if m.userid.profile %}
-                                    <img src="{{ m.userid.profile.url }}" class="rounded-circle" alt=""
-                                        style="width:36px;height:36px;object-fit:cover;">
-                                    {% else %}
-                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold"
-                                        style="width:36px;height:36px;font-size:14px;">
-                                        {{ m.userid.username|first|upper }}
+                            <tr class="transition">
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="position-relative">
+                                            {% if m.userid.profile %}
+                                            <img src="{{ m.userid.profile.url }}" class="rounded-circle border border-2 border-white shadow-sm" alt=""
+                                                style="width:45px;height:45px;object-fit:cover;">
+                                            {% else %}
+                                            <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                                style="width:45px;height:45px;font-size:16px;">
+                                                {{ m.userid.username|first|upper }}
+                                            </div>
+                                            {% endif %}
+                                            {% if m.role == 'admin' %}
+                                            <div class="position-absolute bottom-0 end-0 bg-warning rounded-circle d-flex align-items-center justify-content-center border border-2 border-white" style="width:16px;height:16px; margin-bottom: 2px;">
+                                                <i class="ri-shield-check-fill text-white" style="font-size: 10px;"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ m.userid.username }}</div>
+                                            <div class="small text-muted">{{ m.userid.email }}</div>
+                                        </div>
                                     </div>
-                                    {% endif %}
                                 </td>
-                                <td class="align-middle">{{ m.userid.username }}</td>
-                                <td class="align-middle">
+                                <td class="py-3">
                                     {% if m.role == 'admin' %}
-                                    <span class="badge bg-warning text-dark"><i
-                                            class="las la-shield-alt me-1"></i>Admin</span>
+                                    <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">
+                                        <i class="ri-admin-line me-1"></i>Administrator
+                                    </span>
                                     {% else %}
-                                    <span class="badge bg-info text-white"><i class="las la-user me-1"></i>Member</span>
+                                    <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
+                                        <i class="ri-user-line me-1"></i>Member
+                                    </span>
                                     {% endif %}
                                 </td>
-                                <td class="align-middle">
+                                <td class="py-3">
                                     {% if m.role == 'admin' %}
-                                    <span class="text-success small fw-bold"><i
-                                            class="las la-check-circle fs-5 align-middle"></i> Granted by default</span>
+                                    <span class="text-success small fw-bold d-flex align-items-center">
+                                        <i class="ri-checkbox-circle-fill me-1 fs-5"></i> Granted by default
+                                    </span>
                                     {% elif m.can_post %}
-                                    <span class="badge bg-success text-white">Allowed</span>
+                                    <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                                        <i class="ri-check-line me-1"></i>Allowed
+                                    </span>
                                     {% else %}
-                                    <span class="badge bg-danger text-white">Restricted</span>
+                                    <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                                        <i class="ri-forbid-line me-1"></i>Restricted
+                                    </span>
                                     {% endif %}
                                 </td>
                                 {% if is_admin %}
-                                <td class="align-middle text-end">
+                                <td class="pe-4 py-3 text-end">
                                     {% if m.userid.userid != community.userid.userid %}
+                                    <div class="d-flex justify-content-end gap-2">
+                                        {% if m.role == 'admin' %}
+                                            <form method="post" action="{% url 'demote_member' community.communityid m.communitymemberid %}" onsubmit="return confirm('Demote to regular Member?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-light border" title="Demote to Member">
+                                                    <i class="ri-arrow-down-circle-line me-1"></i>Demote
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            {% if m.can_post %}
+                                                <form method="post" action="{% url 'reject_post_permission' community.communityid m.communitymemberid %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Revoke Posting Rights">
+                                                        <i class="ri-forbid-line me-1"></i>Restrict
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <form method="post" action="{% url 'approve_post_permission' community.communityid m.communitymemberid %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Grant Posting Rights">
+                                                        <i class="ri-check-line me-1"></i>Grant
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                            
+                                            <form method="post" action="{% url 'promote_member' community.communityid m.communitymemberid %}" onsubmit="return confirm('Promote to Admin?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Promote to Admin">
+                                                    <i class="ri-vip-crown-line me-1"></i>Promote
+                                                </button>
+                                            </form>
 
-                                    <!-- Demote/Promote Actions -->
-                                    {% if m.role == 'admin' %}
-                                    <form method="post"
-                                        action="{% url 'demote_member' community.communityid m.communitymemberid %}"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Demote {{ m.userid.username }} to regular Member?');">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary"
-                                            title="Demote to Member">
-                                            <i class="las la-arrow-down"></i> Demote
-                                        </button>
-                                    </form>
-                                    {% else %}
-
-                                    <!-- Posting Permission Toggle -->
-                                    {% if m.can_post %}
-                                    <form method="post"
-                                        action="{% url 'reject_post_permission' community.communityid m.communitymemberid %}"
-                                        class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                            title="Revoke Posting Rights">
-                                            <i class="las la-ban"></i> Restrict Post
-                                        </button>
-                                    </form>
-                                    {% else %}
-                                    <form method="post"
-                                        action="{% url 'approve_post_permission' community.communityid m.communitymemberid %}"
-                                        class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-success"
-                                            title="Grant Posting Rights">
-                                            <i class="las la-check"></i> Grant Post
-                                        </button>
-                                    </form>
-                                    {% endif %}
-                                    <form method="post"
-                                        action="{% url 'promote_member' community.communityid m.communitymemberid %}"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Promote {{ m.userid.username }} to Admin?');">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-warning"
-                                            title="Promote to Admin">
-                                            <i class="las la-arrow-up"></i> Promote
-                                        </button>
-                                    </form>
-                                    <form method="post"
-                                        action="{% url 'delete_member' community.communityid m.communitymemberid %}"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Remove {{ m.userid.username }} from this group?');">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                            title="Remove Member">
-                                            <i class="las la-trash"></i> Remove
-                                        </button>
-                                    </form>
-                                    {% endif %}
+                                            <form method="post" action="{% url 'delete_member' community.communityid m.communitymemberid %}" onsubmit="return confirm('Remove this user?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-light border text-danger" title="Remove Member">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
                                     {% endif %}
                                 </td>
                                 {% endif %}
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">No members in this group yet.</td>
+                                <td colspan="6" class="text-center py-5 text-muted">No members in this group yet.</td>
                             </tr>
                             {% endfor %}
                         </tbody>

@@ -192,17 +192,21 @@
 
             <div class="col-lg-9 col-md-8">
                 <!-- Tabbed Navigation -->
-                <div class="card shadow-sm border-0 mb-4 rounded-4">
-                    <div class="card-body p-0">
-                        <ul class="nav nav-pills nav-fill p-2 gap-2" role="tablist">
+                <div class="card shadow-sm border-0 mb-4 rounded-4 bg-light-subtle">
+                    <div class="card-body p-2">
+                        <ul class="nav nav-pills nav-fill gap-2" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active fw-bold rounded-pill" href="{% url 'community_detail' community.communityid %}">
-                                    <i class="las la-newspaper fs-5 me-1"></i> Posts
+                                <a class="nav-link active fw-bold rounded-pill py-2 shadow-sm transition-all" 
+                                   href="{% url 'community_detail' community.communityid %}"
+                                   style="background: #0f2854 !important; color: white !important;">
+                                    <i class="las la-newspaper fs-5 me-2"></i>Posts
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fw-bold rounded-pill text-muted hover-bg-light" href="{% url 'community_chat' community.communityid %}">
-                                    <i class="las la-comments fs-5 me-1"></i> Group Chat
+                                <a class="nav-link fw-bold rounded-pill py-2 text-muted hover-bg-white transition-all shadow-none" 
+                                   href="{% url 'community_chat' community.communityid %}"
+                                   style="color: #666 !important;">
+                                    <i class="las la-comments fs-5 me-2"></i>Group Chat
                                 </a>
                             </li>
                         </ul>

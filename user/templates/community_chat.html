@@ -1,112 +1,121 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="content-inner" id="page_layout">
     <div class="container-fluid">
-        <!-- Chat Card Area -->
         <div class="row justify-content-center">
-            <div class="col-lg-10 col-xl-8">
-                
-                <div class="card shadow-lg border-0 rounded-4" style="height: 80vh; display: flex; flex-direction: column; overflow: hidden;">
-                    <!-- Card Header -->
-                    <div class="card-header border-0 py-3 px-4 shadow-sm d-flex align-items-center" style="background: rgb(15, 40, 84); z-index: 10;">
-                        <!-- Left: Back Button -->
-                        <a href="{% url 'community_detail' community.communityid %}" class="btn btn-icon btn-light rounded-circle shadow-sm hover-lift me-4" title="Back to Community" style="width: 42px; height: 42px;">
-                            <i class="fas fa-arrow-left" style="color: rgb(15, 40, 84); font-size: 1.2rem;"></i>
-                        </a>
-
-                        <!-- Left Aligned: Group Info -->
-                        <div class="d-flex align-items-center text-white">
+            <div class="col-lg-10 col-xl-9">
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden d-flex flex-column" 
+                     style="height: calc(100vh - 140px); background: #f8f9fa;">
+                    
+                    <!-- Header -->
+                    <div class="card-header border-0 py-3 px-4 d-flex align-items-center justify-content-between" 
+                         style="background: #0f2854; z-index: 10;">
+                        <div class="d-flex align-items-center">
+                            <a href="{% url 'community_detail' community.communityid %}" class="btn btn-link text-white p-0 me-3">
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
                             {% if community.thumbnail %}
-                            <img src="{{ community.thumbnail.url }}" class="rounded-circle me-3 border border-2 border-white-50 shadow-sm" alt="communityimg" style="width: 50px; height: 50px; object-fit:cover;">
+                            <img src="{{ community.thumbnail.url }}" class="rounded-circle me-3 border border-2 border-white-50 shadow-sm" alt="img" style="width: 45px; height: 45px; object-fit:cover;">
                             {% endif %}
-                                <div class="text-start">
-                                    <h4 class="mb-0 fw-bold line-height text-white">{{ community.communitytitle }}</h4>
-                                </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold text-white">{{ community.communitytitle }}</h5>
+                                <span class="text-white-50 small"><i class="las la-users me-1"></i>Community Chat</span>
+                            </div>
                         </div>
                     </div>
 
-
-                    <!-- Chat Messages Container -->
-                    <div class="card-body p-4" id="chat-messages" style="overflow-y: auto; flex-grow: 1; background: #f8f9fa;">
+                    <!-- Messages -->
+                    <div class="card-body p-4" id="chat-messages" style="overflow-y: auto; flex-grow: 1; scroll-behavior: smooth;">
                         {% for msg in messages %}
-                        
-                        {% if msg.sender.userid == current_user.userid %}
-                        <!-- Sent Message (Right) -->
-                        <div class="d-flex justify-content-end mb-4">
-                            <div class="d-flex flex-column align-items-end" style="max-width: 75%;">
-                                <div class="text-white p-3 rounded-4 shadow-sm" style="background: rgb(15, 40, 84); border-bottom-right-radius: 4px !important;">
-                                    {% if msg.image %}
-                                    <img src="{{ msg.image.url }}" class="img-fluid rounded-3 mb-2 shadow-sm" style="max-height: 300px; width: 100%; object-fit: cover; cursor: pointer;" onclick="window.open('{{ msg.image.url }}', '_blank')">
-                                    {% endif %}
-                                    {% if msg.message %}
-                                    <p class="mb-0" style="word-wrap: break-word;">{{ msg.message }}</p>
-                                    {% endif %}
-                                </div>
-                                <span class="text-muted small mt-1">{{ msg.senddt|time:"H:i" }}</span>
-                            </div>
-                        </div>
-                        {% else %}
-                        <!-- Received Message (Left) -->
-                        <div class="d-flex mb-4">
-                            <!-- Sender Avatar -->
-                            <div class="me-3 flex-shrink-0">
+                        <div class="mb-4 d-flex {% if msg.sender.userid == current_user.userid %}justify-content-end{% else %}justify-content-start{% endif %}">
+                            {% if msg.sender.userid != current_user.userid %}
+                            <div class="me-2 flex-shrink-0 align-self-end mb-2">
                                 {% if msg.sender.profile %}
-                                <img src="{{ msg.sender.profile.url }}" class="avatar-40 rounded-circle shadow-sm" alt="userimg" style="object-fit:cover;">
+                                <img src="{{ msg.sender.profile.url }}" class="avatar-35 rounded-circle shadow-sm" style="object-fit: cover;">
                                 {% else %}
-                                <div class="avatar-40 rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm">
+                                <div class="avatar-35 rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center small fw-bold">
                                     {{ msg.sender.username|make_list|first|upper }}
                                 </div>
                                 {% endif %}
                             </div>
-                            
-                            <div class="d-flex flex-column align-items-start" style="max-width: 75%;">
-                                <span class="fw-bold fs-6 mb-1 text-dark">{{ msg.sender.username }}</span>
-                                <div class="bg-white p-3 rounded-4 shadow-sm border" style="border-bottom-left-radius: 4px !important;">
+                            {% endif %}
+
+                            <div style="max-width: 70%;">
+                                {% if msg.sender.userid != current_user.userid %}
+                                <span class="d-block small text-muted mb-1 ms-2 fw-bold">{{ msg.sender.username }}</span>
+                                {% endif %}
+                                
+                                <div class="px-3 py-2 shadow-sm position-relative" 
+                                     style="border-radius: 16px; font-size: 0.95rem;
+                                     {% if msg.sender.userid == current_user.userid %}
+                                        background: #0f2854; color: white; border-bottom-right-radius: 5px;
+                                     {% else %}
+                                        background: white; color: #333; border-bottom-left-radius: 5px; border: 1px solid #eee;
+                                     {% endif %}">
+                                    
                                     {% if msg.image %}
-                                    <img src="{{ msg.image.url }}" class="img-fluid rounded-3 mb-2 shadow-sm" style="max-height: 300px; width: 100%; object-fit: cover; cursor: pointer;" onclick="window.open('{{ msg.image.url }}', '_blank')">
+                                    <div class="mb-2 rounded-3 overflow-hidden shadow-sm border" style="cursor: pointer;" onclick="window.open('{{ msg.image.url }}', '_blank')">
+                                        <img src="{{ msg.image.url }}" class="img-fluid w-100" style="max-height: 250px; object-fit: cover;">
+                                    </div>
                                     {% endif %}
-                                    {% if msg.message %}
-                                    <p class="mb-0 text-dark" style="word-wrap: break-word;">{{ msg.message }}</p>
-                                    {% endif %}
+                                    
+                                    <p class="mb-0" style="word-break: break-word;">{{ msg.message|urlize|linebreaksbr }}</p>
+                                    
+                                    <div class="text-end mt-1" style="font-size: 0.65rem; opacity: 0.7;">
+                                        {{ msg.senddt|date:"h:i A" }}
+                                    </div>
                                 </div>
-                                <span class="text-muted small mt-1">{{ msg.senddt|time:"H:i" }}</span>
                             </div>
                         </div>
-                        {% endif %}
-                        
                         {% empty %}
-                        <div class="h-100 d-flex flex-column align-items-center justify-content-center text-center">
-                            <div class="bg-white p-4 rounded-circle shadow-sm mb-3">
-                                <i class="las la-comments text-primary" style="font-size: 3rem;"></i>
-                            </div>
-                            <h5 class="text-muted fw-bold">No messages yet.</h5>
-                            <p class="text-muted">Start the conversation with the group!</p>
+                        <div class="h-100 d-flex flex-column align-items-center justify-content-center text-center opacity-50">
+                            <i class="las la-comments fs-1 mb-2"></i>
+                            <p class="fw-bold">No messages here yet</p>
+                            <span class="small">Start the conversation with your community!</span>
                         </div>
                         {% endfor %}
                     </div>
 
-                    <div class="card-footer bg-white border-top p-3 rounded-bottom-4">
-                        <form method="post" action="{% url 'send_community_message' community.communityid %}" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
+                    <!-- Input -->
+                    <div class="card-footer bg-white border-top p-2">
+                        <form method="post" action="{% url 'send_community_message' community.communityid %}" enctype="multipart/form-data" 
+                              class="d-flex align-items-center gap-2 position-relative" id="chat-form">
                             {% csrf_token %}
-                            <div class="position-relative">
-                                <button type="button" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center flex-shrink-0 hover-lift" style="width: 45px; height: 45px;" onclick="document.getElementById('chat-file-input').click()" title="Attach image" aria-label="Attach image">
-                                    <i class="fas fa-paperclip fs-5" style="display: block !important; color: rgb(15, 40, 84);"></i>
-                                </button>
-                                <input type="file" id="chat-file-input" name="image" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
+                            
+                            <button type="button" class="btn btn-icon btn-light rounded-circle shadow-none text-muted" id="emoji-btn" style="background: transparent;">
+                                <i class="ri-emotion-line fs-4"></i>
+                            </button>
+                            
+                            <!-- Emoji Picker -->
+                            <div id="emoji-picker-container" class="position-absolute d-none shadow-lg border rounded-4 bg-white p-3" 
+                                 style="bottom: 60px; left: 0; z-index: 1050; width: 280px; max-height: 300px; overflow-y: auto;">
+                                <div class="d-grid gap-2" style="grid-template-columns: repeat(6, 1fr); cursor: pointer; font-size: 1.5rem;" id="emoji-grid"></div>
                             </div>
+
+                            <button type="button" class="btn btn-icon btn-light rounded-circle shadow-none text-muted" 
+                                    style="background: transparent;" onclick="document.getElementById('chat-file-input').click()">
+                                <i class="ri-attachment-line fs-4"></i>
+                            </button>
+                            <input type="file" id="chat-file-input" name="image" accept="image/*" class="d-none" onchange="handleFileSelect(this)">
+
                             <div class="flex-grow-1 position-relative">
-                                <input type="text" name="message" id="chat-input" class="form-control form-control-lg rounded-pill bg-light border-0 shadow-sm px-4" placeholder="Type your message here..." autocomplete="off" autofocus>
+                                <input type="text" name="message" id="chat-input" class="form-control rounded-pill border-0 bg-light px-4 shadow-none" 
+                                       placeholder="Type a message..." autocomplete="off">
+                                
                                 <div id="file-preview-badge" class="position-absolute translate-middle-y top-50 end-0 me-3 d-none">
-                                    <span class="badge bg-primary rounded-pill py-2 px-3 d-flex align-items-center">
-                                        <i class="las la-image me-1"></i> 
-                                        <span id="file-status-text" class="small">Image selected</span>
-                                        <i class="las la-times ms-2 cursor-pointer" onclick="clearFileSelection()" style="cursor: pointer;"></i>
+                                    <span class="badge bg-primary rounded-pill py-1 px-2 d-flex align-items-center small">
+                                        <i class="las la-image me-1"></i>
+                                        <span id="file-status-text">Selected</span>
+                                        <i class="las la-times ms-2 cursor-pointer" onclick="clearFileSelection()"></i>
                                     </span>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-lg rounded-circle shadow d-flex align-items-center justify-content-center flex-shrink-0 hover-lift" style="width: 50px; height: 50px; transition: all 0.2s ease; background: rgb(15, 40, 84); color: white;" title="Send Message" aria-label="Send message">
-                                <i class="fas fa-paper-plane fs-5 m-0" style="transform: rotate(45deg); margin-left: -3px; display: block !important;"></i>
+
+                            <button type="submit" class="btn btn-primary btn-icon rounded-circle shadow-sm" 
+                                    style="width: 45px; height: 45px; background: #0f2854 !important;">
+                                <i class="ri-send-plane-2-fill"></i>
                             </button>
                         </form>
                     </div>
@@ -117,40 +126,67 @@
 </div>
 
 <style>
-    .hover-lift:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.3) !important;
-    }
+    #chat-messages::-webkit-scrollbar { width: 6px; }
+    #chat-messages::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
+    .cursor-pointer { cursor: pointer; }
+    .transition-all { transition: all 0.2s ease; }
 </style>
 
 <script>
-    // Scroll to bottom of chat automatically on load
     document.addEventListener("DOMContentLoaded", function() {
-        var chatContainer = document.getElementById("chat-messages");
-        if(chatContainer) {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+        const chatMessages = document.getElementById("chat-messages");
+        const chatInput = document.getElementById("chat-input");
+        const emojiBtn = document.getElementById("emoji-btn");
+        const emojiPicker = document.getElementById("emoji-picker-container");
+        const emojiGrid = document.getElementById("emoji-grid");
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Custom Emoji Picker Logic
+        const emojis = ['😀','😃','😄','😁','😆','😅','😂','🤣','☺️','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😻','😼','😽','🙀','😿','😾','🤲','👐','🙌','👏','🤝','👍','👎','👊','✊','🤛','🤜','🤞','✌️','🤟','🤘','👌','🤏','👈','👉','👆','👇','☝️','✋','🤚','🖐','🖖','👋','🤙','💪','🦾','🖕','✍️','🙏','🦶','🦵','🦿','💄','💋','👄','🦷','👅','👂','🦻','👃','👣','👁','👀','🧠','🗣','👤','👥'];
+
+        emojis.forEach(emoji => {
+            const span = document.createElement('span');
+            span.textContent = emoji;
+            span.className = 'emoji-item transition-all p-1 text-center';
+            span.style.cursor = 'pointer';
+            span.onclick = () => {
+                const start = chatInput.selectionStart;
+                const end = chatInput.selectionEnd;
+                chatInput.value = chatInput.value.substring(0, start) + emoji + chatInput.value.substring(end);
+                chatInput.focus();
+                chatInput.setSelectionRange(start + emoji.length, start + emoji.length);
+            };
+            emojiGrid.appendChild(span);
+        });
+
+        emojiBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            emojiPicker.classList.toggle("d-none");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
+                emojiPicker.classList.add("d-none");
+            }
+        });
     });
 
     function handleFileSelect(input) {
         const badge = document.getElementById('file-preview-badge');
         const statusText = document.getElementById('file-status-text');
-        const chatInput = document.getElementById('chat-input');
-        
         if (input.files && input.files[0]) {
             badge.classList.remove('d-none');
-            chatInput.removeAttribute('required'); // No longer required if image is selected
-            statusText.textContent = input.files[0].name.length > 15 ? input.files[0].name.substring(0, 12) + '...' : input.files[0].name;
-        } else {
-            clearFileSelection();
+            statusText.textContent = input.files[0].name.length > 10 ? input.files[0].name.substring(0, 8) + '...' : input.files[0].name;
+            document.getElementById('chat-input').removeAttribute('required');
         }
     }
 
     function clearFileSelection() {
-        const input = document.getElementById('chat-file-input');
-        const badge = document.getElementById('file-preview-badge');
-        input.value = '';
-        badge.classList.add('d-none');
+        document.getElementById('chat-file-input').value = '';
+        document.getElementById('file-preview-badge').classList.add('d-none');
+        document.getElementById('chat-input').setAttribute('required', 'required');
     }
 </script>
 {% endblock %}

@@ -885,16 +885,24 @@ def users_list(request):
     all_users = user.objects.exclude(pk=userid)
 
     search_name = request.GET.get('search_name', '')
+    search_state = request.GET.get('search_state', '')
     search_city = request.GET.get('search_city', '')
 
     if search_name:
-        all_users = all_users.filter(username__istartswith=search_name)
+        all_users = all_users.filter(username__icontains=search_name)
+    if search_state:
+        all_users = all_users.filter(cityid__stateid=search_state)
     if search_city:
         all_users = all_users.filter(cityid_id=search_city)
     
     # Get IDs of users current user is following
     following_ids = follow.objects.filter(followerid=userid).values_list('userid_id', flat=True)
     
+    # Filtering cities logic for the dropdown (if state is selected, only show state cities)
+    cities_list = city.objects.all().order_by('cityname')
+    if search_state:
+        cities_list = cities_list.filter(stateid_id=search_state)
+
     # Get communities where current user is admin or member (can invite others to these)
     my_communities = communitymember.objects.filter(userid=current_user, status=1).values_list('communityid', flat=True)
     comms_to_invite = community.objects.filter(pk__in=my_communities)
@@ -903,8 +911,10 @@ def users_list(request):
         'users': all_users,
         'following_ids': following_ids,
         'comms_to_invite': comms_to_invite,
-        'cities': city.objects.all(),
+        'states': state.objects.all().order_by('statename'),
+        'cities': cities_list,
         'search_name': search_name,
+        'search_state': search_state,
         'search_city': search_city,
     }
     return render(request, 'users_list.html', data)
@@ -1701,11 +1711,13 @@ def chats_list(request):
     # Handle sending a new message from the chat interface
     if request.method == 'POST' and target_userid:
         msg_text = request.POST.get('message', '').strip()
-        if msg_text:
+        msg_image = request.FILES.get('image')
+        if msg_text or msg_image:
             chat.objects.create(
                 senderid=int(userid),
                 receiverid=int(target_userid),
                 message=msg_text,
+                image=msg_image,
                 status=0 # Unread
             )
         return redirect(f"{request.path}?u={target_userid}")
@@ -1772,28 +1784,78 @@ def chats_list(request):
     if target_userid:
         target_user = user.objects.filter(pk=target_userid).first()
         if target_user:
-            messages = chat.objects.filter(
-                (Q(senderid=userid) & Q(receiverid=target_userid)) |
-                (Q(senderid=target_userid) & Q(receiverid=userid))
-            )
-            # Re-fetch with select_related for optimization
+            # Fetch with select_related for optimization
             messages = chat.objects.filter(
                 (Q(senderid=userid) & Q(receiverid=target_userid)) |
                 (Q(senderid=target_userid) & Q(receiverid=userid))
             ).select_related('shared_post').order_by('senddt')
 
+    # Mark as read and detect emoji-only messages
+    import re
+    from datetime import timedelta
+    now_dt = timezone.now()
+    yesterday_dt = now_dt - timedelta(days=1)
+    
+    # Simplified emoji detection regex
+    emoji_pattern = re.compile(r'^(\s*)[\U0001f300-\U0001faff\U00002600-\U000027ff\U00002b50-\U00002b55\U0000231a-\U000023f3\U0001f000-\U0001fbff]+(\s*)$')
+
+    for msg in messages:
+        if msg.receiverid == userid and msg.status == 0:
+            msg.status = 1
+            msg.save()
+            
+        stripped_msg = msg.message.strip()
+        if emoji_pattern.match(stripped_msg) and len(stripped_msg) <= 12:
+            msg.is_emoji_only = True
+        else:
+            msg.is_emoji_only = False
+
     data = {
         'current_user': u,
         'chatted_users_list': chatted_users_list,
-        'messages': messages,
+        'chat_messages': messages,
         'target_user': target_user,
         'search_query': search_query,
+        'now': now_dt,
+        'yesterday': yesterday_dt,
     }
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request, 'chats_sidebar_items.html', data)
 
     return render(request, 'chats_list.html', data)
+    
+def delete_chat(request, chat_id):
+    userid = request.session.get('userid')
+    if not userid:
+        return redirect('signin')
+        
+    msg = chat.objects.filter(pk=chat_id, senderid=userid).first()
+    target_u = None
+    if msg:
+        target_u = msg.receiverid
+        msg.delete()
+        
+    if target_u:
+        return redirect(f"/chats/?u={target_u}")
+    return redirect('chats')
+
+def edit_chat(request, chat_id):
+    userid = request.session.get('userid')
+    if not userid:
+        return redirect('signin')
+        
+    if request.method == 'POST':
+        msg_text = request.POST.get('message', '').strip()
+        if msg_text:
+            msg = chat.objects.filter(pk=chat_id, senderid=userid).first()
+            if msg:
+                msg.message = msg_text
+                msg.save()
+                target_u = msg.receiverid
+                return redirect(f"/chats/?u={target_u}")
+                
+    return redirect('chats')
 
 
 # ─── Activity Page ────────────────────────────────────────────────────

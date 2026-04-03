@@ -12,7 +12,13 @@
                     <span class="badge rounded-pill bg-danger shadow-sm ms-2" style="font-size: 0.65rem;">{{ item.unread_count }}</span>
                 {% endif %}
                 {% if item.last_msg %}
-                <small class="text-muted ms-auto" style="font-size: 0.7rem;">{{ item.last_msg.senddt|timesince }}</small>
+                <small class="text-muted ms-auto" style="font-size: 0.7rem;">
+                    {% if item.last_msg.senddt|date:"Y-m-d" == now|date:"Y-m-d" %}
+                        {{ item.last_msg.senddt|date:"h:i A" }}
+                    {% else %}
+                        {{ item.last_msg.senddt|date:"D" }}
+                    {% endif %}
+                </small>
                 {% endif %}
             </div>
             <p class="mb-0 text-muted small text-truncate">

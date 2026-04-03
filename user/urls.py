@@ -27,6 +27,8 @@ urlpatterns = [
     path('buzz/post/<int:post_id>/edit/', views.edit_buzz_post, name='edit_buzz_post'),
     path('buzz/post/<int:post_id>/delete/', views.delete_buzz_post, name='delete_buzz_post'),
     path('chats/', views.chats_list, name='chats'),
+    path('chats/delete/<int:chat_id>/', views.delete_chat, name='delete_chat'),
+    path('chats/edit/<int:chat_id>/', views.edit_chat, name='edit_chat'),
     # Group Member Management
     path('community/<int:community_id>/edit/', views.edit_community, name='edit_community'),
     path('community/<int:community_id>/members/', views.group_members, name='group_members'),
