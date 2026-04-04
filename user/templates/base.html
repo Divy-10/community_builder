@@ -378,45 +378,36 @@
                     </div>
                   </a>
                   <div
-                    class="sub-drop dropdown-menu dropdown-menu-end caption-menu"
+                    class="sub-drop dropdown-menu dropdown-menu-end caption-menu p-0 border-0 shadow-none bg-transparent"
                     aria-labelledby="drop-down-arrow"
-                    style="position: absolute; right: 0; left: auto"
+                    style="background: transparent !important; box-shadow: none !important; border: none !important;"
                   >
-                    <div class="card shadow-none m-0">
-                      <div class="card-body p-0">
-                        <a
-                          href="{% url 'my_profile' %}"
-                          class="iq-sub-card iq-bg-primary-hover"
-                        >
+                    <div class="card shadow m-0 bg-white" style="min-width: 240px;">
+                      <div class="card-body p-0 bg-white">
+                        <a href="{% url 'my_profile' %}" class="iq-sub-card iq-bg-primary-hover border-bottom">
                           <div class="d-flex align-items-center">
-                            <div class="rounded card-icon bg-soft-primary">
-                              <i class="ri-file-user-line"></i>
+                            <div class="bg-transparent me-3">
+                              <i class="ri-user-3-line text-primary" style="font-size: 22px;"></i>
                             </div>
-                            <div class="ms-3">
-                              <h6 class="mb-0">My Profile</h6>
+                            <div class="ms-1">
+                              <h6 class="mb-0 fw-bold">My Profile</h6>
                             </div>
                           </div>
                         </a>
-                        <a
-                          href="{% url 'settings' %}"
-                          class="iq-sub-card iq-bg-primary-hover"
-                        >
+                        <a href="{% url 'settings' %}" class="iq-sub-card iq-bg-primary-hover">
                           <div class="d-flex align-items-center">
-                            <div class="rounded card-icon bg-soft-primary">
-                              <i class="ri-settings-3-line"></i>
+                            <div class="bg-transparent me-3">
+                              <i class="ri-settings-3-line text-primary" style="font-size: 22px;"></i>
                             </div>
-                            <div class="ms-3">
-                              <h6 class="mb-0">Settings</h6>
+                            <div class="ms-1">
+                              <h6 class="mb-0 fw-bold">Settings</h6>
                             </div>
                           </div>
                         </a>
-                        <div class="d-inline-block w-100 text-center p-3">
-                          <a
-                            class="btn btn-primary iq-sign-btn"
-                            href="{% url 'logout' %}"
-                            role="button"
-                            >Sign out<i class="ri-login-box-line ms-2"></i
-                          ></a>
+                        <div class="p-3 border-top text-center bg-white">
+                          <a class="btn btn-primary iq-sign-btn w-100 rounded-pill" href="{% url 'logout' %}" role="button">
+                            Sign out <i class="ri-login-box-line ms-2"></i>
+                          </a>
                         </div>
                       </div>
                     </div>

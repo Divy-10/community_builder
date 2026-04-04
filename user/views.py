@@ -9,6 +9,26 @@ import json
 from .models import *
 
 # Create your views here.
+
+def filter_visible_posts(queryset, viewer_id):
+    """Filters a post queryset based on user privacy settings."""
+    if not viewer_id:
+        # Public posts only for non-logged in users
+        return queryset.filter(
+            Q(userid__settings__profile_visibility='public') | 
+            Q(userid__settings__isnull=True)
+        )
+    
+    # Get IDs of users the viewer is following
+    following_ids = list(follow.objects.filter(followerid=viewer_id).values_list('userid_id', flat=True))
+    
+    return queryset.filter(
+        Q(userid__userid=viewer_id) |                       # My own posts
+        Q(userid__settings__profile_visibility='public')|   # Public users
+        Q(userid__settings__isnull=True) |                  # Users without settings (default public)
+        Q(userid__userid__in=following_ids)                 # Private users I follow
+    ).distinct()
+
 def home(request):
     userid = request.session.get('userid')
     if not userid:
@@ -143,6 +163,7 @@ def home(request):
 
     if all_my_communities:
         posts = post.objects.filter(communityid__in=all_my_communities).order_by('-createddt')
+        posts = filter_visible_posts(posts, userid) # Apply Privacy Filter
         user_likes = like.objects.filter(userid=u).values_list('postid_id', flat=True)
         data = {
             'posts': posts,
@@ -235,7 +256,9 @@ def buzz(request):
     
     if feed_user_ids:
         # Get posts from followed users and self, but ONLY personal posts (no community)
+        # Note: buzz already checks following_ids, but filter_visible_posts provides a double-check and consistency
         posts = post.objects.filter(userid__in=feed_user_ids, communityid__isnull=True).order_by('-createddt')
+        posts = filter_visible_posts(posts, userid)
         user_likes = like.objects.filter(userid=u).values_list('postid_id', flat=True)
         data = {
             'posts': posts,
@@ -365,6 +388,8 @@ def signup(request):
 
         u=user.objects.create(userid=None,username=username,email=email,password=password,profile=profile,bio=bio,gender=gender,dob=dob,cityid=city.objects.get(pk=cityid))
         u.save()
+        # Initialize Settings
+        UserSettings.objects.create(user=u)
         return redirect('signin')
     return render(request,'sign-up.html',data)
 
@@ -576,7 +601,9 @@ def google_callback(request):
             google_id=google_user_id,
         )
         existing_user.save()
-
+        # Initialize Settings if missing
+        UserSettings.objects.get_or_create(user=existing_user)
+        
     request.session['userid'] = existing_user.userid
     request.session['username'] = existing_user.username
     return redirect('home')
@@ -1057,8 +1084,16 @@ def user_profile(request, target_userid=None):
     following_users = user.objects.filter(userid__in=following_user_ids)
     following_count = following_users.count()
     
-    # Fetch user's posts
-    user_posts = post.objects.filter(userid=user_profile).order_by('-createddt')
+    # Fetch user's posts with Privacy Consideration
+    full_posts = post.objects.filter(userid=user_profile).order_by('-createddt')
+    user_posts = filter_visible_posts(full_posts, userid)
+    
+    # Check if we are restricted from seeing posts
+    is_private_account = False
+    if not is_own_profile and not is_following:
+        if hasattr(user_profile, 'settings') and user_profile.settings.profile_visibility == 'private':
+            is_private_account = True
+            user_posts = post.objects.none() # Hide all posts
     
     # Separate Buzz posts and Community posts
     buzz_posts = user_posts.filter(communityid__isnull=True)
@@ -1089,7 +1124,8 @@ def user_profile(request, target_userid=None):
         'buzz_posts': buzz_posts,
         'community_posts': community_posts,
         'user_likes': user_likes,
-        'user_communities': user_communities
+        'user_communities': user_communities,
+        'is_private_account': is_private_account
     }
     return render(request, 'user_profile.html', data)
 
@@ -1342,8 +1378,9 @@ def community_detail(request, community_id):
         can_post = member_obj.can_post
         post_request_status = member_obj.post_request_status
 
-    # Admins or permitted users can see all posts
+    # Filter posts based on privacy
     posts = post.objects.filter(communityid=c).order_by('-createddt')
+    posts = filter_visible_posts(posts, userid)
 
     user_likes = like.objects.filter(userid=u).values_list('postid_id', flat=True)
 

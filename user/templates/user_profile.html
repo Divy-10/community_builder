@@ -25,11 +25,11 @@
                         {% endif %}
                         
                         <div class="d-flex justify-content-center gap-4 mt-3 mb-4">
-                            <div class="text-center" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#followersModal">
+                            <div class="text-center" {% if not is_private_account or is_own_profile or is_following %}style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#followersModal"{% endif %}>
                                 <h4 class="fw-bold mb-0 text-primary">{{ followers_count }}</h4>
                                 <span class="text-muted small text-uppercase">Followers</span>
                             </div>
-                            <div class="text-center" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#followingModal">
+                            <div class="text-center" {% if not is_private_account or is_own_profile or is_following %}style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#followingModal"{% endif %}>
                                 <h4 class="fw-bold mb-0 text-primary">{{ following_count }}</h4>
                                 <span class="text-muted small text-uppercase">Following</span>
                             </div>
@@ -48,6 +48,7 @@
                                 </form>
                             {% endif %}
                             
+                            {% if not is_private_account or is_own_profile or is_following %}
                             <!-- Tabbed Navigation Buttons -->
                             <ul class="nav nav-pills gap-2 m-0" role="tablist" id="profilePills">
                                 <li class="nav-item m-0" role="presentation">
@@ -61,6 +62,7 @@
                                     </button>
                                 </li>
                             </ul>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -69,6 +71,24 @@
     </div>
 </div>
 
+{% if is_private_account %}
+    <!-- Private Account Placeholder -->
+    <div class="row mt-5">
+        <div class="col-sm-12">
+            <div class="card shadow-none border-0 bg-transparent text-center py-5">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-white shadow-sm rounded-circle" style="width: 100px; height: 100px;">
+                            <i class="ri-lock-2-fill text-primary" style="font-size: 50px;"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-2">This Account is Private</h3>
+                    <p class="text-muted mx-auto" style="max-width: 400px;">Follow this account to see their posts and communities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
 <div class="tab-content w-100" id="profilePillsContent">
     <!-- Posts Tab -->
     <div class="tab-pane fade show active" id="user-posts" role="tabpanel" aria-labelledby="posts-tab">
@@ -177,6 +197,8 @@
         </div>
     </div>
 </div>
+{% endif %}
+
 
 <!-- Followers Modal -->
 <div class="modal fade" id="followersModal" tabindex="-1" aria-labelledby="followersModalLabel" aria-hidden="true">

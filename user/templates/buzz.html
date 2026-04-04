@@ -1,22 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Buzz Feed Header Card matching reference -->
-<div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-    <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-            <h3 class="fw-bold text-dark mb-1" style="color: #0f2854 !important;">Buzz</h3>
-            <p class="text-muted small mb-0">Stay updated with the latest in your friends.</p>
-        </div>
+<div class="row pt-4 px-4 pb-2">
+    <div class="col-12">
+        <h2 class="fw-bold mb-1" style="color: #0f2854;">Buzz Feed</h2>
+        <p class="text-muted mb-0">Stay updated with the latest updates from people you follow.</p>
     </div>
 </div>
 
-
-                {% if has_following %}
-                <!-- Posts Feed -->
-                {% for post in posts %}
-                <div class="card shadow-sm border-0 mb-4 rounded-4 hover-shadow transition" id="post-{{ post.postid }}">
-                    <div class="card-body p-4">
+<div class="px-4 mt-4">
+    {% if has_following %}
+    <!-- Posts Feed -->
+    {% for post in posts %}
+    <div class="card shadow-sm border-0 mb-4 rounded-4 hover-shadow transition" id="post-{{ post.postid }}">
+        <div class="card-body p-4">
                         <!-- Post Header -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="d-flex align-items-center">
@@ -187,6 +184,7 @@
                     </div>
                 </div>
                 {% endif %}
+            </div> <!-- close px-4 mt-4 -->
 
 
 <style>
