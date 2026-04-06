@@ -67,6 +67,17 @@
                                             <span class="position-absolute bottom-0 end-0 translate-middle-x bg-success rounded-circle d-flex align-items-center justify-content-center border border-2 border-white" style="width: 24px; height: 24px; right: -5px !important; margin-bottom: -5px;">
                                                 <i class="las la-user-plus text-white small"></i>
                                             </span>
+                                        {% elif act.type == 'follow_request' %}
+                                            {% if act.user.profile %}
+                                            <img src="{{ act.user.profile.url }}" class="avatar-50 rounded-circle shadow-sm" alt="user" style="object-fit:cover;">
+                                            {% else %}
+                                            <div class="avatar-50 rounded-circle bg-light text-primary border shadow-sm d-flex align-items-center justify-content-center fw-bold fs-5">
+                                                {{ act.user.username|make_list|first|upper }}
+                                            </div>
+                                            {% endif %}
+                                            <span class="position-absolute bottom-0 end-0 translate-middle-x bg-warning rounded-circle d-flex align-items-center justify-content-center border border-2 border-white" style="width: 24px; height: 24px; right: -5px !important; margin-bottom: -5px;">
+                                                <i class="las la-user-clock text-white small"></i>
+                                            </span>
                                         {% endif %}
                                     </div>
 
@@ -85,13 +96,34 @@
                                             <p class="mb-1 text-dark fs-6">
                                                 <span class="fw-bold">{{ act.user.username }}</span> started following you.
                                             </p>
+                                        {% elif act.type == 'follow_request' %}
+                                            <div class="d-flex align-items-center justify-content-between w-100">
+                                                <div>
+                                                    <p class="mb-1 text-dark fs-6">
+                                                        <span class="fw-bold">{{ act.user.username }}</span> requested to follow you.
+                                                    </p>
+                                                    <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>{{ act.date|timesince }} ago</p>
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <form method="POST" action="{% url 'respond_follow_request' act.id 'accept' %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">Accept</button>
+                                                    </form>
+                                                    <form method="POST" action="{% url 'respond_follow_request' act.id 'decline' %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">Decline</button>
+                                                    </form>
+                                                </div>
+                                            </div>
                                         {% endif %}
 
-                                        <!-- Timestamp -->
-                                        {% if act.date %}
-                                        <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>{{ act.date|timesince }} ago</p>
-                                        {% else %}
-                                        <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>Recent</p>
+                                        <!-- Timestamp (only if not follow_request, since that handles its own layout) -->
+                                        {% if act.type != 'follow_request' %}
+                                            {% if act.date %}
+                                            <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>{{ act.date|timesince }} ago</p>
+                                            {% else %}
+                                            <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>Recent</p>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                     

@@ -94,21 +94,36 @@
                                         background: #f8f9fa; color: #212529; border-bottom-left-radius: 4px; border: 1px solid #e9ecef;
                                      {% endif %}">
                                     
+{% load user_tags %}
                                     {% if msg.shared_post %}
-                                    <div class="shared-post-card bg-white rounded-3 overflow-hidden mb-2 border border-light-subtle shadow-sm mx-auto" style="width: 100%; min-width: 200px;">
-                                        {% if msg.shared_post.thumbnail %}
-                                            <img src="{{ msg.shared_post.thumbnail.url }}" class="img-fluid w-100" style="max-height: 180px; object-fit: cover;" alt="post">
+                                        {% if msg.shared_post.userid.settings.profile_visibility == 'private' and not current_user|is_following:msg.shared_post.userid and msg.shared_post.userid != current_user %}
+                                            <div class="shared-post-privacy-gate bg-white rounded-3 p-3 mb-2 border text-center shadow-sm mx-auto" style="width: 100%; min-width: 200px;">
+                                                <i class="ri-lock-2-line text-muted fs-2 mb-1 d-block"></i>
+                                                <h6 class="fw-bold text-dark mb-1 small">Private Account</h6>
+                                                <p class="text-muted mb-0 small" style="font-size: 0.75rem;">Follow @{{ msg.shared_post.userid.username }} to see this post.</p>
+                                            </div>
+                                        {% else %}
+                                            <div class="shared-post-card bg-white rounded-3 overflow-hidden mb-2 border border-light-subtle shadow-sm mx-auto" style="width: 100%; min-width: 200px;">
+                                                {% if msg.shared_post.thumbnail %}
+                                                    <img src="{{ msg.shared_post.thumbnail.url }}" class="img-fluid w-100" style="max-height: 180px; object-fit: cover;" alt="post">
+                                                {% endif %}
+                                                <div class="p-2 border-top">
+                                                    <h6 class="fw-bold text-dark mb-1 small text-truncate">{{ msg.shared_post.posttitle }}</h6>
+                                                    <p class="text-muted mb-2 overflow-hidden" style="font-size: 0.7rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                                        {{ msg.shared_post.description }}
+                                                    </p>
+                                                    {% if msg.shared_post.communityid %}
+                                                        <a href="{% url 'community_detail' msg.shared_post.communityid_id %}#post-{{ msg.shared_post.postid }}" class="btn btn-primary btn-sm w-100 rounded-pill py-1 fw-bold" style="font-size: 0.75rem; background: #0f2854 !important;">
+                                                            View Post
+                                                        </a>
+                                                    {% else %}
+                                                        <a href="{% url 'buzz' %}#post-{{ msg.shared_post.postid }}" class="btn btn-primary btn-sm w-100 rounded-pill py-1 fw-bold" style="font-size: 0.75rem; background: #0f2854 !important;">
+                                                            View Post
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
                                         {% endif %}
-                                        <div class="p-2 border-top">
-                                            <h6 class="fw-bold text-dark mb-1 small text-truncate">{{ msg.shared_post.posttitle }}</h6>
-                                            <p class="text-muted mb-2 overflow-hidden" style="font-size: 0.7rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-                                                {{ msg.shared_post.description }}
-                                            </p>
-                                            <a href="{% url 'buzz' %}#post-{{ msg.shared_post.postid }}" class="btn btn-primary btn-sm w-100 rounded-pill py-1 fw-bold" style="font-size: 0.75rem; background: #0f2854 !important;">
-                                                View Post
-                                            </a>
-                                        </div>
-                                    </div>
                                     {% endif %}
 
                                     {% if msg.image %}

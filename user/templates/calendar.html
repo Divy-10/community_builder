@@ -137,7 +137,7 @@
         var meetups = {{ meetups_json|safe }};
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            timeZone: 'UTC',
+            timeZone: 'local',
             initialView: 'dayGridMonth',
             headerToolbar: {
                 left: 'prev,next title',

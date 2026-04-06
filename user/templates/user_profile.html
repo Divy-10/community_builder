@@ -42,6 +42,8 @@
                                     {% csrf_token %}
                                     {% if is_following %}
                                         <button type="submit" class="btn btn-secondary px-5 rounded-pill fw-bold"><i class="las la-user-minus me-1"></i>Unfollow</button>
+                                    {% elif has_pending_request %}
+                                        <button type="submit" class="btn btn-warning px-5 rounded-pill fw-bold"><i class="las la-user-clock me-1"></i>Requested</button>
                                     {% else %}
                                         <button type="submit" class="btn btn-primary px-5 rounded-pill fw-bold"><i class="las la-user-plus me-1"></i>Follow</button>
                                     {% endif %}

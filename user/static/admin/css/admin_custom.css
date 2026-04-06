@@ -423,6 +423,14 @@ body.change-list div.actions span.action-counter {
 #nav-sidebar .module tr.model-city th a::before { content: "\f64f"; } /* city */
 #nav-sidebar .module tr.model-state th a::before { content: "\f59f"; } /* map-marked */
 #nav-sidebar .module tr.model-group th a::before { content: "\f0c0"; } /* groups */
+#nav-sidebar .module tr.model-meetup th a::before { content: "\f073"; } /* calendar-alt (Meetups) */
+#nav-sidebar .module tr.model-meetup_member th a::before { content: "\f0c0"; } /* users (Meetup Members) */
+#nav-sidebar .module tr.model-payment th a::before { content: "\f09d"; } /* credit-card (Payments) */
+#nav-sidebar .module tr.model-followrequest th a::before { content: "\f234"; } /* user-plus (Follow Requests) */
+#nav-sidebar .module tr.model-story th a::before { content: "\f03e"; } /* image (Stories) */
+#nav-sidebar .module tr.model-storyseen th a::before { content: "\f06e"; } /* eye (Story Seen) */
+#nav-sidebar .module tr.model-blog th a::before { content: "\f1ea"; } /* newspaper (Blogs) */
+#nav-sidebar .module tr.model-usersettings th a::before { content: "\f085"; } /* cogs (User Settings) */
 
 /* Styling for the 'Add' and 'Change' links (Side actions) */
 #nav-sidebar .module a.addlink, 

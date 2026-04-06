@@ -274,10 +274,14 @@
                 <i class="fa-solid fa-images"></i>
                 Posts
             </a>
+            <a href="{% url 'custom_admin:meetups' %}" class="nav-item {% if request.resolver_match.url_name == 'meetups' %}active{% endif %}">
+                <i class="fa-solid fa-calendar-days"></i>
+                Meetups
+            </a>
             
             <a href="/admin/" class="nav-item" style="color: #f59e0b;">
-                <i class="fa-brands fa-python"></i>
-                Default Django Admin
+                <i class="fa-solid fa-sliders"></i>
+                UniVo Administration
             </a>
             
             <a href="/" class="nav-item logout-btn" style="margin-top: auto;">

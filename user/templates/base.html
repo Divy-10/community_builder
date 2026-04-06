@@ -550,12 +550,30 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body p-0">
-            <div class="p-3">
-                <div class="input-group mb-3 bg-light rounded-pill overflow-hidden border-0">
-                    <span class="input-group-text bg-transparent border-0 pe-0"><i class="ri-search-line text-muted"></i></span>
-                    <input type="text" id="shareSearch" class="form-control bg-transparent border-0 shadow-none ps-2" placeholder="Search friends..." onkeyup="filterShareTargets()">
+            <div class="px-3 pt-3 pb-2">
+                <div class="search-bar-container d-flex align-items-center rounded-pill px-3" style="background-color: #f8f9fa; border: 1px solid #eef0f2; height: 50px; transition: all 0.3s ease;">
+                    <i class="ri-search-line text-muted fs-5 me-2"></i>
+                    <input type="text" id="shareSearch" class="form-control border-0 bg-transparent shadow-none p-0 share-search-input" 
+                           placeholder="Search friends..." onkeyup="filterShareTargets()" 
+                           style="height: 100%; font-size: 0.95rem;">
                 </div>
             </div>
+            <style>
+                .search-bar-container:focus-within {
+                    background-color: #fff !important;
+                    border-color: var(--bs-primary) !important;
+                    box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.12) !important;
+                    transform: translateY(-1px);
+                }
+                .share-item-wrapper {
+                    transition: all 0.2s ease;
+                    border-radius: 12px;
+                    padding: 8px 12px;
+                }
+                .share-item-wrapper:hover {
+                    background-color: rgba(var(--bs-primary-rgb), 0.04);
+                }
+            </style>
             <div id="shareTargetsList" style="max-height: 300px; overflow-y: auto;" class="px-3 pb-3">
               <div class="text-center py-4">
                   <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
@@ -691,17 +709,20 @@
       function renderShareTargets(targets) {
         const list = document.getElementById('shareTargetsList');
         if(targets.length === 0) {
-            list.innerHTML = '<p class="text-center text-muted py-3">No friends found.</p>';
+            list.innerHTML = '<p class="text-center text-muted py-4">No friends found.</p>';
             return;
         }
         
         list.innerHTML = targets.map(t => `
-          <div class="d-flex align-items-center justify-content-between mb-3 share-item">
+          <div class="d-flex align-items-center justify-content-between mb-2 share-item-wrapper">
             <div class="d-flex align-items-center">
-              <img src="${t.profile_url}" class="avatar-35 rounded-circle me-3" style="object-fit:cover;">
-              <span class="fw-semibold small">${t.username}</span>
+              <img src="${t.profile_url}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+              <div>
+                <div class="fw-bold text-dark small" style="line-height: 1.2;">${t.username}</div>
+                <div class="text-muted" style="font-size: 0.75rem;">Friend</div>
+              </div>
             </div>
-            <button class="btn btn-primary btn-sm rounded-pill px-3 py-1 fw-bold fs-7" onclick="sendPostToUser(this, ${t.id})">Send</button>
+            <button class="btn btn-primary btn-sm rounded-pill px-3 py-1 fw-bold fs-7" style="font-size: 0.75rem !important;" onclick="sendPostToUser(this, ${t.id})">Send</button>
           </div>
         `).join('');
       }

@@ -334,3 +334,14 @@ class Payment(models.Model):
 
     def __str__(self):
         return "%d - %s - %s" % (self.paymentid, self.userid.username, self.status)
+
+# FollowRequest
+class FollowRequest(models.Model):
+    requestid = models.AutoField(primary_key=True)
+    sender = models.ForeignKey(user, on_delete=models.CASCADE, related_name='sent_follow_requests')
+    receiver = models.ForeignKey(user, on_delete=models.CASCADE, related_name='received_follow_requests')
+    status = models.IntegerField(default=0) # 0=Pending, 1=Accepted, 2=Declined
+    createddt = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Request from {self.sender.username} to {self.receiver.username}"

@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count
 from django.utils import timezone
+from django.utils.timezone import localtime
 from datetime import datetime, timedelta
 import json
 from .models import *
@@ -925,6 +926,9 @@ def users_list(request):
     # Get IDs of users current user is following
     following_ids = follow.objects.filter(followerid=userid).values_list('userid_id', flat=True)
     
+    # Get IDs of users with pending follow requests from current user
+    pending_request_ids = FollowRequest.objects.filter(sender_id=userid, status=0).values_list('receiver_id', flat=True)
+
     # Filtering cities logic for the dropdown (if state is selected, only show state cities)
     cities_list = city.objects.all().order_by('cityname')
     if search_state:
@@ -937,6 +941,7 @@ def users_list(request):
     data = {
         'users': all_users,
         'following_ids': following_ids,
+        'pending_request_ids': pending_request_ids,
         'comms_to_invite': comms_to_invite,
         'states': state.objects.all().order_by('statename'),
         'cities': cities_list,
@@ -951,6 +956,7 @@ def toggle_follow(request, target_userid):
     if not userid:
         return redirect('signin')
         
+    u = user.objects.get(pk=userid)
     target_user = user.objects.get(pk=target_userid)
     
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
@@ -963,13 +969,53 @@ def toggle_follow(request, target_userid):
         if is_ajax:
             return JsonResponse({'success': True, 'following': False, 'message': f'Unfollowed {target_user.username}.'})
     else:
-        # Follow
-        f = follow.objects.create(followerid=userid, userid=target_user)
-        f.save()
-        if is_ajax:
-            return JsonResponse({'success': True, 'following': True, 'message': f'Following {target_user.username}!'})
+        # Check if account is private
+        is_private = False
+        try:
+            if target_user.settings.profile_visibility == 'private':
+                is_private = True
+        except:
+            pass
+
+        if is_private:
+            # Handle Follow Request for Private Account
+            existing_request = FollowRequest.objects.filter(sender=u, receiver=target_user, status=0).first()
+            if existing_request:
+                # Cancel request
+                existing_request.delete()
+                if is_ajax:
+                    return JsonResponse({'success': True, 'requested': False, 'message': 'Request canceled.'})
+            else:
+                # Create Request
+                FollowRequest.objects.create(sender=u, receiver=target_user, status=0)
+                if is_ajax:
+                    return JsonResponse({'success': True, 'requested': True, 'message': 'Follow request sent!'})
+        else:
+            # Follow Public Account
+            f = follow.objects.create(followerid=userid, userid=target_user)
+            f.save()
+            if is_ajax:
+                return JsonResponse({'success': True, 'following': True, 'message': f'Following {target_user.username}!'})
         
     return redirect(request.META.get('HTTP_REFERER', 'users_list'))
+
+def respond_follow_request(request, request_id, action):
+    userid = request.session.get('userid')
+    if not userid:
+        return redirect('signin')
+        
+    fr = get_object_or_404(FollowRequest, pk=request_id, receiver_id=userid, status=0)
+    
+    if action == 'accept':
+        fr.status = 1
+        fr.save()
+        # Create follow entry
+        follow.objects.get_or_create(followerid=fr.sender.userid, userid=fr.receiver)
+    elif action == 'decline':
+        fr.status = 2
+        fr.save()
+        
+    return redirect('activity')
 
 def invite_user(request, target_userid):
     userid = request.session.get('userid')
@@ -1112,9 +1158,15 @@ def user_profile(request, target_userid=None):
     # Merge and deduplicate just in case
     user_communities = list({c.communityid: c for c in (created_communities + joined_communities)}.values())
         
+    # Check for pending follow request
+    has_pending_request = False
+    if not is_own_profile and not is_following:
+        has_pending_request = FollowRequest.objects.filter(sender_id=userid, receiver=user_profile, status=0).exists()
+
     data = {
         'user_profile': user_profile,
         'is_following': is_following,
+        'has_pending_request': has_pending_request,
         'is_own_profile': is_own_profile,
         'followers_count': followers_count,
         'following_count': following_count,
@@ -1633,8 +1685,13 @@ def share_post_to_user(request, post_id):
             u = user.objects.get(pk=userid)
             
             # Create a chat message
-            # Clean post name for message
-            msg_content = f"Hey! Check out this post: {p.posttitle}\n\nView post here: http://{request.get_host()}/buzz/#post-{post_id}"
+            # Dynamically determine the correct link based on whether it's a community post or a buzz post
+            if p.communityid:
+                post_link = f"http://{request.get_host()}/community/{p.communityid.pk}/#post-{post_id}"
+            else:
+                post_link = f"http://{request.get_host()}/buzz/#post-{post_id}"
+
+            msg_content = f"Hey! Check out this post: {p.posttitle}\n\nView post here: {post_link}"
             
             c = chat.objects.create(
                 senderid=int(userid),
@@ -1919,16 +1976,25 @@ def activity(request):
     # In follow model: followerid is the person who clicked follow, userid is the person being followed
     follows = follow.objects.filter(userid=u)
     
+    # 4. Get pending follow requests for the user
+    follow_requests = FollowRequest.objects.filter(receiver=u, status=0)
+    
     # Create a unified activity list
     activities = []
     
+    for fr in follow_requests:
+        activities.append({
+            'type': 'follow_request',
+            'user': fr.sender,
+            'date': fr.createddt,
+            'id': fr.requestid
+        })
+
     for l in likes:
         activities.append({
             'type': 'like',
             'user': l.userid,
             'post': l.postid,
-            # like model doesn't have a date, we will use the post date as a fallback, or we can just sort by likeid as a proxy for time
-            # Since like model lacks addeddt, we'll assign a mock date or None
             'date': getattr(l, 'createddt', None), 
             'id': l.likeid
         })
@@ -1944,19 +2010,14 @@ def activity(request):
         })
         
     for f in follows:
-        # We need to get the actual user object for the follower
         follower = user.objects.filter(pk=f.followerid).first()
         activities.append({
             'type': 'follow',
             'user': follower,
-            # No date on follow model natively, use fallback or None
             'date': getattr(f, 'createddt', None),
             'id': f.followid
         })
 
-    # Sort activities. We will try to sort by date if available, otherwise by ID to estimate chronologically
-    # For models lacking dates, we'll push them to the end or sort by ID descending.
-    # A safe fallback is sorting descending by ID (largest ID = most recent)
     activities.sort(key=lambda x: (x['date'] is not None, x['date'], x['id']), reverse=True)
 
     data = {
@@ -2107,14 +2168,14 @@ def settings_view(request):
                 elif action == 'update_privacy':
                     settings.profile_visibility = data.get('profile_visibility', settings.profile_visibility)
                     settings.data_usage_consent = data.get('data_usage_consent', settings.data_usage_consent)
+                    settings.ai_recommendations = data.get('ai_recommendations', settings.ai_recommendations)
                     settings.save()
                     return JsonResponse({'success': True, 'msg': 'Privacy settings updated.'})
                 
-                elif action == 'update_advanced':
-                    settings.ai_recommendations = data.get('ai_recommendations', settings.ai_recommendations)
+                elif action == 'update_security_settings':
                     settings.two_factor_auth = data.get('two_factor_auth', settings.two_factor_auth)
                     settings.save()
-                    return JsonResponse({'success': True, 'msg': 'Advanced settings saved.'})
+                    return JsonResponse({'success': True, 'msg': 'Security settings updated.'})
                     
                 elif action == 'update_regional':
                     settings.language = data.get('language', settings.language)
@@ -2291,9 +2352,9 @@ def create_meetup(request, community_id):
         )
 
         try:
-            from django.utils.dateparse import parse_datetime
-            dt = parse_datetime(meeting_date)
-            formatted_date = dt.strftime("%B %d, %Y at %I:%M %p") if dt else meeting_date
+            from django.utils.timezone import localtime
+            dt = localtime(meeting_date)
+            formatted_date = dt.strftime("%B %d, %Y at %I:%M %p")
         except:
             formatted_date = meeting_date
             
@@ -2446,8 +2507,8 @@ def calendar_view(request):
                 'meetup_type': m.meetup_type,
                 'description': m.description,
                 'location': m.location or m.meeting_link or 'N/A',
-                'date_str': m.meeting_date.strftime("%A, %B %d, %Y"),
-                'time_str': m.meeting_date.strftime("%I:%M %p"),
+                'date_str': localtime(m.meeting_date).strftime("%A, %B %d, %Y"),
+                'time_str': localtime(m.meeting_date).strftime("%I:%M %p"),
             }
         })
     

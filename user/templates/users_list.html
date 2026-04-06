@@ -38,6 +38,10 @@
                                         <button onclick="toggleCardFollow(this, {{ u.userid }})" class="btn btn-secondary rounded-pill px-4 flex-grow-1 shadow-sm transition">
                                             <i class="ri-user-unfollow-line me-1"></i> Unfollow
                                         </button>
+                                    {% elif u.userid in pending_request_ids %}
+                                        <button onclick="toggleCardFollow(this, {{ u.userid }})" class="btn btn-warning rounded-pill px-4 flex-grow-1 shadow-sm transition">
+                                            <i class="ri-time-line me-1"></i> Requested
+                                        </button>
                                     {% else %}
                                         <button onclick="toggleCardFollow(this, {{ u.userid }})" class="btn btn-primary rounded-pill px-4 flex-grow-1 shadow-sm transition">
                                             <i class="ri-user-add-line me-1"></i> Follow
@@ -150,6 +154,10 @@ function toggleCardFollow(btn, targetId) {
                 btn.className = 'btn btn-secondary rounded-pill px-4 flex-grow-1 shadow-sm transition';
                 btn.innerHTML = '<i class="ri-user-unfollow-line me-1"></i> Unfollow';
                 showToast(data.message, 'success');
+            } else if(data.requested) {
+                btn.className = 'btn btn-warning rounded-pill px-4 flex-grow-1 shadow-sm transition';
+                btn.innerHTML = '<i class="ri-time-line me-1"></i> Requested';
+                showToast(data.message, 'warning');
             } else {
                 btn.className = 'btn btn-primary rounded-pill px-4 flex-grow-1 shadow-sm transition';
                 btn.innerHTML = '<i class="ri-user-add-line me-1"></i> Follow';
@@ -259,8 +267,8 @@ function submitInvite(event, targetId) {
         <form method="get" action="{% url 'users_list' %}" class="position-relative" style="z-index: 20;">
             <!-- Name Filter -->
             <div class="mb-4 pt-1">
-                <label class="form-label text-dark fs-7 fw-bold text-uppercase ls-1 mb-3 d-block">
-                    <i class="ri-user-search-line me-1 opacity-50"></i> User Name
+                <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                    <i class="ri-user-search-line me-2 text-primary opacity-75"></i> User Name
                 </label>
                 <input type="text" 
                        class="premium-input-field" 
@@ -271,8 +279,8 @@ function submitInvite(event, targetId) {
             
             <!-- State Filter -->
             <div class="mb-4">
-                <label class="form-label text-dark fs-7 fw-bold text-uppercase ls-1 mb-3 d-block">
-                    <i class="ri-map-pin-line me-1 opacity-50"></i> State
+                <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                    <i class="ri-map-pin-line me-2 text-primary opacity-75"></i> State
                 </label>
                 <select class="premium-input-field premium-select-field" name="search_state" id="search_state" onchange="updateCities(this.value)">
                     <option value="">All States</option>
@@ -284,8 +292,8 @@ function submitInvite(event, targetId) {
             
             <!-- City Filter -->
             <div class="mb-2">
-                <label class="form-label text-dark fs-7 fw-bold text-uppercase ls-1 mb-3 d-block">
-                    <i class="ri-map-pin-2-line me-1 opacity-50"></i> City
+                <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                    <i class="ri-map-pin-2-line me-2 text-primary opacity-75"></i> City
                 </label>
                 <select class="premium-input-field premium-select-field" name="search_city" id="search_city">
                     <option value="">All Regions</option>

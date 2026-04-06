@@ -32,12 +32,17 @@ def format_currency(amount, settings_obj=None):
 def format_datetime(value, settings_obj=None):
     if not value:
         return ""
-        
-    date_format = "MM/DD/YYYY"
-    if settings_obj and hasattr(settings_obj, 'date_time_format'):
-        date_format = settings_obj.date_time_format
-
+    
+    from django.utils.timezone import localtime
     try:
+        # Convert to local timezone if aware
+        if hasattr(value, 'tzinfo') and value.tzinfo:
+            value = localtime(value)
+            
+        date_format = "MM/DD/YYYY"
+        if settings_obj and hasattr(settings_obj, 'date_time_format'):
+            date_format = settings_obj.date_time_format
+
         if date_format == "DD/MM/YYYY":
             return value.strftime("%d/%m/%Y %I:%M %p")
         elif date_format == "MM/DD/YYYY":
@@ -46,5 +51,19 @@ def format_datetime(value, settings_obj=None):
             return value.strftime("%Y-%m-%d %H:%M")
         else:
             return value.strftime("%b %d, %Y")
-    except AttributeError:
+    except (AttributeError, ValueError):
         return value
+
+@register.filter(name='is_following')
+def is_following(user_obj, author_obj):
+    from user.models import follow
+    if not user_obj or not author_obj:
+        return False
+    return follow.objects.filter(followerid=user_obj.userid, userid=author_obj).exists()
+
+@register.filter(name='is_member_of')
+def is_member_of(user_obj, community_obj):
+    from user.models import communitymember
+    if not user_obj or not community_obj:
+        return False
+    return communitymember.objects.filter(userid=user_obj, communityid=community_obj, status=1).exists()

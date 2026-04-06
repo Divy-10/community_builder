@@ -14,6 +14,7 @@ urlpatterns = [
     path('community/<int:community_id>/verify-payment/', views.verify_payment, name='verify_payment'),
     path('users/', views.users_list, name='users_list'),
     path('follow/<int:target_userid>/', views.toggle_follow, name='toggle_follow'),
+    path('follow/request/respond/<int:request_id>/<str:action>/', views.respond_follow_request, name='respond_follow_request'),
     path('invite_user/<int:target_userid>/', views.invite_user, name='invite_user'),
     path('invitations/', views.invitations_list, name='invitations_list'),
     path('invitation/respond/<int:inviteid>/<str:action>/', views.respond_invite, name='respond_invite'),
