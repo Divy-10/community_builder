@@ -113,56 +113,228 @@
 {% endblock %}
 
 {% block right_sidebar %}
-<div class="iq-sidebar-right sidebar-default">
-    <div class="card shadow-none h-100 mb-0 border-0 bg-transparent">
-        <div class="card-header bg-transparent py-3 px-0">
-            <h5 class="card-title fw-bold d-flex align-items-center gap-2 mb-0">
-                <i class="las la-filter text-primary"></i> Filter Communities
-            </h5>
-        </div>
-        <div class="card-body px-0">
-            <form method="get" action="{% url 'group' %}">
-                <div class="mb-4">
-                    <label class="form-label text-muted small fw-bold">Community Name</label>
-                    <input type="text" class="filter-input transition rounded-pill px-3 py-2 w-100" name="search_name"
-                        value="{{ search_name }}" placeholder="Search by name...">
-                </div>
-                <div class="mb-4">
-                    <label class="form-label text-muted small fw-bold">Category</label>
-                    <select class="filter-input transition rounded-pill px-3 py-2 w-100" name="search_category">
-                        <option value="">All Categories</option>
-                        {% for cat in categories %}
-                        <option value="{{ cat.categoryid }}" {% if search_category == cat.categoryid|stringformat:"i" %}selected{% endif %}>{{ cat.categoryname }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label text-muted small fw-bold">City</label>
-                    <select class="filter-input transition rounded-pill px-3 py-2 w-100" name="search_city">
-                        <option value="">All Cities</option>
-                        {% for city in cities %}
-                        <option value="{{ city.cityid }}" {% if search_city == city.cityid|stringformat:"i" %}selected{% endif %}>{{ city.cityname }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label text-muted small fw-bold">Minimum Members</label>
-                    <input type="number" class="filter-input transition rounded-pill px-3 py-2 w-100"
-                        name="search_members" value="{{ search_members }}" placeholder="e.g. 5" min="0">
-                </div>
+<div class="iq-sidebar-right sidebar-default p-0" style="background: transparent !important; box-shadow: none !important; border: none !important; height: calc(100vh - 75px) !important; overflow-y: auto !important; overflow-x: hidden !important; padding-bottom: 50px !important; position: fixed; right: 0; top: 75px; z-index: 900;">
+    <style>
+        .iq-sidebar-right::after, .iq-sidebar-right::before { display: none !important; }
+        .iq-sidebar-right::-webkit-scrollbar { width: 5px; }
+        .iq-sidebar-right::-webkit-scrollbar-track { background: transparent; }
+        .iq-sidebar-right::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.05); border-radius: 10px; }
+        .iq-sidebar-right:hover::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+    </style>
+    <!-- Floating Background Elements (Premium Accent) -->
+    <div class="premium-bg-container">
+        <div class="floating-element floating-1"></div>
+        <div class="floating-element floating-2"></div>
+    </div>
 
-                <div class="mt-4 pt-3">
-                    <button type="submit"
-                        class="btn btn-primary w-100 rounded-pill fw-bold hover-shadow transition mb-2 py-2">Apply
-                        Filters</button>
-                    <a href="{% url 'group' %}"
-                        class="btn btn-light w-100 rounded-pill fw-bold text-muted hover-shadow transition py-2">Clear
-                        All</a>
-                </div>
-            </form>
+    <!-- Main Filter Box (Premium Card) -->
+    <div class="premium-sidebar-card">
+        <div class="border-bottom border-light pb-4 mb-4">
+            <h5 class="fw-bold d-flex align-items-center gap-3 mb-0">
+                <i class="ri-sound-module-line text-primary fs-3"></i>
+                <span class="ls-1">FILTER COMMUNITIES</span>
+            </h5>
+            <p class="text-muted small mb-0 mt-2">Find groups by name, city or category</p>
         </div>
+
+        <form method="get" action="{% url 'group' %}" class="position-relative" style="z-index: 20;">
+            <!-- Community Name -->
+            <div class="mb-4 pt-1">
+                <label class="form-label text-dark fs-7 fw-bold text-uppercase ls-1 mb-3 d-block">
+                    <i class="ri-group-line me-1 opacity-50"></i> Community Name
+                </label>
+                <input type="text" 
+                       class="premium-input-field" 
+                       name="search_name" 
+                       value="{{ search_name }}" 
+                       placeholder="Search by name...">
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="mb-4">
+                <label class="form-label text-dark fs-7 fw-bold text-uppercase ls-1 mb-3 d-block">
+                    <i class="ri-grid-line me-1 opacity-50"></i> Category
+                </label>
+                <select class="premium-input-field premium-select-field" name="search_category">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.categoryid }}" {% if search_category == cat.categoryid|stringformat:"i" %}selected{% endif %}>{{ cat.categoryname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- City Filter -->
+            <div class="mb-4">
+                <label class="form-label text-dark fs-7 fw-bold text-uppercase ls-1 mb-3 d-block">
+                    <i class="ri-map-pin-line me-1 opacity-50"></i> City
+                </label>
+                <select class="premium-input-field premium-select-field" name="search_city">
+                    <option value="">All Cities</option>
+                    {% for city in cities %}
+                    <option value="{{ city.cityid }}" {% if search_city == city.cityid|stringformat:"i" %}selected{% endif %}>{{ city.cityname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Min Members -->
+            <div class="mb-2">
+                <label class="form-label text-dark fs-7 fw-bold text-uppercase ls-1 mb-3 d-block">
+                    <i class="ri-user-line me-1 opacity-50"></i> Min. Members
+                </label>
+                <input type="number" 
+                       class="premium-input-field" 
+                       name="search_members" 
+                       value="{{ search_members }}" 
+                       placeholder="e.g. 5" min="0">
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="mt-3">
+                <button type="submit" class="btn-premium-eco w-100 mb-2">
+                    Apply Filters
+                </button>
+                
+                <a href="{% url 'group' %}" class="btn-premium-ghost w-100 mb-4 d-flex align-items-center justify-content-center gap-2">
+                    <i class="ri-restart-line"></i>
+                    <span>RESET ALL</span>
+                </a>
+            </div>
+        </form>
     </div>
 </div>
-
 {% endblock %}
+
 {% block content_class %}has-right-sidebar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .premium-sidebar-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 30px;
+        padding-bottom: 40px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        min-height: auto;
+        position: relative;
+        z-index: 10;
+        transition: all 0.3s ease;
+        margin-bottom: 30px;
+    }
+
+    .premium-bg-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .floating-element {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.15;
+        z-index: 2;
+    }
+
+    .floating-1 {
+        top: -10%;
+        right: -10%;
+        width: 200px;
+        height: 200px;
+        background: linear-gradient(45deg, #3B82F6, #1E40AF);
+        animation: float-glow 8s infinite alternate;
+    }
+
+    .floating-2 {
+        bottom: 5%;
+        left: -5%;
+        width: 150px;
+        height: 150px;
+        background: linear-gradient(135deg, #0f2854, #1E40AF);
+        animation: float-glow 12s infinite alternate-reverse;
+    }
+
+    @keyframes float-glow {
+        0% { transform: scale(1) translate(0, 0); opacity: 0.15; }
+        100% { transform: scale(1.2) translate(10px, 20px); opacity: 0.25; }
+    }
+
+    .ls-1 { letter-spacing: 1.5px; }
+
+    .premium-input-field {
+        width: 100%;
+        padding: 12px 20px;
+        background: #f8f9fa;
+        border: 1.5px solid #eee;
+        border-radius: 14px;
+        font-size: 0.95rem;
+        color: #333;
+        transition: all 0.3s ease;
+        outline: none !important;
+    }
+
+    .premium-input-field:focus {
+        background: #fff;
+        border-color: #0f2854;
+        box-shadow: 0 5px 15px rgba(15, 40, 84, 0.1);
+    }
+
+    .premium-select-field {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M12 16L6 10H18L12 16Z'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        background-size: 18px;
+    }
+
+    .btn-premium-eco {
+        background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%) !important;
+        color: white !important;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 50px !important;
+        font-weight: 600;
+        font-size: 1.05rem;
+        box-shadow: 0 8px 15px rgba(44, 82, 130, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-transform: none !important;
+    }
+
+    .btn-premium-eco:hover {
+        transform: translateY(-1.5px);
+        box-shadow: 0 12px 20px rgba(44, 82, 130, 0.3);
+        filter: brightness(1.1);
+        color: white !important;
+    }
+
+    .btn-premium-ghost {
+        background: #f8f9fa;
+        color: #666;
+        border: 1px solid #eee;
+        padding: 12px 20px;
+        border-radius: 16px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        text-decoration: none !important;
+    }
+
+    .btn-premium-ghost:hover {
+        background: #fff;
+        border-color: #ddd;
+        color: #333;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .fs-7 { font-size: 0.75rem; }
+</style>
+{% endblock %}

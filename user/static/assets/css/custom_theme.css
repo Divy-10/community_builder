@@ -852,20 +852,20 @@ hr {
 
 /* Premium Primary Button */
 .btn-premium-eco {
-  background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%) !important;
+  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%) !important;
   color: #fff !important;
   border: none !important;
   padding: 14px 28px !important;
   border-radius: 99px !important;
   font-weight: 700 !important;
   letter-spacing: 0.5px !important;
-  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 10px 20px rgba(44, 82, 130, 0.2) !important;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 .btn-premium-eco:hover {
   transform: translateY(-3px) scale(1.02) !important;
-  box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 15px 30px rgba(44, 82, 130, 0.3) !important;
   filter: brightness(1.1) !important;
 }
 
@@ -914,7 +914,7 @@ hr {
 .floating-1 {
   width: 150px;
   height: 150px;
-  background: #10B981;
+  background: #3B82F6;
   top: 10%;
   right: -20px;
 }
@@ -922,10 +922,8 @@ hr {
 .floating-2 {
   width: 200px;
   height: 200px;
-  background: #3B82F6;
+  background: #1E40AF;
   bottom: 20%;
   left: -30px;
   animation-duration: 20s;
 }
-
->>>>>>>caaaf1c4fcaadbfc744615f50e08ae5cdf11b138
