@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #495057;
+    }
+    .form-control, .form-select {
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1.5px solid #eee;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: #fff;
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 4px rgba(var(--bs-primary-rgb), 0.1);
+        transform: translateY(-1px);
+    }
+    .form-control:hover:not(:focus), .form-select:hover:not(:focus) {
+        background-color: #f1f3f5;
+        border-color: #e9ecef;
+    }
+    body.dark-mode .form-label {
+        color: #adb5bd;
+    }
+    body.dark-mode .form-control, body.dark-mode .form-select {
+        background-color: #2a2a2a;
+        border-color: #333;
+        color: #e0e0e0;
+    }
+    body.dark-mode .form-control:focus, body.dark-mode .form-select:focus {
+        background-color: #333;
+    }
+</style>
+
+<div class="content-inner" id="page_layout">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header d-flex justify-content-between border-bottom-0 bg-transparent pt-4 px-4">
+                        <div class="header-title">
+                            <h4 class="card-title fw-bold">Edit Profile</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>Update your personal details below.</p>
+                        <form method="post" enctype="multipart/form-data" action="{% url 'edit_profile' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label" for="name">Your Full Name:</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                    value="{{ user_profile.username }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email address:</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                    value="{{ user_profile.email }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="profile">Profile Image (leave blank to keep
+                                    current):</label>
+                                <input type="file" class="form-control" id="profile" name="fup">
+                                {% if user_profile.profile %}
+                                <div class="mt-2">
+                                    <img src="{{ user_profile.profile.url }}" alt="Current Profile"
+                                        class="img-thumbnail" style="max-height: 100px;">
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="bio">Bio:</label>
+                                <textarea class="form-control" id="bio" name="bio" rows="4"
+                                    required>{{ user_profile.bio }}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Gender:</label><br>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="gender" id="genderMale"
+                                        value="male" {% if user_profile.gender|lower == 'male' %}checked{% endif %}>
+                                    <label class="form-check-label" for="genderMale">Male</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="gender" id="genderFemale"
+                                        value="female" {% if user_profile.gender|lower == 'female' %}checked{% endif %}>
+                                    <label class="form-check-label" for="genderFemale">Female</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="dob">Date of Birth:</label>
+                                <input type="date" class="form-control" id="dob" name="dob"
+                                    value="{{ user_profile.dob|date:'Y-m-d' }}" required>
+                                <script>document.getElementById('dob').max = new Date().toISOString().split('T')[0];</script>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="state">Select State:</label>
+                                <select name="state" id="state" class="form-control" required>
+                                    <option value="">-- Select State --</option>
+                                    {% for s in states %}
+                                    <option value="{{ s.stateid }}" {% if user_state_id == s.stateid %}selected{% endif %}>{{ s.statename }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="city">Select City:</label>
+                                <select name="city" id="city" class="form-control" required disabled>
+                                    <option value="">-- Select State First --</option>
+                                </select>
+                            </div>
+
+                            <script>
+                                var currentCityId = "{{ user_profile.cityid.cityid }}";
+
+                                function loadCities(stateId, preselect) {
+                                    var citySelect = document.getElementById('city');
+                                    citySelect.innerHTML = '<option value="">-- Loading... --</option>';
+                                    citySelect.disabled = true;
+
+                                    if (!stateId) {
+                                        citySelect.innerHTML = '<option value="">-- Select State First --</option>';
+                                        return;
+                                    }
+
+                                    const url = "{% url 'get_cities_by_state' state_id=0 %}".replace('0', stateId);
+                                    fetch(url)
+                                        .then(function (response) { 
+                                            if (!response.ok) throw new Error('API Error: ' + response.status);
+                                            return response.json(); 
+                                        })
+                                        .then(function (data) {
+                                            citySelect.innerHTML = '<option value="">-- Select City --</option>';
+                                            if (data.length === 0) {
+                                                citySelect.innerHTML = '<option value="">-- No Cities Found --</option>';
+                                            }
+                                            data.forEach(function (c) {
+                                                var opt = document.createElement('option');
+                                                opt.value = c.cityid;
+                                                opt.textContent = c.cityname;
+                                                if (preselect && String(c.cityid) === String(preselect)) {
+                                                    opt.selected = true;
+                                                }
+                                                citySelect.appendChild(opt);
+                                            });
+                                            citySelect.disabled = false;
+                                        })
+                                        .catch(function(error) {
+                                            console.error('Fetch Error:', error);
+                                            citySelect.innerHTML = '<option value="">-- Error Loading Cities --</option>';
+                                        });
+                                }
+
+                                document.getElementById('state').addEventListener('change', function () {
+                                    loadCities(this.value, null);
+                                });
+
+                                // Auto-load cities for pre-selected state
+                                var stateSelect = document.getElementById('state');
+                                if (stateSelect.value) {
+                                    loadCities(stateSelect.value, currentCityId);
+                                }
+                            </script>
+
+                            <button type="submit" class="btn btn-primary mt-3">Update Profile</button>
+                            <a href="{% url 'my_profile' %}" class="btn bg-danger-subtle mt-3 text-danger">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-inner" id="page_layout">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between p-3 rounded-4 shadow-sm" style="background-color: rgb(15, 40, 84) !important;">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow" style="width: 50px; height: 50px; overflow: hidden;">
+                            <img src="/media/assets/activity_header_icon.png" alt="activity-icon" style="width: 100%; height: 100%; object-fit: contain; padding: 5px;">
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold text-white">Your Activity</h4>
+                            <p class="mb-0 text-white-50 small">Stay up to date with interactions on your account</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed Area -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush rounded-4">
+                            {% for act in activities %}
+                            <div class="list-group-item list-group-item-action py-4 px-4 border-bottom hover-bg-light transition">
+                                <div class="d-flex align-items-start">
+                                    
+                                    <!-- User Avatar & Icon Badge -->
+                                    <div class="position-relative me-4 flex-shrink-0">
+                                        {% if act.type == 'like' %}
+                                            {% if act.user.profile %}
+                                            <img src="{{ act.user.profile.url }}" class="avatar-50 rounded-circle shadow-sm" alt="user" style="object-fit:cover;">
+                                            {% else %}
+                                            <div class="avatar-50 rounded-circle bg-light text-primary border shadow-sm d-flex align-items-center justify-content-center fw-bold fs-5">
+                                                {{ act.user.username|make_list|first|upper }}
+                                            </div>
+                                            {% endif %}
+                                            <span class="position-absolute bottom-0 end-0 translate-middle-x bg-danger rounded-circle d-flex align-items-center justify-content-center border border-2 border-white" style="width: 24px; height: 24px; right: -5px !important; margin-bottom: -5px;">
+                                                <i class="las la-heart text-white small"></i>
+                                            </span>
+
+                                        {% elif act.type == 'comment' %}
+                                            {% if act.user.profile %}
+                                            <img src="{{ act.user.profile.url }}" class="avatar-50 rounded-circle shadow-sm" alt="user" style="object-fit:cover;">
+                                            {% else %}
+                                            <div class="avatar-50 rounded-circle bg-light text-primary border shadow-sm d-flex align-items-center justify-content-center fw-bold fs-5">
+                                                {{ act.user.username|make_list|first|upper }}
+                                            </div>
+                                            {% endif %}
+                                            <span class="position-absolute bottom-0 end-0 translate-middle-x bg-primary rounded-circle d-flex align-items-center justify-content-center border border-2 border-white" style="width: 24px; height: 24px; right: -5px !important; margin-bottom: -5px;">
+                                                <i class="las la-comment text-white small"></i>
+                                            </span>
+
+                                        {% elif act.type == 'follow' %}
+                                            {% if act.user.profile %}
+                                            <img src="{{ act.user.profile.url }}" class="avatar-50 rounded-circle shadow-sm" alt="user" style="object-fit:cover;">
+                                            {% else %}
+                                            <div class="avatar-50 rounded-circle bg-light text-primary border shadow-sm d-flex align-items-center justify-content-center fw-bold fs-5">
+                                                {{ act.user.username|make_list|first|upper }}
+                                            </div>
+                                            {% endif %}
+                                            <span class="position-absolute bottom-0 end-0 translate-middle-x bg-success rounded-circle d-flex align-items-center justify-content-center border border-2 border-white" style="width: 24px; height: 24px; right: -5px !important; margin-bottom: -5px;">
+                                                <i class="las la-user-plus text-white small"></i>
+                                            </span>
+                                        {% elif act.type == 'follow_request' %}
+                                            {% if act.user.profile %}
+                                            <img src="{{ act.user.profile.url }}" class="avatar-50 rounded-circle shadow-sm" alt="user" style="object-fit:cover;">
+                                            {% else %}
+                                            <div class="avatar-50 rounded-circle bg-light text-primary border shadow-sm d-flex align-items-center justify-content-center fw-bold fs-5">
+                                                {{ act.user.username|make_list|first|upper }}
+                                            </div>
+                                            {% endif %}
+                                            <span class="position-absolute bottom-0 end-0 translate-middle-x bg-warning rounded-circle d-flex align-items-center justify-content-center border border-2 border-white" style="width: 24px; height: 24px; right: -5px !important; margin-bottom: -5px;">
+                                                <i class="las la-user-clock text-white small"></i>
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Activity Content -->
+                                    <div class="flex-grow-1">
+                                        {% if act.type == 'like' %}
+                                            <p class="mb-1 text-dark fs-6">
+                                                <span class="fw-bold">{{ act.user.username }}</span> liked your post.
+                                            </p>
+                                        {% elif act.type == 'comment' %}
+                                            <p class="mb-1 text-dark fs-6">
+                                                <span class="fw-bold">{{ act.user.username }}</span> commented on your post: 
+                                                <span class="text-muted fst-italic">"{{ act.comment|truncatechars:50 }}"</span>
+                                            </p>
+                                        {% elif act.type == 'follow' %}
+                                            <p class="mb-1 text-dark fs-6">
+                                                <span class="fw-bold">{{ act.user.username }}</span> started following you.
+                                            </p>
+                                        {% elif act.type == 'follow_request' %}
+                                            <div class="d-flex align-items-center justify-content-between w-100">
+                                                <div>
+                                                    <p class="mb-1 text-dark fs-6">
+                                                        <span class="fw-bold">{{ act.user.username }}</span> requested to follow you.
+                                                    </p>
+                                                    <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>{{ act.date|timesince }} ago</p>
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <form method="POST" action="{% url 'respond_follow_request' act.id 'accept' %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">Accept</button>
+                                                    </form>
+                                                    <form method="POST" action="{% url 'respond_follow_request' act.id 'decline' %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">Decline</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        <!-- Timestamp (only if not follow_request, since that handles its own layout) -->
+                                        {% if act.type != 'follow_request' %}
+                                            {% if act.date %}
+                                            <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>{{ act.date|timesince }} ago</p>
+                                            {% else %}
+                                            <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>Recent</p>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            
+                            {% empty %}
+                            <!-- Empty State -->
+                            <div class="py-5 text-center">
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="las la-bell-slash text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                                <h5 class="text-dark fw-bold">No Activity Yet</h5>
+                                <p class="text-muted">When people interact with you or your posts, you'll see it here.</p>
+                            </div>
+                            {% endfor %}
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-bg-light:hover {
+        background-color: #f8f9fa !important;
+    }
+    .transition {
+        transition: all 0.2s ease-in-out;
+    }
+</style>
+{% endblock %}

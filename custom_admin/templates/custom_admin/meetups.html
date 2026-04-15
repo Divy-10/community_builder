@@ -1,0 +1,197 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Manage Meetups | Univo Super admin{% endblock %}
+{% block page_title %}Meetups Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+    }
+
+    .modern-table th {
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .modern-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        vertical-align: middle;
+    }
+
+    .modern-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .modern-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .item-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .item-thumb {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: rgba(255,255,255,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .item-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .item-title {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 1rem;
+    }
+
+    .item-subtitle {
+        font-size: 0.825rem;
+        color: var(--text-secondary);
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .badge-premium {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--accent-color);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+    
+    .badge-offline {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+        border-color: rgba(245, 158, 11, 0.2);
+    }
+    
+    .badge-online {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .action-btn {
+        padding: 0.5rem;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        color: var(--text-secondary);
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        background: rgba(255,255,255,0.1);
+        color: var(--text-primary);
+    }
+
+    .action-btn.delete:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; align-items: center;">
+        <h2 style="font-size: 1.25rem; font-weight: 600;">System Meetups</h2>
+        <div style="position: relative;">
+            <i class="fa-solid fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+            <input type="text" id="searchInput" placeholder="Search meetups..." style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.5rem 1rem 0.5rem 2.5rem; border-radius: 8px; outline: none; width: 250px;">
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Meetup</th>
+                    <th>Community</th>
+                    <th>Type</th>
+                    <th>Scheduled For</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in meetups %}
+                <tr>
+                    <td>
+                        <div class="item-info">
+                            {% if m.thumbnail %}
+                            <img src="{{ m.thumbnail.url }}" alt="{{ m.title }}" class="item-thumb">
+                            {% else %}
+                            <div class="item-thumb"><i class="fa-solid fa-calendar-day fs-3"></i></div>
+                            {% endif %}
+                            <div class="item-details">
+                                <span class="item-title">{{ m.title }}</span>
+                                <span class="item-subtitle">{{ m.description }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="text-primary fw-medium">{{ m.communityid.communitytitle }}</span>
+                    </td>
+                    <td>
+                        {% if m.meetup_type == 'offline' %}
+                        <span class="badge-premium badge-offline">Offline</span>
+                        {% else %}
+                        <span class="badge-premium badge-online">Online</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="font-size: 0.9rem;">
+                            <div>{{ m.meeting_date|date:"F d, Y" }}</div>
+                            <div class="text-secondary small">{{ m.meeting_date|date:"h:i A" }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'admin:user_meetup_change' m.meetupid %}" class="action-btn" title="View in Admin"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <a href="{% url 'admin:user_meetup_delete' m.meetupid %}" class="action-btn delete" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        No meetups scheduled in the system.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

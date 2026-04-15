@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | UniVo Admin{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'admin/css/admin_custom.css' %}?v=8.3" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+{% endblock %}
+
+{% block welcome-msg %}
+  Welcome to <strong>{% firstof user.get_short_name user.get_username %}</strong> /
+{% endblock %}
+
+{% block branding %}
+<div class="header-container">
+  <h1 id="site-name">
+    <a href="{% url 'admin:index' %}">UniVo Administration</a>
+  </h1>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/admin_custom.css' %}?v=8.3" />
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block userlinks %}
+    <a href="/custom-admin/" style="font-weight: 600; color: #f59e0b; margin-right: 15px; padding: 4px 8px; border-radius: 4px; background: rgba(245, 158, 11, 0.1); text-decoration: none;">
+        <i class="fas fa-bolt"></i> Univo Super admin
+    </a>
+    {{ block.super }}
+{% endblock %}

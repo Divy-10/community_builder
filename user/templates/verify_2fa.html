@@ -1,0 +1,70 @@
+{% extends "base_auth.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- verify-2fa page -->
+<div class="wrapper">
+    <section class="sign-in-page min-vh-100" style="background: var(--gradient-brand);">
+        <div id="container-inside">
+            <div id="circle-small"></div>
+            <div id="circle-medium"></div>
+            <div id="circle-large"></div>
+            <div id="circle-xlarge"></div>
+            <div id="circle-xxlarge"></div>
+        </div>
+        <div class="container p-0">
+            <div class="row no-gutters vh-100 align-items-center">
+                <div class="col-md-6 text-center pt-5">
+                    <div class="sign-in-detail text-white">
+                        <a class="sign-in-logo mb-5 d-inline-block" href="#" style="text-decoration: none;">
+                            <img src="{% static 'assets/images/animated_logo.svg' %}" class="img-fluid mb-2" style="max-height: 60px; animation: rotateLogo 5s linear infinite;" alt="logo">
+                            <h2 class="text-white fw-bold mb-0">UniVo</h2>
+                        </a>
+                        <div class="welcome-animation-container mt-2">
+                            <h2 class="text-white fw-bold mb-3" style="font-size: 2.5rem;">Extra Security Step</h2>
+                            <p class="text-white-50 fs-5 mb-5 px-5">Because you enabled Two-Factor Authentication, we need to verify it's really you.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 pt-5 pt-5 pb-lg-0 pb-5 h-100 d-flex flex-column justify-content-center">
+                    <div class="sign-in-from p-5 rounded-4 auth-card-clean mx-auto" style="max-width: 480px; width: 100%;">
+                        <div class="text-center mb-4">
+                            <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                                <i class="ri-shield-keyhole-line" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h2 class="fw-bold text-dark">Enter OTP</h2>
+                            <p class="text-muted small">Please check your developer console for the 6-digit security code.</p>
+                        </div>
+
+                        {% if error %}
+                        <div class="alert alert-danger py-2 mb-3" role="alert">
+                            {{ error }}
+                        </div>
+                        {% endif %}
+
+                        <form class="mt-4" method="post" action="{% url 'verify_2fa' %}">
+                            {% csrf_token %}
+                            <div class="form-group mb-4">
+                                <label class="form-label fw-bold text-muted small text-uppercase">6-Digit Code</label>
+                                <input type="text" class="form-control form-control-lg text-center fw-bold" id="otp" name="otp"
+                                    placeholder="• • • • • •" required maxlength="6" style="letter-spacing: 0.5rem; font-size: 1.5rem;">
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold hover-shadow transition shadow-sm">
+                                    <i class="ri-check-line me-2"></i>Verify & Log In
+                                </button>
+                                <a href="{% url 'logout' %}" class="btn btn-light btn-lg rounded-pill fw-bold text-muted mt-2">
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% endblock %}

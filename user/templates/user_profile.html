@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ user_profile.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <div class="header-title">
+                    <h4 class="card-title">User Profile</h4>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        {% if user_profile.profile %}
+                        <img src="{{ user_profile.profile.url }}" alt="profile-img" class="rounded-circle img-fluid mb-3 shadow" style="width: 250px; height: 250px; object-fit: cover; border: 5px solid #fff;">
+                        {% else %}
+                        <img src="{% static 'assets/images/user/1.jpg' %}" alt="profile-img" class="rounded-circle img-fluid mb-3 shadow" style="width: 250px; height: 250px; object-fit: cover; border: 5px solid #fff;">
+                        {% endif %}
+                        <h2 class="mt-2 font-weight-bold">{{ user_profile.username }}</h2>
+                        {% if user_profile.bio %}
+                            <p class="text-muted fs-6 px-4 mb-3">{{ user_profile.bio }}</p>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-center gap-4 mt-3 mb-4">
+                            <div class="text-center" {% if not is_private_account or is_own_profile or is_following %}style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#followersModal"{% endif %}>
+                                <h4 class="fw-bold mb-0 text-primary">{{ followers_count }}</h4>
+                                <span class="text-muted small text-uppercase">Followers</span>
+                            </div>
+                            <div class="text-center" {% if not is_private_account or is_own_profile or is_following %}style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#followingModal"{% endif %}>
+                                <h4 class="fw-bold mb-0 text-primary">{{ following_count }}</h4>
+                                <span class="text-muted small text-uppercase">Following</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons and Navigation -->
+                        <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap mt-2 mb-2">
+                            {% if not is_own_profile %}
+                                <form action="{% url 'toggle_follow' user_profile.userid %}" method="POST" class="d-inline m-0">
+                                    {% csrf_token %}
+                                    {% if is_following %}
+                                        <button type="submit" class="btn btn-secondary px-5 rounded-pill fw-bold"><i class="las la-user-minus me-1"></i>Unfollow</button>
+                                    {% elif has_pending_request %}
+                                        <button type="submit" class="btn btn-warning px-5 rounded-pill fw-bold"><i class="las la-user-clock me-1"></i>Requested</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-primary px-5 rounded-pill fw-bold"><i class="las la-user-plus me-1"></i>Follow</button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                            
+                            {% if not is_private_account or is_own_profile or is_following %}
+                            <!-- Tabbed Navigation Buttons -->
+                            <ul class="nav nav-pills gap-2 m-0" role="tablist" id="profilePills">
+                                <li class="nav-item m-0" role="presentation">
+                                    <button class="nav-link active px-4 rounded-pill fw-bold d-flex align-items-center justify-content-center" id="posts-tab" data-bs-toggle="pill" data-bs-target="#user-posts" type="button" role="tab" aria-controls="user-posts" aria-selected="true" style="transition: all 0.2s ease;">
+                                        <i class="las la-newspaper fs-5 me-1"></i> Posts
+                                    </button>
+                                </li>
+                                <li class="nav-item m-0" role="presentation">
+                                    <button class="nav-link px-4 rounded-pill fw-bold text-muted hover-bg-light d-flex align-items-center justify-content-center" id="communities-tab" data-bs-toggle="pill" data-bs-target="#user-communities" type="button" role="tab" aria-controls="user-communities" aria-selected="false" style="transition: all 0.2s ease;">
+                                        <i class="las la-users fs-5 me-1"></i> Communities
+                                    </button>
+                                </li>
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if is_private_account %}
+    <!-- Private Account Placeholder -->
+    <div class="row mt-5">
+        <div class="col-sm-12">
+            <div class="card shadow-none border-0 bg-transparent text-center py-5">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-white shadow-sm rounded-circle" style="width: 100px; height: 100px;">
+                            <i class="ri-lock-2-fill text-primary" style="font-size: 50px;"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-2">This Account is Private</h3>
+                    <p class="text-muted mx-auto" style="max-width: 400px;">Follow this account to see their posts and communities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+<div class="tab-content w-100" id="profilePillsContent">
+    <!-- Posts Tab -->
+    <div class="tab-pane fade show active" id="user-posts" role="tabpanel" aria-labelledby="posts-tab">
+        <div class="row mt-4">
+            <div class="col-sm-12">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h4 class="mb-0">Posts <span class="badge bg-primary ms-1 fs-6">{{ user_posts|length }}</span></h4>
+                    
+                    <!-- Sub-tabs for Post Types -->
+                    <ul class="nav nav-pills bg-light p-1 rounded-pill" id="postSubTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded-pill px-4 fw-bold small" id="buzz-posts-tab" data-bs-toggle="pill" data-bs-target="#buzz-posts-content" type="button" role="tab" aria-controls="buzz-posts-content" aria-selected="true">
+                                Buzz <span class="badge bg-white text-primary ms-1">{{ buzz_posts|length }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill px-4 fw-bold small" id="community-posts-tab" data-bs-toggle="pill" data-bs-target="#community-posts-content" type="button" role="tab" aria-controls="community-posts-content" aria-selected="false">
+                                Community <span class="badge bg-white text-primary ms-1">{{ community_posts|length }}</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="tab-content" id="postSubTabsContent">
+                    <!-- Buzz Posts Content -->
+                    <div class="tab-pane fade show active" id="buzz-posts-content" role="tabpanel" aria-labelledby="buzz-posts-tab">
+                        <div class="row g-4 d-flex flex-row flex-wrap mt-2">
+                            {% for p in buzz_posts %}
+                            <div class="col-12 col-md-6 col-lg-4 mb-4">
+                                {% include "post_card_item.html" with p=p %}
+                            </div>
+                        
+
+
+                            {% empty %}
+                            <div class="col-12 text-center py-5">
+                                <div class="avatar-100 bg-light text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3">
+                                    <i class="las la-rss fs-1"></i>
+                                </div>
+                                <h5 class="text-muted">No Buzz posts yet</h5>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Community Posts Content -->
+                    <div class="tab-pane fade" id="community-posts-content" role="tabpanel" aria-labelledby="community-posts-tab">
+                        <div class="row g-4 d-flex flex-row flex-wrap mt-2">
+                            {% for p in community_posts %}
+                            <div class="col-12 col-md-6 col-lg-4 mb-4">
+                                {% include "post_card_item.html" with p=p %}
+                            </div>
+                            {% empty %}
+                            <div class="col-12 text-center py-5">
+                                <div class="avatar-100 bg-light text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3">
+                                    <i class="las la-users fs-1"></i>
+                                </div>
+                                <h5 class="text-muted">No Community posts yet</h5>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Communities Tab -->
+    <div class="tab-pane fade" id="user-communities" role="tabpanel" aria-labelledby="communities-tab">
+        <div class="row mt-4">
+            <div class="col-sm-12">
+                <h4 class="mb-4">Communities <span class="badge bg-primary ms-1 fs-6">{{ user_communities|length }}</span></h4>
+                <div class="row g-4 d-flex flex-row flex-wrap">
+                    {% for c in user_communities %}
+                    <div class="col-12 col-md-6 col-lg-4 mb-4">
+                        <div class="card shadow-sm border-0 rounded-4 hover-shadow transition h-100">
+                        <div class="card-body text-center p-4">
+                            <a href="{% url 'community_detail' c.communityid %}" class="text-decoration-none">
+                                {% if c.thumbnail %}
+                                <img src="{{ c.thumbnail.url }}" class="rounded-circle mb-3 shadow-sm border" alt="Community Thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                                {% else %}
+                                <div class="avatar-80 bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 mx-auto" style="width: 80px; height: 80px;">
+                                    <i class="las la-users fs-2"></i>
+                                </div>
+                                {% endif %}
+                                <h5 class="fw-bold mb-1 text-dark">{{ c.communitytitle }}</h5>
+                            </a>
+                            <p class="text-muted small mb-3">{{ c.categoryid.categoryname }} • {{ c.cityid.cityname }}</p>
+                            
+                            <div class="mt-auto">
+                                <a href="{% url 'community_detail' c.communityid %}" class="btn btn-outline-primary rounded-pill w-100">View Community</a>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <div class="avatar-100 bg-light text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3">
+                            <i class="las la-users fs-1"></i>
+                        </div>
+                        <h5 class="text-muted">Not part of any communities yet</h5>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+<!-- Followers Modal -->
+<div class="modal fade" id="followersModal" tabindex="-1" aria-labelledby="followersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="followersModalLabel">Followers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for f_user in follower_users %}
+                    <li class="list-group-item d-flex align-items-center justify-content-between py-3">
+                        <div class="d-flex align-items-center">
+                            {% if f_user.profile %}
+                            <img src="{{ f_user.profile.url }}" class="rounded-circle me-3" alt="user" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'assets/images/user/1.jpg' %}" class="rounded-circle me-3" alt="user" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ f_user.username }}</h6>
+                                <p class="mb-0 text-muted small">@{{ f_user.username|lower }}</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'user_profile' f_user.userid %}" class="btn btn-sm btn-soft-primary rounded-pill px-3">View Profile</a>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center py-4 text-muted">No followers yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Following Modal -->
+<div class="modal fade" id="followingModal" tabindex="-1" aria-labelledby="followingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="followingModalLabel">Following</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for f_user in following_users %}
+                    <li class="list-group-item d-flex align-items-center justify-content-between py-3">
+                        <div class="d-flex align-items-center">
+                            {% if f_user.profile %}
+                            <img src="{{ f_user.profile.url }}" class="rounded-circle me-3" alt="user" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'assets/images/user/1.jpg' %}" class="rounded-circle me-3" alt="user" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ f_user.username }}</h6>
+                                <p class="mb-0 text-muted small">@{{ f_user.username|lower }}</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'user_profile' f_user.userid %}" class="btn btn-sm btn-soft-primary rounded-pill px-3">View Profile</a>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center py-4 text-muted">Not following anyone yet.</li>
+                    {% endfor %}                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    .nav-pills .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+    }
+    .nav-pills .nav-link:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.05);
+        color: var(--bs-primary);
+    }
+    .nav-pills .nav-link.active {
+        background-color: var(--bs-primary);
+        color: white;
+        box-shadow: 0 4px 10px rgba(var(--bs-primary-rgb), 0.3);
+    }
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+        transform: translateY(-3px);
+    }
+    .hover-scale:hover {
+        transform: scale(1.1);
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}

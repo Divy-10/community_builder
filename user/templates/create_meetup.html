@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Create Meetup — {{ community.communitytitle }} — UniVo{% endblock %}
+
+{% block content %}
+
+<div class="content-inner" id="page_layout">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Back Button -->
+                <div class="mb-4 pt-4">
+                    <a href="{% url 'community_detail' community.communityid %}" class="btn btn-outline-secondary rounded-pill px-3">
+                        <i class="las la-arrow-left me-2"></i>Back to {{ community.communitytitle }}
+                    </a>
+                </div>
+
+                <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+                    <!-- Header -->
+                    <div class="card-header border-0 p-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <h4 class="text-white fw-bold mb-1">
+                            <i class="las la-calendar-plus me-2"></i>Create Meetup
+                        </h4>
+                        <p class="text-white-50 mb-0 small">Schedule a new meeting for {{ community.communitytitle }}</p>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="card-body p-4">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            {% if error_msg %}
+                            <div class="alert alert-danger border-0 rounded-3 mb-4 d-flex align-items-center">
+                                <i class="las la-exclamation-circle fs-4 me-2"></i>
+                                <div>{{ error_msg }}</div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Title -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Meetup Title <span class="text-danger">*</span></label>
+                                <input type="text" name="title" class="form-control rounded-3 bg-light border-0 py-2 px-3"
+                                    placeholder="e.g. Weekly Code Review Session" required maxlength="100"
+                                    value="{{ prev_data.title }}">
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+                                <textarea name="description" class="form-control rounded-3 bg-light border-0 py-2 px-3" rows="4"
+                                    placeholder="Describe what this meetup is about, what attendees can expect..." required maxlength="1000">{{ prev_data.description }}</textarea>
+                            </div>
+
+                            <!-- Meeting Type -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Meeting Type <span class="text-danger">*</span></label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="meetup_type" id="type_offline" value="offline" 
+                                            {% if not prev_data.meetup_type or prev_data.meetup_type == 'offline' %}checked{% endif %}
+                                            onchange="toggleMeetingFields()">
+                                        <label class="form-check-label fw-medium" for="type_offline">
+                                            <i class="las la-map-marker text-success me-1"></i> Offline (In-Person)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="meetup_type" id="type_online" value="internal"
+                                            {% if prev_data.meetup_type == 'internal' %}checked{% endif %}
+                                            onchange="toggleMeetingFields()">
+                                        <label class="form-check-label fw-medium" for="type_online">
+                                            <i class="las la-video text-info me-1"></i> Online Video Conference
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Location (for offline) -->
+                            <div class="mb-4" id="location_field">
+                                <label class="form-label fw-semibold">Location <span class="text-danger">*</span></label>
+                                <input type="text" name="location" id="location_input" class="form-control rounded-3 bg-light border-0 py-2 px-3"
+                                    placeholder="e.g. Room 301, Engineering Building OR Google Maps Link" maxlength="200"
+                                    value="{{ prev_data.location }}">
+                                <small class="text-muted text-xs">You can enter a location name or paste a GPS/Maps link here.</small>
+                            </div>
+
+                            <!-- (External Link Removed - using Internal Jitsi room) -->
+
+                            <!-- Meetup Date -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Meetup Date <span class="text-danger">*</span></label>
+                                <input type="date" name="meetup_date" id="meetup_date" class="form-control rounded-3 bg-light border-0 py-2 px-3" required
+                                    value="{{ prev_data.meetup_date }}">
+                            </div>
+
+                            <!-- Start & End Time -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Start Time <span class="text-danger">*</span></label>
+                                    <input type="time" name="start_time" id="start_time" class="form-control rounded-3 bg-light border-0 py-2 px-3" required
+                                        value="{{ prev_data.start_time }}">
+                                </div>
+                                <div class="col-md-6 mt-3 mt-md-0">
+                                    <label class="form-label fw-semibold">End Time <span class="text-danger">*</span></label>
+                                    <input type="time" name="end_time" id="end_time" class="form-control rounded-3 bg-light border-0 py-2 px-3" required
+                                        value="{{ prev_data.end_time }}">
+                                </div>
+                            </div>
+
+                            <!-- Member Limit -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Member Limit <small class="text-muted">(Optional)</small></label>
+                                <input type="number" name="member_limit" class="form-control rounded-3 bg-light border-0 py-2 px-3"
+                                    placeholder="Enter maximum members (e.g. 20). Use 0 or leave empty for unlimited." min="0"
+                                    value="{{ prev_data.member_limit|default:0 }}">
+                                <small class="text-muted text-xs">If set, only this many people can join the meetup.</small>
+                            </div>
+
+
+                            <!-- Thumbnail -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Cover Photo <small class="text-muted">(optional)</small></label>
+                                <input type="file" name="thumbnail" class="form-control rounded-3 bg-light border-0 py-2 px-3" accept="image/*">
+                                <small class="text-muted">Recommended: 16:9 ratio, at least 800x450px</small>
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="d-flex gap-3 justify-content-end pt-3">
+                                <a href="{% url 'community_detail' community.communityid %}" class="btn btn-soft-secondary rounded-pill px-4">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+                                    <i class="las la-calendar-plus me-2"></i>Create Meetup
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleMeetingFields() {
+    const isOnline = document.getElementById('type_online').checked;
+    const locationField = document.getElementById('location_field');
+    const locationInput = document.getElementById('location_input');
+
+    if (isOnline) {
+        locationField.classList.add('d-none');
+        locationInput.removeAttribute('required');
+    } else {
+        locationField.classList.remove('d-none');
+        locationInput.setAttribute('required', '');
+    }
+}
+
+// Prevent past dates
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    
+    const minDate = `${year}-${month}-${day}`;
+    const dateInput = document.getElementById('meetup_date');
+    dateInput.setAttribute('min', minDate);
+
+    // Initial value if not set
+    if (!dateInput.value) {
+        dateInput.value = minDate;
+    }
+
+    const startTimeInput = document.getElementById('start_time');
+    const endTimeInput = document.getElementById('end_time');
+
+    function validateTimes() {
+        if (startTimeInput.value && endTimeInput.value) {
+            if (endTimeInput.value <= startTimeInput.value) {
+                endTimeInput.setCustomValidity("End time must be after start time");
+            } else {
+                endTimeInput.setCustomValidity("");
+            }
+        }
+    }
+
+    startTimeInput.addEventListener('change', validateTimes);
+    endTimeInput.addEventListener('change', validateTimes);
+});
+
+</script>
+{% endblock %}

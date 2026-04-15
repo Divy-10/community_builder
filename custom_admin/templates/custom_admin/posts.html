@@ -1,0 +1,202 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Manage Posts | Univo Super admin{% endblock %}
+{% block page_title %}Posts Monitoring{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+    }
+
+    .modern-table th {
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .modern-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        vertical-align: middle;
+    }
+
+    .modern-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .modern-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .post-thumb {
+        width: 80px;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+        background: rgba(255,255,255,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .post-details {
+        max-width: 300px;
+    }
+
+    .post-title {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 1rem;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .post-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .author-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: rgba(168, 85, 247, 0.1);
+        color: #c084fc;
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.5rem;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        color: var(--text-secondary);
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        background: rgba(255,255,255,0.1);
+        color: var(--text-primary);
+    }
+
+    .action-btn.delete:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .status-approved {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; align-items: center;">
+        <h2 style="font-size: 1.25rem; font-weight: 600;">Posts Monitoring</h2>
+        <div style="position: relative;">
+            <i class="fa-solid fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+            <input type="text" id="searchInput" placeholder="Search posts..." style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.5rem 1rem 0.5rem 2.5rem; border-radius: 8px; outline: none; width: 250px;">
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th style="width: 100px;">Media</th>
+                    <th>Post Content</th>
+                    <th>Community</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                <tr>
+                    <td>
+                        {% if post.thumbnail %}
+                        <img src="{{ post.thumbnail.url }}" alt="Post Media" class="post-thumb">
+                        {% else %}
+                        <div class="post-thumb"><i class="fa-solid fa-image"></i></div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="post-details">
+                            <span class="post-title">{{ post.posttitle }}</span>
+                            <div class="post-desc">{{ post.description }}</div>
+                            <div class="author-badge"><i class="fa-solid fa-user" style="margin-right:0.25rem"></i>{{ post.userid.username }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if post.communityid %}
+                        <div style="font-weight: 500;">{{ post.communityid.communitytitle }}</div>
+                        {% else %}
+                        <div style="color: var(--text-secondary); font-style: italic;">Personal Feed</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if post.isapproved %}
+                        <span class="status-badge status-approved">Approved</span>
+                        {% else %}
+                        <span class="status-badge status-pending">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: var(--text-secondary); font-size: 0.875rem;">
+                        {{ post.createddt|date:"M d, Y H:i" }}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'admin:user_post_change' post.postid %}" class="action-btn" title="View"><i class="fa-solid fa-eye"></i></a>
+                            <a href="{% url 'admin:user_post_delete' post.postid %}" class="action-btn delete" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        No posts found in the system.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

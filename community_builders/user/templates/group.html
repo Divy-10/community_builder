@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="content-inner " id="page_layout">
+                    <div class="container-fluid">
+                        <div class="row mb-4">
+                            <div class="col-12 p-4 text-end">
+                                <a href="{% url 'create_group' %}" class="btn btn-primary"><i class="las la-plus me-2"></i>Create New Group</a>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            {% for c in communities %}
+                            <div class="col-lg-4 col-md-4 mb-4">
+                                <div class="card group-box h-100 mb-0">
+                                    <div class="top-bg-image">
+                                        <img src="../assets/images/page-img/profile-bg2.jpg" class="img-fluid w-100"
+                                            alt="group-bg" loading="lazy">
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <div class="group-icon">
+                                            {% if c.thumbnail %}
+                                            <img src="{{ c.thumbnail.url }}" alt="profile-img"
+                                                class="rounded-2 img-fluid avatar-90 border border-4" loading="lazy" style="object-fit:cover;">
+                                            {% else %}
+                                            <img src="../assets/images/page-img/gi-1.jpg" alt="profile-img"
+                                                class="rounded-2 img-fluid avatar-90 border border-4" loading="lazy">
+                                            {% endif %}
+                                        </div>
+                                        <div class="group-info mt-3 mb-2">
+                                            <a href="#" class="h4">{{ c.communitytitle }}</a>
+                                            <p class="mb-0 text-muted">{{ c.categoryid.categoryname }}</p>
+                                        </div>
+                                        <div class="group-details pb-4 mb-4 border-bottom">
+                                            <ul
+                                                class="d-flex align-items-center justify-content-center list-inline m-0 p-0 gap-3">
+                                                <li>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <i class="ph ph-file-text fs-4"></i>
+                                                        <span class="text-capitalize">{{ c.post_set.count }} Posts</span>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <i class="ph ph-users fs-4"></i>
+                                                        <span class="text-capitalize">{{ c.communitymember_set.count }} Members</span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="group-member mb-4">
+                                            <div class="iq-media-group">
+                                                {% for member in c.communitymember_set.all|slice:":6" %}
+                                                    {% if member.userid.profile %}
+                                                        <a href="#" class="iq-media">
+                                                            <img class="img-fluid avatar-30 rounded-circle"
+                                                                src="{{ member.userid.profile.url }}" loading="lazy" style="object-fit:cover;">
+                                                        </a>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            {% if request.session.userid == c.userid.userid %}
+                                            <button class="btn btn-success-subtle fw-semibold px-3">Manage Group</button>
+                                            {% else %}
+                                            <button class="btn btn-primary-subtle fw-semibold px-3">Join Group</button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12 text-center py-5">
+                                <h4 class="text-muted">No groups created yet. Be the first to start one!</h4>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+
+{% endblock %}

@@ -1,0 +1,406 @@
+{% extends "base_auth.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<!-- sign-in page -->
+<div class="wrapper">
+    <section class="sign-in-page min-vh-100" style="background: var(--gradient-brand);">
+        <div id="container-inside">
+            <div id="circle-small"></div>
+            <div id="circle-medium"></div>
+            <div id="circle-large"></div>
+            <div id="circle-xlarge"></div>
+            <div id="circle-xxlarge"></div>
+        </div>
+        <div class="container p-0">
+            <div class="row no-gutters vh-100 align-items-center">
+                <div class="col-md-6 text-center pt-5">
+                    <div class="sign-in-detail text-white">
+                        <a class="sign-in-logo mb-5 d-inline-block" href="#" style="text-decoration: none;">
+                            <img src="{% static 'assets/images/animated_logo.svg' %}" class="img-fluid mb-2" style="max-height: 60px; animation: rotateLogo 5s linear infinite;" alt="logo">
+                            <h2 class="text-white fw-bold mb-0">UniVo</h2>
+                        </a>
+                        <div class="welcome-animation-container mt-2">
+                            <style>
+                                @keyframes spinAndScale {
+                                    0% { transform: scale(1) rotate(0deg); }
+                                    50% { transform: scale(1.3) rotate(180deg); }
+                                    100% { transform: scale(1) rotate(360deg); }
+                                }
+                                .rotating-logo {
+                                    animation: spinAndScale 6s infinite ease-in-out;
+                                    max-height: 14rem;
+                                }
+                                .success-logo-anim {
+                                    animation: successExpand 2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+                                }
+                                @keyframes successExpand {
+                                    0% { transform: scale(1) rotate(0deg); }
+                                    100% { transform: scale(2.5) rotate(720deg); }
+                                }
+                                .welcome-msg-anim {
+                                    animation: welcomeFadeIn 1.5s ease-out 0.5s forwards !important;
+                                }
+                                @keyframes welcomeFadeIn {
+                                    0% { opacity: 0; transform: translateY(30px); }
+                                    100% { opacity: 1; transform: translateY(0); }
+                                }
+                                .hide-form-anim {
+                                    animation: fadeOutForm 0.8s ease-out forwards;
+                                }
+                                @keyframes fadeOutForm {
+                                    0% { opacity: 1; transform: translateX(0); }
+                                    100% { opacity: 0; transform: translateX(30px); pointer-events: none; visibility: hidden; }
+                                }
+                            </style>
+                            <h2 id="success-welcome-text" class="text-white fw-bold" style="opacity: 0; display: none; margin-bottom: 5rem; font-size: 2.5rem;">Welcome to UniVo</h2>
+                            <img src="{% static 'assets/images/animated_logo.svg' %}" id="main-rotating-logo" class="img-fluid mb-4 rotating-logo" alt="logo">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 pt-5 pt-5 pb-lg-0 pb-5 h-100 d-flex flex-column justify-content-center">
+                    <div class="sign-in-from p-5 rounded-4 auth-card-clean mx-auto" style="max-width: 480px; width: 100%;">
+                        <h1 class="mb-0">Sign in</h1>
+                        <p>Enter your email address and password </p>
+
+                        <div id="signin-error-alert" class="alert alert-danger" role="alert" {% if not simsg %}style="display: none;"{% endif %}>
+                            {{ simsg|default:'Invalid credentials' }}
+                        </div>
+
+                        <form class="mt-4" id="signin-form" method="post" action="{% url 'signin' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Email address</label>
+                                <input type="email" class="form-control mb-0" id="email" name="email"
+                                    placeholder="Enter email" required>
+                                <div id="emailError" class="alert alert-danger mt-2" role="alert" style="display:none; padding: 0.5rem 1rem; font-size: 14px; margin-bottom: 0;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputPassword1">Password</label>
+                                <a href="#" class="float-end" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot password?</a>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control mb-0" id="password" name="password"
+                                        placeholder="Password" required style="padding-right: 40px;">
+                                    <i class="ri-eye-line position-absolute" id="togglePassword" style="right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; color: #6c757d;"></i>
+                                </div>
+                                <div id="passwordError" class="alert alert-danger mt-2" role="alert" style="display:none; padding: 0.5rem 1rem; font-size: 14px; margin-bottom: 0;"></div>
+                            </div>
+                            <div class="d-inline-block w-100">
+                                <input type="submit" class="btn btn-primary float-end" name="sign-in-btn"
+                                    value="Sign in">
+                            </div>
+                            <div class="sign-info">
+                                <span class="dark-color d-inline-block line-height-2">Don't have an account? <a
+                                        href="{% url 'signup' %}">Sign up</a></span>
+                                <ul class="iq-social-media">
+                                    <li><a href="#"><i class="ri-facebook-box-line"></i></a></li>
+                                    <li><a href="#"><i class="ri-twitter-line"></i></a></li>
+                                    <li><a href="#"><i class="ri-instagram-line"></i></a></li>
+                                </ul>
+                            </div>
+                        </form>
+
+                        <!-- Google Sign-In -->
+                        <div class="mt-3 mb-2 text-center position-relative">
+                            <hr style="border-color: #dee2e6;">
+                            <span class="position-absolute top-50 start-50 translate-middle px-3 text-muted" style="font-size: 13px; white-space: nowrap; background: transparent !important; backdrop-filter: blur(5px); border-radius: 99px;">or continue with</span>
+                        </div>
+                        <a href="{% url 'google_login' %}" id="google-signin-btn"
+                           class="d-flex align-items-center justify-content-center gap-2 w-100 py-2 px-3 rounded-pill text-decoration-none glass-panel"
+                           style="border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-size: 15px; font-weight: 500; transition: all 0.3s ease; cursor: pointer;">
+                            <!-- Google "G" SVG logo -->
+                            <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                                <path fill="none" d="M0 0h48v48H0z"/>
+                            </svg>
+                            Sign in with Google
+                        </a>
+                        <style>
+                            #google-signin-btn:hover {
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+                                background: #f8f9fa !important;
+                            }
+                        </style>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forgotPasswordModalLabel">Reset Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="forgotPasswordForm" method="post" action="{% url 'forgot_password' %}" onsubmit="return validateForgotPasswordForm()">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Enter your email and a new password to reset your account credentials.</p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email address</label>
+                        <input type="email" class="form-control mb-0" id="resetEmail" name="email" placeholder="Enter email" required readonly>
+                        <div id="resetEmailError" class="alert alert-danger mt-2" role="alert" style="display:none; padding: 0.5rem 1rem; font-size: 14px; margin-bottom: 0;"></div>
+                    </div>
+                    
+                    <div class="form-group mt-3">
+                        <label class="form-label">New Password</label>
+                        <div class="position-relative">
+                            <input type="password" class="form-control mb-0" id="resetPassword" name="new_password" placeholder="New Password" required style="padding-right: 40px;">
+                            <i class="ri-eye-line position-absolute" id="toggleResetPassword" style="right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; color: #6c757d;"></i>
+                        </div>
+                        <div id="resetPasswordError" class="alert alert-danger mt-2" role="alert" style="display:none; padding: 0.5rem 1rem; font-size: 14px; margin-bottom: 0;"></div>
+                        <div id="resetPasswordStrength" class="mt-1">
+                            <small class="text-muted">Password must have: 8+ chars, uppercase, lowercase, number, special character</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" name="reset-password-btn">Reset Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function validateSigninForm() {
+        var email = document.getElementById('email').value.trim();
+        var password = document.getElementById('password').value;
+        var emailError = document.getElementById('emailError');
+        var passwordError = document.getElementById('passwordError');
+        var valid = true;
+
+        emailError.style.display = 'none';
+        passwordError.style.display = 'none';
+
+        // Email validation
+        var emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        if (!email) {
+            emailError.textContent = 'Email is required.';
+            emailError.style.display = 'block';
+            valid = false;
+        } else if (email.indexOf(' ') !== -1) {
+            emailError.textContent = 'Email must not contain spaces.';
+            emailError.style.display = 'block';
+            valid = false;
+        } else if (!emailRegex.test(email)) {
+            emailError.textContent = 'Please enter a valid email address.';
+            emailError.style.display = 'block';
+            valid = false;
+        }
+
+        // Password validation
+        if (!password) {
+            passwordError.textContent = 'Password is required.';
+            passwordError.style.display = 'block';
+            valid = false;
+        } else if (password.length < 8) {
+            passwordError.textContent = 'Password must be at least 8 characters.';
+            passwordError.style.display = 'block';
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const togglePassword = document.getElementById('togglePassword');
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function (e) {
+                const passwordInput = document.getElementById('password');
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('ri-eye-line');
+                this.classList.toggle('ri-eye-off-line');
+            });
+        }
+        
+        // Modal password toggle
+        const toggleResetPassword = document.getElementById('toggleResetPassword');
+        if (toggleResetPassword) {
+            toggleResetPassword.addEventListener('click', function (e) {
+                const passwordInput = document.getElementById('resetPassword');
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('ri-eye-line');
+                this.classList.toggle('ri-eye-off-line');
+            });
+        }
+        
+        const resetPasswordInput = document.getElementById('resetPassword');
+        if(resetPasswordInput) {
+            resetPasswordInput.addEventListener('input', function () {
+                var pw = this.value;
+                var strength = 0;
+                if (pw.length >= 8) strength++;
+                if (/[A-Z]/.test(pw)) strength++;
+                if (/[a-z]/.test(pw)) strength++;
+                if (/[0-9]/.test(pw)) strength++;
+                if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw)) strength++;
+
+                var strengthDiv = document.getElementById('resetPasswordStrength');
+                var colors = ['#dc3545', '#dc3545', '#fd7e14', '#ffc107', '#28a745', '#198754'];
+                var labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+                var barWidth = (strength / 5) * 100;
+
+                strengthDiv.innerHTML = '<div style="background:#e9ecef;border-radius:4px;height:6px;margin-bottom:4px;">' +
+                    '<div style="background:' + colors[strength] + ';height:6px;border-radius:4px;width:' + barWidth + '%;transition:width 0.3s;"></div></div>' +
+                    '<small style="color:' + colors[strength] + ';">' + labels[strength] + '</small>';
+            });
+        }
+        
+        // Populate modal email from sign-in form email
+        const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+        if (forgotPasswordModal) {
+            forgotPasswordModal.addEventListener('show.bs.modal', function (event) {
+                const mainEmailInput = document.getElementById('email');
+                const resetEmailInput = document.getElementById('resetEmail');
+                if (mainEmailInput && resetEmailInput) {
+                    resetEmailInput.value = mainEmailInput.value;
+                    // If the main email is empty, allow user to type in it, otherwise make it readonly
+                    if (mainEmailInput.value.trim() === '') {
+                        resetEmailInput.removeAttribute('readonly');
+                    } else {
+                        resetEmailInput.setAttribute('readonly', true);
+                    }
+                }
+            });
+        }
+
+        // Handle signin form with AJAX for animation
+        const signinForm = document.getElementById('signin-form');
+        if (signinForm) {
+            signinForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!validateSigninForm()) return;
+
+                const formData = new FormData(this);
+                formData.append('sign-in-btn', 'Sign in');
+
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Play animation
+                        const formContainer = document.querySelector('.sign-in-from');
+                        if(formContainer) formContainer.parentElement.classList.add('hide-form-anim');
+                        
+                        // Expand logo to take full width and apply animation
+                        const leftCol = document.querySelector('.sign-in-detail').parentElement;
+                        leftCol.classList.remove('col-md-6');
+                        leftCol.classList.add('col-md-12');
+                        
+                        const logo = document.getElementById('main-rotating-logo');
+                        if (logo) logo.classList.add('success-logo-anim');
+                        
+                        const welcomeText = document.getElementById('success-welcome-text');
+                        if (welcomeText) {
+                            if(data.username) {
+                                welcomeText.textContent = `Welcome ${data.username} to UniVo`;
+                            }
+                            welcomeText.style.display = 'block';
+                            welcomeText.classList.add('welcome-msg-anim');
+                        }
+
+                        // Wait for animation then redirect
+                        setTimeout(() => {
+                            window.location.href = data.redirect_url || '/';
+                        }, 2500);
+                    } else {
+                        // Show error
+                        const errorAlert = document.getElementById('signin-error-alert');
+                        if (errorAlert) {
+                            errorAlert.textContent = data.msg || 'Invalid credentials';
+                            errorAlert.style.display = 'block';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during signin:', error);
+                    // Fallback to regular submission on error
+                    signinForm.submit();
+                });
+            });
+        }
+    });
+
+    function validateForgotPasswordForm() {
+        var email = document.getElementById('resetEmail').value.trim();
+        var password = document.getElementById('resetPassword').value;
+        var emailError = document.getElementById('resetEmailError');
+        var passwordError = document.getElementById('resetPasswordError');
+        var valid = true;
+
+        // Reset errors
+        emailError.style.display = 'none';
+        passwordError.style.display = 'none';
+
+        // Email Validation
+        var emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        if (!email) {
+            emailError.textContent = 'Email is required.';
+            emailError.style.display = 'block';
+            valid = false;
+        } else if (email.indexOf(' ') !== -1) {
+            emailError.textContent = 'Email must not contain spaces.';
+            emailError.style.display = 'block';
+            valid = false;
+        } else if (!emailRegex.test(email)) {
+            emailError.textContent = 'Please enter a valid email address.';
+            emailError.style.display = 'block';
+            valid = false;
+        }
+
+        // Password Validation 
+        var errors = [];
+        if (password.length < 8) errors.push('at least 8 characters');
+        if (!/[A-Z]/.test(password)) errors.push('one uppercase letter');
+        if (!/[a-z]/.test(password)) errors.push('one lowercase letter');
+        if (!/[0-9]/.test(password)) errors.push('one number');
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) errors.push('one special character');
+        if (password.indexOf(' ') !== -1) errors.push('no spaces allowed');
+
+        if (errors.length > 0) {
+            passwordError.textContent = 'Password must have: ' + errors.join(', ') + '.';
+            passwordError.style.display = 'block';
+            valid = false;
+        }
+
+        return valid;
+    }
+</script>
+
+{% endblock %}

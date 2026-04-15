@@ -1,0 +1,451 @@
+{% extends "base_auth.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* 1. Make the main section take up the full screen and stay fixed */
+    .sign-in-page {
+        height: 100vh;
+        overflow: hidden;
+        /* Prevents the whole background from scrolling */
+        position: relative;
+    }
+
+    /* 2. Create the "Scroll View" for the form side */
+    .sign-in-from {
+        max-height: 85vh;
+        /* Limits the height so it doesn't go off-screen */
+        overflow-y: auto;
+        /* This creates the scrollbar */
+        overflow-x: hidden;
+        padding-right: 15px;
+        /* Space for the scrollbar */
+        margin-top: 20px;
+    }
+
+    /* 3. Modern Scrollbar Styling (Optional but recommended) */
+    .sign-in-from::-webkit-scrollbar {
+        display: none;
+    }
+    .sign-in-from {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    /* Ensure circles stay in the background */
+    #container-inside {
+        position: absolute;
+        z-index: 0;
+    }
+
+    /* Animation Overlay CSS */
+    #transition-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 999999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(255,255,255,0);
+        transition: background-color 0.5s ease;
+        flex-direction: column;
+    }
+    #transition-overlay.fade-in {
+        background-color: rgba(255,255,255,0.95);
+    }
+    .logo-anim-wrapper {
+        width: 150px;
+        height: 150px;
+        background: linear-gradient(135deg, #506fe4 0%, #3e5bc4 100%);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transform: scale(0);
+        opacity: 0;
+        transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
+        box-shadow: 0 10px 30px rgba(80, 111, 228, 0.4);
+    }
+    .logo-anim-wrapper.animate-pop {
+        transform: scale(1);
+        opacity: 1;
+    }
+    .logo-anim-wrapper.animate-expand {
+        transition: transform 0.8s ease-in;
+        transform: scale(30);
+    }
+    .logo-anim-wrapper img {
+        width: 70px;
+        height: auto;
+        transition: transform 0.8s, opacity 0.5s;
+    }
+    .logo-anim-wrapper.animate-expand img {
+        transform: scale(0);
+        opacity: 0;
+    }
+    #loading-text {
+        position: absolute;
+        margin-top: 220px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #506fe4;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        letter-spacing: 1px;
+    }
+    #loading-text.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+
+<div class="wrapper">
+    <!-- Overlay for transition -->
+    <div id="transition-overlay">
+        <div class="logo-anim-wrapper" id="animWrapper">
+            <img src="{% static 'assets/images/animated_logo.svg' %}" alt="logo">
+        </div>
+        <div id="loading-text">Preparing Your Account...</div>
+    </div>
+    <section class="sign-in-page" style="background: var(--gradient-brand);">
+        <div id="container-inside">
+            <div id="circle-small"></div>
+            <div id="circle-medium"></div>
+            <div id="circle-large"></div>
+            <div id="circle-xlarge"></div>
+            <div id="circle-xxlarge"></div>
+        </div>
+        <div class="container p-0">
+            <div class="row no-gutters">
+                <div class="col-md-6 text-center pt-5">
+                    <div class="sign-in-detail text-white">
+                        <a class="sign-in-logo mb-5 d-inline-block" href="#" style="text-decoration: none;">
+                            <img src="{% static 'assets/images/animated_logo.svg' %}" class="img-fluid mb-2" style="max-height: 60px; animation: rotateLogo 5s linear infinite;" alt="logo">
+                            <h2 class="text-white fw-bold mb-0">UniVo</h2>
+                        </a>
+                        <div class="sign-slider overflow-hidden">
+                            <ul class="swiper-wrapper list-inline m-0 p-0">
+                                <li class="swiper-slide">
+                                    <img src="{% static 'assets/images/animated_logo.svg' %}" class="img-fluid mb-4" alt="logo">
+                                    <h4 class="mb-1 text-white">Find new friends</h4>
+                                    <p>It is a long established fact that a reader will be distracted.</p>
+                                </li>
+                                <li class="swiper-slide">
+                                    <img src="{% static 'assets/images/animated_logo.svg' %}" class="img-fluid mb-4" alt="logo">
+                                    <h4 class="mb-1 text-white">Connect with the world</h4>
+                                    <p>It is a long established fact that a reader will be distracted.</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 pt-5 pb-lg-0 pb-5" style="z-index: 1;">
+                    <div class="sign-in-from p-5 rounded-4 auth-card-clean mx-auto" style="max-width: 500px; width: 100%;">
+                        <h1 class="mb-0">Sign Up</h1>
+                        <p>Create a new account.</p>
+
+                        {% if error_msg %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error_msg }}
+                        </div>
+                        {% endif %}
+
+                        <form class="mt-4" method="post" enctype="multipart/form-data" id="signupForm"
+                            action="{% url 'signup' %}" onsubmit="return handleSignupSubmit(event)">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label">Your Full Name</label>
+                                <input type="text" class="form-control mb-0" id="name" placeholder="Your Full Name"
+                                    name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email address</label>
+                                <input type="email" class="form-control mb-0" id="email" placeholder="Enter email"
+                                    name="email" required>
+                                <div id="emailError" class="alert alert-danger mt-2" role="alert" style="display:none; padding: 0.5rem 1rem; font-size: 14px; margin-bottom: 0;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control mb-0" id="password" placeholder="Password"
+                                        name="password" required style="padding-right: 40px;">
+                                    <i class="ri-eye-line position-absolute" id="togglePassword" style="right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; color: #6c757d;"></i>
+                                </div>
+                                <div id="passwordError" class="alert alert-danger mt-2" role="alert" style="display:none; padding: 0.5rem 1rem; font-size: 14px; margin-bottom: 0;"></div>
+                                <div id="passwordStrength" class="mt-1">
+                                    <small class="text-muted">Password must have: 8+ chars, uppercase, lowercase,
+                                        number, special character</small>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Enter Profile Image</label>
+                                <input type="file" class="form-control mb-0" id="profile" name="fup" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Enter Bio</label>
+                                <input type="text" class="form-control mb-0" id="bio" placeholder="Your Bio" name="bio"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Enter Your Gender</label><br>
+                                <input type="radio" name="gender" value="male" checked> Male
+                                <input type="radio" name="gender" value="female"> Female
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Enter Date of Birth</label>
+                                <input type="date" class="form-control mb-0" id="dob" name="dob" required>
+                                <script>document.getElementById('dob').max = new Date().toISOString().split('T')[0];</script>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Select State</label>
+                                <select name="state" id="state" class="form-control" required>
+                                    <option value="" style="color: #091a4e !important;">-- Select State --</option>
+                                    {% for s in states %}
+                                    <option value="{{ s.stateid }}" >{{ s.statename }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Select City</label>
+                                <select name="city" id="city" class="form-control" required disabled>
+                                    <option value="">-- Select State First --</option>
+                                </select>
+                            </div>
+
+                            <script>
+                                document.getElementById('state').addEventListener('change', function () {
+                                    var stateId = this.value;
+                                    var citySelect = document.getElementById('city');
+                                    citySelect.innerHTML = '<option value="">-- Loading... --</option>';
+                                    citySelect.disabled = true;
+
+                                    if (!stateId) {
+                                        citySelect.innerHTML = '<option value="">-- Select State First --</option>';
+                                        return;
+                                    }
+
+                                    const url = "{% url 'get_cities_by_state' state_id=0 %}".replace('0', stateId);
+                                    fetch(url)
+                                        .then(function (response) { 
+                                            if (!response.ok) throw new Error('API Error: ' + response.status);
+                                            return response.json(); 
+                                        })
+                                        .then(function (data) {
+                                            citySelect.innerHTML = '<option value="">-- Select City --</option>';
+                                            if (data.length === 0) {
+                                                citySelect.innerHTML = '<option value="">-- No Cities Found --</option>';
+                                            }
+                                            data.forEach(function (c) {
+                                                var opt = document.createElement('option');
+                                                opt.value = c.cityid;
+                                                opt.textContent = c.cityname;
+                                                citySelect.appendChild(opt);
+                                            });
+                                            citySelect.disabled = false;
+                                        })
+                                        .catch(function(error) {
+                                            console.error('Fetch Error:', error);
+                                            citySelect.innerHTML = '<option value="">-- Error Loading Cities --</option>';
+                                        });
+                                });
+                            </script>
+
+                            <!-- <div class="form-group">
+                                <label class="form-label">Enter Register Date</label>
+                                <input type="date" class="form-control mb-0" id="register_date" name="register_date"
+                                    required>
+                            </div> -->
+
+                            <div class="d-inline-block w-100">
+                                <div class="form-check d-inline-block mt-2 pt-1">
+                                    <input type="checkbox" class="form-check-input" id="customCheck1">
+                                    <label class="form-check-label" for="customCheck1">I accept <a href="#">Terms and
+                                            Conditions</a></label>
+                                </div>
+                                <input type="submit" class="btn btn-primary float-end" id="sign-up-btn"
+                                    name="sign-up-btn" value="Sign Up">
+                            </div>
+
+                            <div class="sign-info mt-3">
+                                <span class="dark-color d-inline-block line-height-2">Already Have Account? <a
+                                        href="{% url 'signin' %}">Log In</a></span>
+                                <ul class="iq-social-media">
+                                    <li><a href="#"><i class="ri-facebook-box-line"></i></a></li>
+                                    <li><a href="#"><i class="ri-twitter-line"></i></a></li>
+                                    <li><a href="#"><i class="ri-instagram-line"></i></a></li>
+                                </ul>
+                            </div>
+                        </form>
+
+                        <script>
+                            function validateSignupForm() {
+                                var email = document.getElementById('email').value.trim();
+                                var password = document.getElementById('password').value;
+                                var emailError = document.getElementById('emailError');
+                                var passwordError = document.getElementById('passwordError');
+                                var valid = true;
+
+                                // Reset errors
+                                emailError.style.display = 'none';
+                                passwordError.style.display = 'none';
+
+                                // ── Email Validation ──
+                                var emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+                                if (!email) {
+                                    emailError.textContent = 'Email is required.';
+                                    emailError.style.display = 'block';
+                                    valid = false;
+                                } else if (email.indexOf(' ') !== -1) {
+                                    emailError.textContent = 'Email must not contain spaces.';
+                                    emailError.style.display = 'block';
+                                    valid = false;
+                                } else if (!emailRegex.test(email)) {
+                                    emailError.textContent = 'Please enter a valid email address (e.g. user@example.com).';
+                                    emailError.style.display = 'block';
+                                    valid = false;
+                                }
+
+                                // ── Password Validation ──
+                                var errors = [];
+                                if (password.length < 8) errors.push('at least 8 characters');
+                                if (!/[A-Z]/.test(password)) errors.push('one uppercase letter');
+                                if (!/[a-z]/.test(password)) errors.push('one lowercase letter');
+                                if (!/[0-9]/.test(password)) errors.push('one number');
+                                if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) errors.push('one special character (!@#$%^&* etc.)');
+                                if (password.indexOf(' ') !== -1) errors.push('no spaces allowed');
+
+                                // ── Terms and Conditions Validation ──
+                                var termsCheckbox = document.getElementById('customCheck1');
+                                if (!termsCheckbox.checked) {
+                                    alert('You must accept the Terms and Conditions to sign up.');
+                                    valid = false;
+                                }
+
+                                if (errors.length > 0) {
+                                    passwordError.textContent = 'Password must have: ' + errors.join(', ') + '.';
+                                    passwordError.style.display = 'block';
+                                    valid = false;
+                                }
+
+                                return valid;
+                            }
+
+                            function handleSignupSubmit(event) {
+                                if (!validateSignupForm()) {
+                                    return false;
+                                }
+                                
+                                // Prevent immediate submission
+                                event.preventDefault();
+                                
+                                const overlay = document.getElementById('transition-overlay');
+                                const wrapper = document.getElementById('animWrapper');
+                                const text = document.getElementById('loading-text');
+                                
+                                overlay.style.display = 'flex';
+                                
+                                // Fade in overlay
+                                setTimeout(() => {
+                                    overlay.classList.add('fade-in');
+                                }, 10);
+                                
+                                // Pop up logo and text
+                                setTimeout(() => {
+                                    wrapper.classList.add('animate-pop');
+                                    text.classList.add('show');
+                                }, 150);
+                                
+                                // Expand wrapper to cover screen
+                                setTimeout(() => {
+                                    text.classList.remove('show');
+                                    wrapper.classList.add('animate-expand');
+                                }, 1400);
+                                
+                                // Submit the form
+                                setTimeout(() => {
+                                    const form = document.getElementById('signupForm');
+                                    
+                                    // Make sure backend receives the submit btn name
+                                    if (!document.getElementById('hidden-signup-btn')) {
+                                        const hiddenInp = document.createElement('input');
+                                        hiddenInp.type = 'hidden';
+                                        hiddenInp.name = 'sign-up-btn';
+                                        hiddenInp.value = 'Sign Up';
+                                        hiddenInp.id = 'hidden-signup-btn';
+                                        form.appendChild(hiddenInp);
+                                    }
+                                    
+                                    form.submit();
+                                }, 2200);
+                                
+                                return false;
+                            }
+
+                            document.addEventListener("DOMContentLoaded", function() {
+                                const togglePassword = document.getElementById('togglePassword');
+                                if (togglePassword) {
+                                    togglePassword.addEventListener('click', function (e) {
+                                        const passwordInput = document.getElementById('password');
+                                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                                        passwordInput.setAttribute('type', type);
+                                        this.classList.toggle('ri-eye-line');
+                                        this.classList.toggle('ri-eye-off-line');
+                                    });
+                                }
+                            });
+
+                            // Real-time password strength indicator
+                            document.getElementById('password').addEventListener('input', function () {
+                                var pw = this.value;
+                                var strength = 0;
+                                if (pw.length >= 8) strength++;
+                                if (/[A-Z]/.test(pw)) strength++;
+                                if (/[a-z]/.test(pw)) strength++;
+                                if (/[0-9]/.test(pw)) strength++;
+                                if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw)) strength++;
+
+                                var strengthDiv = document.getElementById('passwordStrength');
+                                var colors = ['#dc3545', '#dc3545', '#fd7e14', '#ffc107', '#28a745', '#198754'];
+                                var labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+                                var barWidth = (strength / 5) * 100;
+
+                                strengthDiv.innerHTML = '<div style="background:#e9ecef;border-radius:4px;height:6px;margin-bottom:4px;">' +
+                                    '<div style="background:' + colors[strength] + ';height:6px;border-radius:4px;width:' + barWidth + '%;transition:width 0.3s;"></div></div>' +
+                                    '<small style="color:' + colors[strength] + ';">' + labels[strength] + '</small>';
+                            });
+
+                            // Real-time email validation
+                            document.getElementById('email').addEventListener('blur', function () {
+                                var email = this.value.trim();
+                                var emailError = document.getElementById('emailError');
+                                var emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
+                                if (email && !emailRegex.test(email)) {
+                                    emailError.textContent = 'Please enter a valid email address.';
+                                    emailError.style.display = 'block';
+                                } else if (email && email.indexOf(' ') !== -1) {
+                                    emailError.textContent = 'Email must not contain spaces.';
+                                    emailError.style.display = 'block';
+                                } else {
+                                    emailError.style.display = 'none';
+                                }
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

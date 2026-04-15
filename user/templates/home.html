@@ -1,0 +1,832 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content_class %}has-right-sidebar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .story-nav-btn {
+        opacity: 0.7;
+        transition: all 0.3s ease;
+    }
+
+    .story-nav-btn:hover {
+        opacity: 1 !important;
+        transform: scale(1.1);
+    }
+
+    #storyProgressBarContainer .bg-secondary {
+        background-color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        transform: translateY(-2px);
+    }
+
+    .transition {
+        transition: all 0.3s ease;
+    }
+
+    .rotate-logo {
+        animation: rotate-logo-spin 10s linear infinite;
+    }
+
+    @keyframes rotate-logo-spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .hover-danger:hover {
+        color: #dc3545 !important;
+    }
+
+    .hover-primary:hover {
+        color: #0d6efd !important;
+    }
+
+    .story-add-btn:hover {
+        background-color: #0088cc !important;
+        transform: scale(1.1);
+        transition: all 0.2s ease;
+    }
+
+    .story-item p {
+        font-size: 0.75rem;
+        margin-top: 4px;
+        color: var(--bs-text-muted) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Stories Section -->
+<div class="row mt-4 pt-2 mb-4">
+    <div class="col-sm-12">
+        <div class="card shadow-none border-0 bg-transparent mb-0">
+            <div class="card-body p-0">
+                <div class="d-flex align-items-center gap-3 overflow-auto pb-3 story-container"
+                    style="scrollbar-width: none; -ms-overflow-style: none;">
+                    <!-- Current User Story / Add Button -->
+                    <div class="text-center story-item" style="min-width: 80px;">
+                        <div class="position-relative d-inline-block mb-1">
+                            <!-- Ring/Avatar for Viewing (if exists) -->
+                                <div id="ring-{{ current_user.username }}"
+                                    class="{% if my_stories != '[]' and not my_all_seen %}story-ring{% endif %} rounded-circle p-1"
+                                    {% if my_stories != '[]' %}
+                                    data-stories="{{ my_stories }}"
+                                    data-username="{{ current_user.username }}"
+                                    data-avatar="{% if current_user.profile %}{{ current_user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}"
+                                    onclick='openStoryFromElement(this)'
+                                    style="cursor: pointer;" {% endif %}>
+                                <img src="{% if current_user.profile %}{{ current_user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}"
+                                    class="rounded-circle border border-2 border-white shadow-sm"
+                                    style="width: 60px; height: 60px; object-fit: cover;">
+                            </div>
+                            <!-- Plus Icon for Adding -->
+                            <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle d-flex align-items-center justify-content-center border border-2 border-white shadow-sm story-add-btn"
+                                data-bs-toggle="modal" data-bs-target="#addStoryModal"
+                                style="width: 24px; height: 24px; margin-right: 2px; margin-bottom: 2px; cursor: pointer; z-index: 10;">
+                                <i class="fas fa-plus text-white" style="font-size: 12px;"></i>
+                            </div>
+                        </div>
+                        <p class="small mb-0 fw-semibold text-muted">Your Story</p>
+                    </div>
+
+                    <!-- Followed Users Stories -->
+                    {% for item in other_users_stories %}
+                    <div class="text-center story-item" style="min-width: 80px;">
+                        <div class="position-relative d-inline-block mb-1">
+                            <div id="ring-{{ item.user.username }}"
+                                class="{% if not item.all_seen %}story-ring{% endif %} rounded-circle p-1"
+                                data-stories="{{ item.stories_json }}"
+                                data-username="{{ item.user.username }}"
+                                data-avatar="{% if item.user.profile %}{{ item.user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}"
+                                onclick='openStoryFromElement(this)'
+                                style="cursor: pointer;">
+                                <img src="{% if item.user.profile %}{{ item.user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}"
+                                    class="rounded-circle border border-2 border-white shadow-sm"
+                                    style="width: 60px; height: 60px; object-fit: cover;">
+                            </div>
+                        </div>
+                        <p class="small mb-0 fw-semibold text-truncate px-1" style="max-width: 80px; display: block; overflow: hidden; color: var(--bs-text-muted);">{{ item.user.username }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Story Modal -->
+<div class="modal fade" id="addStoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Add to Your Story</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <form action="{% url 'add_story' %}" method="post" enctype="multipart/form-data" id="storyForm">
+                    {% csrf_token %}
+                    <div class="story-upload-zone text-center p-5 rounded-4 border-2 border-dashed border-primary-subtle bg-soft-primary bg-opacity-10 mb-3"
+                        onclick="document.getElementById('story_image').click()" style="cursor: pointer;">
+                        <i class="las la-cloud-upload-alt text-primary mb-2" style="font-size: 3rem;"></i>
+                        <h6 class="fw-bold mb-1">Select an Image</h6>
+                        <p class="text-muted small mb-0">Upload a photo to share with your friends!</p>
+                        <input type="file" name="story_image" id="story_image" class="d-none" accept="image/*"
+                            onchange="document.getElementById('storyForm').submit()">
+                    </div>
+                    <div class="text-center d-grid">
+                        <button type="button" class="btn btn-primary rounded-pill fw-bold"
+                            onclick="document.getElementById('story_image').click()">Choose File</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Home Feed / Community Suggestions -->
+{% if communities %}
+<div class="row">
+    <div class="col-12 mb-4 text-center">
+        <br>
+        <i class="las la-compass text-primary" style="font-size: 4rem;"></i>
+        <h3 class="fw-bold mt-2">Welcome to Community Builders!</h3>
+        <p class="text-muted">You haven't joined any communities yet. Browse and join some communities below to curate
+            your customized home feed.</p>
+    </div>
+    {% for c in communities %}
+    <div class="col-lg-6 col-md-6 mb-4">
+        <div class="card group-box h-100 mb-0 shadow-sm border-0 rounded-4 transition hover-shadow">
+            <div class="top-bg-image position-relative">
+                {% if c.background_image %}
+                <img src="{{ c.background_image.url }}" class="img-fluid w-100 rounded-top" alt="group-bg"
+                    loading="lazy" style="height: 120px; object-fit: cover; filter: brightness(0.8);">
+                {% else %}
+                <img src="../../assets/images/page-img/profile-bg2.jpg" class="img-fluid w-100 rounded-top"
+                    alt="group-bg" loading="lazy" style="height: 120px; object-fit: cover; filter: brightness(0.8);">
+                {% endif %}
+                <div class="position-absolute w-100 h-100 top-0 start-0 rounded-top"
+                    style="background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);"></div>
+            </div>
+            <div class="card-body text-center position-relative mt-n5 pt-0">
+                <div class="group-icon d-inline-block bg-white p-1 rounded-circle shadow-sm" style="margin-top: -50px;">
+                    {% if c.thumbnail %}
+                    <img src="{{ c.thumbnail.url }}" alt="profile-img"
+                        class="rounded-circle img-fluid avatar-90 border border-4 border-white" loading="lazy"
+                        style="object-fit:cover;">
+                    {% else %}
+                    <img src="../../assets/images/page-img/gi-1.jpg" alt="profile-img"
+                        class="rounded-circle img-fluid avatar-90 border border-4 border-white" loading="lazy">
+                    {% endif %}
+                </div>
+                <div class="group-info mt-3 mb-3">
+                    <a href="{% url 'community_detail' c.communityid %}"
+                        class="h4 fw-bold text-dark text-decoration-none d-block mb-1">{{ c.communitytitle }}</a>
+                    <div class="mb-2">
+                        <span class="text-muted small px-2 py-1 rounded-3 bg-light d-inline-flex align-items-center gap-1" style="font-size: 0.75rem; letter-spacing: 0.3px;">
+                            <i class="las la-tag opacity-50"></i> {{ c.categoryid.categoryname }}
+                        </span>
+                    </div>
+                    <p class="text-muted small px-3 text-truncate" style="max-height: 40px;">{{ c.discription }}</p>
+                </div>
+                <div class="text-center mt-3 pt-3 border-top">
+                    {% if c.communityid in pending_ids %}
+                    <button class="btn btn-warning-subtle fw-semibold rounded-pill px-4 w-100" disabled><i
+                            class="las la-clock me-1"></i>Requested</button>
+                    {% else %}
+                    <form method="post" action="{% url 'join_group' c.communityid %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="btn btn-primary fw-bold rounded-pill px-4 w-100 hover-shadow transition"><i
+                                class="las la-plus me-1"></i>Join Community</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <h4 class="text-muted">No communities available yet.</h4>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Posts Feed -->
+{% for post in posts %}
+<div class="card shadow-sm border-0 mb-4 rounded-4 hover-shadow transition" id="post-{{ post.postid }}">
+    <div class="card-body p-4">
+        <!-- Post Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+                {% if post.userid.profile %}
+                <img src="{{ post.userid.profile.url }}" alt="avatar" class="avatar-50 rounded-circle border shadow-sm"
+                    style="object-fit:cover;">
+                {% else %}
+                <div
+                    class="avatar-50 rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fs-5 fw-bold shadow-sm">
+                    {{ post.userid.username|make_list|first|upper }}
+                </div>
+                {% endif %}
+                <div class="ms-3">
+                    <h6 class="mb-0 fw-bold text-dark d-inline-block">{{ post.userid.username }}</h6>
+                    <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>{{ post.createddt|timesince }} ago
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Community Info Badge & Action Menu -->
+            <div class="position-absolute d-flex align-items-center gap-2" style="top: 15px; right: 20px; z-index: 10;">
+                {% if post.communityid %}
+                <a href="{% url 'community_detail' post.communityid.communityid %}"
+                    class="btn btn-sm btn-light rounded-pill px-3 fw-semibold d-flex align-items-center gap-2 hover-shadow transition text-decoration-none" style="font-size: 0.8rem; background: rgba(255,255,255,0.8);">
+                    {% if post.communityid.thumbnail %}
+                    <img src="{{ post.communityid.thumbnail.url }}" class="avatar-20 rounded-circle"
+                        style="object-fit:cover;">
+                    {% endif %}
+                    <span class="text-primary">{{ post.communityid.communitytitle }}</span>
+                </a>
+                {% else %}
+                <span class="badge bg-soft-primary px-3 py-2 fw-semibold d-flex align-items-center gap-2" style="font-size: 0.75rem;">Buzz Feed</span>
+                {% endif %}
+
+                <!-- Post Action Menu (3 dots) -->
+                <div class="dropdown">
+                    <a href="#" class="text-secondary" id="postActionMenu{{ post.postid }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="ri-more-fill fs-4"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="postActionMenu{{ post.postid }}">
+                        {% if request.session.userid|add:"0" == post.userid.userid %}
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" href="javascript:void(0)" 
+                               onclick="openEditModal('{{ post.postid }}', '{{ post.posttitle|escapejs }}', '{{ post.description|escapejs }}', '{% if post.communityid %}{{ post.communityid.communityid }}{% endif %}')">
+                                <i class="ri-edit-line"></i> Edit Post
+                            </a>
+                        </li>
+                        <li>
+                            {% if post.communityid %}
+                            <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="{% url 'delete_post' post.communityid.communityid post.postid %}" onclick="return confirm('Are you sure you want to delete this post?')">
+                                <i class="ri-delete-bin-line"></i> Delete Post
+                            </a>
+                            {% else %}
+                            <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="{% url 'delete_buzz_post' post.postid %}" onclick="return confirm('Are you sure you want to delete this post?')">
+                                <i class="ri-delete-bin-line"></i> Delete Post
+                            </a>
+                            {% endif %}
+                        </li>
+                        {% elif post.communityid and request.session.userid|add:"0" == post.communityid.userid.userid %}
+                        <!-- Community Owner can also delete -->
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="{% url 'delete_post' post.communityid.communityid post.postid %}" onclick="return confirm('Are you sure you want to delete this post?')">
+                                <i class="ri-delete-bin-line"></i> Delete Post
+                            </a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                <i class="ri-flag-line"></i> Report
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post Content -->
+        <h4 class="fw-bold mb-2">{{ post.posttitle }}</h4>
+
+        {% if post.thumbnail %}
+        <div class="post-img-wrapper mb-4 rounded-3 overflow-hidden shadow-sm border bg-light" ondblclick="toggleLike({{ post.postid }}, true)">
+            <i class="ri-heart-fill heart-overlay" id="heart-overlay-{{ post.postid }}"></i>
+            {% if post.is_video %}
+            <video src="{{ post.thumbnail.url }}" class="img-fluid w-100" controls style="max-height: 600px; object-fit: contain;"></video>
+            {% else %}
+            <img src="{{ post.thumbnail.url }}" class="img-fluid w-100" alt="post-img"
+                style="max-height: 600px; object-fit: contain;">
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Interactions (Like, Comment) -->
+        <div class="d-flex align-items-center justify-content-between border-top border-bottom py-3 mb-3">
+            <div class="d-flex align-items-center gap-3">
+                <!-- Like Button -->
+                <button type="button" id="like-btn-{{ post.postid }}"
+                    onclick="toggleLike({{ post.postid }}, true)"
+                    class="btn-interaction {% if post.postid in user_likes %}liked{% endif %}"
+                    style="font-size: 0.95rem;">
+                    <i id="like-icon-{{ post.postid }}"
+                        class="{% if post.postid in user_likes %}ri-heart-fill{% else %}ri-heart-line{% endif %} m-0"></i>
+                    <span id="like-count-{{ post.postid }}">{{ post.like_set.count }}</span>
+                </button>
+
+                <!-- Comment Count -->
+                <button
+                    class="btn-interaction"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.postid }}"
+                    aria-expanded="{% if post.comment_set.count > 0 %}true{% else %}false{% endif %}"
+                    aria-controls="comments-{{ post.postid }}" style="font-size: 0.95rem;">
+                    <i class="ri-chat-3-line m-0"></i>
+                    <span>{{ post.comment_set.count }}</span>
+                </button>
+
+                <!-- Share Button -->
+                <button type="button" class="btn-interaction" onclick="openShareModal({{ post.postid }})" style="font-size: 0.95rem;">
+                    <i class="ri-send-plane-2-line m-0"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-3 post-desc-container">
+            <span class="text-body text-opacity-75 desc-short" style="line-height: 1.6;" id="desc-short-{{ post.postid }}">{{ post.description|truncatechars:150 }}</span>
+            <span class="text-body text-opacity-75 desc-full d-none" style="line-height: 1.6;" id="desc-full-{{ post.postid }}">{{ post.description|linebreaksbr }}</span>
+            {% if post.description|length > 150 %}
+            <a href="javascript:void(0)" onclick="toggleDesc({{ post.postid }})" id="desc-toggle-{{ post.postid }}" class="text-primary text-decoration-none fw-bold ms-1" style="font-size: 0.9rem;">View more</a>
+            {% endif %}
+        </div>
+
+        <!-- Comments Section -->
+        <div class="collapse {% if post.comment_set.count > 0 %}show{% endif %}" id="comments-{{ post.postid }}">
+            <div class="comments-list mt-3">
+                {% for comment in post.comment_set.all|dictsortreversed:"createddt" %}
+                {% if forloop.counter <= 2 %} <div class="d-flex mb-3">
+                    <div class="me-3">
+                        <img src="{% if comment.userid.profile %}{{ comment.userid.profile.url }}{% else %}../../assets/images/user/1.jpg{% endif %}"
+                            class="avatar-35 rounded-circle shadow-sm" alt="userimg" style="object-fit:cover;">
+                    </div>
+                    <div class="bg-light p-3 rounded-4 flex-grow-1 position-relative">
+                        <h6 class="mb-1 fw-bold fs-6">{{ comment.userid.username }}</h6>
+                        <p class="mb-0 text-dark small" style="line-height: 1.5;">{{ comment.comment }}</p>
+                        <span class="text-muted" style="font-size: 0.70rem; position: absolute; top: 10px; right: 15px;">{{ comment.createddt|timesince }} ago</span>
+                    </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            {% if post.comment_set.count > 2 %}
+            <div class="accordion accordion-flush" id="accordionComments{{ post.postid }}">
+                <div class="accordion-item bg-transparent border-0">
+                    <h2 class="accordion-header" id="headingComments{{ post.postid }}">
+                        <button
+                            class="accordion-button collapsed bg-transparent shadow-none px-0 py-2 text-muted fw-semibold small"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#collapseComments{{ post.postid }}"
+                            aria-expanded="false" aria-controls="collapseComments{{ post.postid }}">
+                            View all {{ post.comment_set.count }} comments
+                        </button>
+                    </h2>
+                    <div id="collapseComments{{ post.postid }}" class="accordion-collapse collapse"
+                        aria-labelledby="headingComments{{ post.postid }}"
+                        data-bs-parent="#accordionComments{{ post.postid }}">
+                        <div class="accordion-body px-0 pt-2 pb-0">
+                            {% for comment in post.comment_set.all|dictsortreversed:"createddt" %}
+                            {% if forloop.counter > 2 %}
+                            <div class="d-flex mb-3">
+                                <div class="me-3">
+                                    <img src="{% if comment.userid.profile %}{{ comment.userid.profile.url }}{% else %}../../assets/images/user/1.jpg{% endif %}"
+                                        class="avatar-35 rounded-circle shadow-sm" alt="userimg"
+                                        style="object-fit:cover;">
+                                </div>
+                                <div class="bg-light p-3 rounded-4 flex-grow-1 position-relative">
+                                    <h6 class="mb-1 fw-bold fs-6">{{ comment.userid.username }}</h6>
+                                    <p class="mb-0 text-dark small" style="line-height: 1.5;">{{ comment.comment }}</p>
+                                    <span class="text-muted" style="font-size: 0.70rem; position: absolute; top: 10px; right: 15px;">{{ comment.createddt|timesince }} ago</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Add Comment Form -->
+        <div class="d-flex align-items-center mt-3 pt-2 border-top">
+            <img src="{% if current_user.profile %}{{ current_user.profile.url }}{% else %}{% static 'assets/images/user/1.jpg' %}{% endif %}"
+                alt="user" class="avatar-35 rounded-circle shadow-sm me-3" style="object-fit:cover;">
+            <form method="post" action="{% url 'add_comment' post.postid %}"
+                class="flex-grow-1 d-flex align-items-center gap-2">
+                {% csrf_token %}
+                <input type="text" name="comment" class="form-control rounded-pill shadow-sm border-light bg-light"
+                    placeholder="Write a comment..." required>
+                <button type="submit"
+                    class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+                    <span>Send</span>
+                    <i class="las la-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+</div>
+{% empty %}
+<div class="card shadow-sm border-0 rounded-4 text-center py-5">
+    <div class="card-body">
+        <i class="las la-rss text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted fw-bold">No posts to show.</h4>
+        <p class="text-muted">No posts have been made in your communities!</p>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+</div>
+</div>
+</div>
+</div>
+
+<!-- Story Viewer Modal (Full Screen) -->
+<div class="modal fade" id="storyViewerModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" style="z-index: 2100 !important;">
+    <div class="modal-dialog modal-fullscreen m-0">
+        <div class="modal-content bg-black border-0 rounded-0">
+            <!-- Progress Bars -->
+            <div id="storyProgressBarContainer" class="position-absolute top-0 start-0 w-100 p-2 d-flex gap-1"
+                style="z-index: 1070;">
+                <!-- Segments will be injected here -->
+            </div>
+
+            <!-- Close Button Top Right -->
+            <div class="position-absolute top-0 end-0 p-4" style="z-index: 1080;">
+                <button type="button"
+                    class="btn border-0 p-0 text-white d-flex align-items-center justify-content-center bg-dark rounded-circle shadow-lg"
+                    data-bs-dismiss="modal" aria-label="Close" style="width: 45px; height: 45px; opacity: 1;"
+                    onclick="closeStoryViewer()">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-body d-flex flex-column align-items-center justify-content-center p-0 position-relative">
+                <!-- User Header (Top) -->
+                <div class="position-absolute top-0 start-0 w-100 p-4 pt-5 d-flex align-items-center"
+                    style="background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); z-index: 1060;">
+                    <img id="storyViewerAvatar" src=""
+                        class="avatar-40 rounded-circle border border-2 border-white me-3" style="object-fit: cover;">
+                    <div>
+                        <h6 class="fw-bold text-white mb-0" id="storyViewerTitle">Username</h6>
+                        <small class="text-white-50" id="storyViewerTime">Just now</small>
+                    </div>
+                </div>
+
+                <!-- Navigation Arrows -->
+                <button class="btn border-0 text-white position-absolute start-0 h-100 px-3 story-nav-btn shadow-none"
+                    onclick="prevStory()" style="z-index: 1055; background: none;">
+                    <i class="fas fa-chevron-left" style="font-size: 2rem; text-shadow: 0 0 10px rgba(0,0,0,0.8);"></i>
+                </button>
+                <button class="btn border-0 text-white position-absolute end-0 h-100 px-3 story-nav-btn shadow-none"
+                    onclick="nextStory()" style="z-index: 1055; background: none;">
+                    <i class="fas fa-chevron-right" style="font-size: 2rem; text-shadow: 0 0 10px rgba(0,0,0,0.8);"></i>
+                </button>
+
+                <!-- Story Image (Centered) -->
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                    <img id="storyViewerImage" src="" class="img-fluid"
+                        style="max-height: 100vh; max-width: 100%; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.8);">
+                </div>
+
+                <!-- View Count (Bottom Left) -->
+                <div id="storyViewCountContainer" class="position-absolute bottom-0 start-0 p-4 mb-4 d-none"
+                    style="z-index: 1070;">
+                    <div class="d-flex align-items-center text-white bg-dark bg-opacity-75 px-3 py-2 rounded-pill shadow-lg border border-1 border-white-50"
+                        onclick="openViewersList()" style="cursor: pointer; transition: all 0.2s ease;">
+                        <i class="fas fa-eye me-2"></i>
+                        <span id="storyViewCountText" class="fw-semibold">0</span>
+                    </div>
+                </div>
+
+                <!-- Delete Button (Bottom Right) -->
+                <div id="storyDeleteContainer" class="position-absolute bottom-0 end-0 p-4 mb-4 d-none"
+                    style="z-index: 1070;">
+                    <div class="d-flex align-items-center text-white bg-danger bg-opacity-75 px-3 py-2 rounded-pill shadow-lg border border-1 border-white-50"
+                        onclick="deleteStory()" style="cursor: pointer; transition: all 0.2s ease;">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Story Viewers Offcanvas (Bottom Sheet) -->
+<div class="offcanvas offcanvas-bottom bg-dark text-white" tabindex="-1" id="storyViewersOffcanvas"
+    style="height: 50vh; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 2200 !important;">
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title fw-bold"><i class="fas fa-eye me-2"></i>Viewers</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+        <ul class="list-group list-group-flush" id="storyViewersList">
+            <!-- Viewers will be injected here -->
+        </ul>
+        <div id="noViewersMsg" class="text-center py-5 text-muted d-none">
+            <i class="fas fa-users fa-3x mb-3"></i>
+            <p>No views yet</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block right_sidebar %}
+<div class="iq-sidebar-right sidebar-default border-0">
+    <div class="d-flex flex-column gap-4">
+        <!-- Active Users -->
+        <div>
+            <h5 class="fw-bold text-dark mb-4" style="letter-spacing: -0.5px; font-size: 1.1rem;">Active Users</h5>
+            <div class="d-flex flex-column gap-4">
+                {% for user in active_users %}
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="position-relative">
+                            <img src="{% if user.profile %}{{ user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}"
+                                class="avatar-40 rounded-circle shadow-sm" style="object-fit: cover;">
+                            <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle"
+                                style="width: 10px; height: 10px; transform: translate(15%, 15%);"></span>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.9rem;">{{ user.username }}</h6>
+                            <small class="text-muted" style="font-size: 0.75rem;">Active</small>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small mb-0">No active users.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <hr class="my-2 opacity-10">
+
+        <!-- Suggestions -->
+        <div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold text-dark mb-0" style="letter-spacing: -0.5px; font-size: 1.1rem;">Suggestions</h5>
+                <a href="{% url 'users_list' %}" class="small text-muted text-decoration-none fw-semibold" style="font-size: 0.75rem;">See All</a>
+            </div>
+            <div class="d-flex flex-column gap-4">
+                {% for user in suggested_users %}
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <img src="{% if user.profile %}{{ user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}"
+                            class="avatar-40 rounded-circle shadow-sm" style="object-fit: cover;">
+                        <div class="ms-2">
+                            <h6 class="mb-0 fw-bold text-dark text-truncate-sidebar" style="font-size: 0.85rem;">{{ user.username }}</h6>
+                            <small class="text-muted d-block" style="font-size: 10px;">Suggested</small>
+                        </div>
+                    </div>
+                    <a href="{% url 'toggle_follow' user.userid %}" class="btn btn-primary rounded-pill px-3 py-1 fw-bold shadow-none" style="font-size: 0.75rem;">Follow</a>
+                </div>
+                {% empty %}
+                <p class="text-muted small mb-0">No suggestions.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <hr class="my-2 opacity-10">
+
+        <!-- Latest Activities -->
+        <div>
+            <h5 class="fw-bold text-dark mb-4" style="letter-spacing: -0.5px; font-size: 1.1rem;">Latest Activities</h5>
+            <div class="d-flex flex-column">
+                {% for activity in latest_activities %}
+                <div class="d-flex align-items-start gap-3 py-3 {% if not forloop.last %}border-bottom{% endif %}" style="border-color: #f1f1f1 !important;">
+                    <img src="{% if activity.user.profile %}{{ activity.user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}"
+                        class="avatar-40 rounded-circle shadow-sm" style="object-fit: cover; flex-shrink: 0;">
+                    <div class="flex-grow-1">
+                        <p class="mb-1 text-dark" style="font-size: 0.85rem; line-height: 1.4;">
+                            <span class="fw-bold">{{ activity.user.username }}</span> <span class="text-muted">{{ activity.text|safe }}</span>
+                        </p>
+                        <small class="text-muted" style="font-size: 0.7rem;">{{ activity.time|timesince }} ago</small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="las la-bell-slash text-muted mb-2" style="font-size: 2rem; opacity: 0.3;"></i>
+                    <p class="text-muted small mb-0">No recent activities.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- UniVo Branding -->
+        <div class="card shadow-none border-0 rounded-4 overflow-hidden position-relative mt-2" style="background: rgb(15, 40, 84) !important; min-height: 250px;">
+            <div class="card-body p-4 text-center d-flex flex-column align-items-center justify-content-center position-relative" style="z-index: 2;">
+                <div class="mb-3 rotate-logo">
+                    <img src="{% static 'assets/images/animated_logo.svg' %}" alt="UniVo Logo" class="img-fluid" style="max-height: 50px;">
+                </div>
+                <h2 class="text-white fw-bold mb-1" style="letter-spacing: -1px; font-size: 2rem;">UniVo</h2>
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="rounded-3 d-flex align-items-center justify-content-center bg-white shadow-sm" style="width: 35px; height: 35px;"><i class="fab fa-instagram text-primary"></i></a>
+                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="rounded-3 d-flex align-items-center justify-content-center bg-white shadow-sm" style="width: 35px; height: 35px;"><i class="fab fa-twitter text-primary"></i></a>
+                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="rounded-3 d-flex align-items-center justify-content-center bg-white shadow-sm" style="width: 35px; height: 35px;"><i class="fab fa-facebook-f text-primary"></i></a>
+                </div>
+                <a href="{% url 'contact_us' %}" class="btn btn-light rounded-pill px-4 py-2 fw-bold text-primary small">Contact Us</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    let currentStories = [];
+    let currentStoryIndex = 0;
+    let currentStoryOwner = "";
+    let storyTimer = null;
+    const STORY_DURATION = 5000;
+
+    function getRelativeTime(timestamp) {
+        const now = new Date();
+        const created = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - created) / 1000);
+        if (diffInSeconds < 60) return 'Just now';
+        const minutes = Math.floor(diffInSeconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+    }
+
+    function openStoryFromElement(el) {
+        const username = el.getAttribute('data-username');
+        const avatarUrl = el.getAttribute('data-avatar');
+        const stories = JSON.parse(el.getAttribute('data-stories'));
+        openStoryViewer(username, avatarUrl, stories);
+    }
+
+    function openStoryViewer(username, avatarUrl, stories) {
+        console.log("Opening story viewer for:", username);
+        currentStories = stories;
+        currentStoryOwner = username;
+        currentStoryIndex = 0;
+        document.getElementById('storyViewerAvatar').src = avatarUrl;
+        document.getElementById('storyViewerTitle').innerText = username;
+
+        const progressContainer = document.getElementById('storyProgressBarContainer');
+        progressContainer.innerHTML = '';
+        currentStories.forEach((_, index) => {
+            const bar = document.createElement('div');
+            bar.className = 'flex-grow-1 bg-secondary rounded-pill overflow-hidden';
+            bar.style.height = '3px';
+            bar.innerHTML = `<div id="story-progress-${index}" class="h-100 bg-white" style="width: 0%; transition: width linear;"></div>`;
+            progressContainer.appendChild(bar);
+        });
+
+        const modalEl = document.getElementById('storyViewerModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+        showStory(0);
+    }
+
+    function showStory(index) {
+        if (index < 0 || index >= currentStories.length) {
+            closeStoryViewer();
+            return;
+        }
+
+        currentStoryIndex = index;
+        const story = currentStories[index];
+        document.getElementById('storyViewerImage').src = story.url;
+        document.getElementById('storyViewerTime').innerText = getRelativeTime(story.created_at);
+
+        const deleteContainer = document.getElementById('storyDeleteContainer');
+        deleteContainer.classList.toggle('d-none', currentStoryOwner !== "{{ current_user.username }}");
+
+        const viewCountContainer = document.getElementById('storyViewCountContainer');
+        if (currentStoryOwner === "{{ current_user.username }}") {
+            viewCountContainer.classList.remove('d-none');
+            document.getElementById('storyViewCountText').innerText = story.views || 0;
+        } else {
+            viewCountContainer.classList.add('d-none');
+        }
+
+        if (!story.seen) {
+            fetch('/mark-story-seen/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify({ story_id: story.id })
+            }).then(() => { 
+                story.seen = true; 
+                // Check if all stories are now seen to remove ring visually
+                const allNowSeen = currentStories.every(s => s.seen);
+                if (allNowSeen) {
+                    const ringElement = document.getElementById(`ring-${currentStoryOwner}`);
+                    if (ringElement) ringElement.classList.remove('story-ring');
+                }
+            });
+        }
+
+        currentStories.forEach((_, i) => {
+            const bar = document.getElementById(`story-progress-${i}`);
+            if (bar) {
+                bar.style.transition = 'none';
+                bar.style.width = i < index ? '100%' : '0%';
+            }
+        });
+
+        setTimeout(() => {
+            const bar = document.getElementById(`story-progress-${index}`);
+            if (bar) {
+                bar.style.transition = `width ${STORY_DURATION}ms linear`;
+                bar.style.width = '100%';
+            }
+        }, 10);
+
+        clearTimeout(storyTimer);
+        storyTimer = setTimeout(() => nextStory(), STORY_DURATION);
+    }
+
+    function nextStory() {
+        if (currentStoryIndex < currentStories.length - 1) showStory(currentStoryIndex + 1);
+        else closeStoryViewer();
+    }
+
+    function prevStory() {
+        if (currentStoryIndex > 0) showStory(currentStoryIndex - 1);
+    }
+
+    function closeStoryViewer() {
+        clearTimeout(storyTimer);
+        const modalEl = document.getElementById('storyViewerModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+    }
+
+    function openViewersList() {
+        const story = currentStories[currentStoryIndex];
+        const list = document.getElementById('storyViewersList');
+        const noMsg = document.getElementById('noViewersMsg');
+        
+        clearTimeout(storyTimer); // Pause story
+        
+        list.innerHTML = '';
+        if (story.viewers && story.viewers.length > 0) {
+            noMsg.classList.add('d-none');
+            story.viewers.forEach(v => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item bg-transparent border-secondary py-3 px-4';
+                li.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <img src="${v.profile}" class="avatar-40 rounded-circle me-3" style="object-fit: cover;">
+                        <span class="text-white fw-bold">${v.username}</span>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        } else {
+            noMsg.classList.remove('d-none');
+        }
+        
+        const offcanvasEl = document.getElementById('storyViewersOffcanvas');
+        const offcanvas = new bootstrap.Offcanvas(offcanvasEl);
+        offcanvas.show();
+    }
+
+    function deleteStory() {
+        if (!confirm('Are you sure you want to delete this story?')) return;
+        const story = currentStories[currentStoryIndex];
+        clearTimeout(storyTimer);
+
+        fetch('/delete-story/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ story_id: story.id })
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                currentStories.splice(currentStoryIndex, 1);
+                if (currentStories.length === 0) {
+                    closeStoryViewer();
+                    location.reload();
+                } else {
+                    showStory(Math.min(currentStoryIndex, currentStories.length - 1));
+                }
+            } else {
+                alert('Error: ' + data.error);
+                showStory(currentStoryIndex);
+            }
+        });
+    }
+
+    document.getElementById('storyViewerModal').addEventListener('hidden.bs.modal', function () {
+        clearTimeout(storyTimer);
+    });
+
+    document.getElementById('storyViewersOffcanvas').addEventListener('hidden.bs.offcanvas', function () {
+        // Resume story when offcanvas is closed
+        storyTimer = setTimeout(() => nextStory(), STORY_DURATION);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,909 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>{% block title %}UniVo{% endblock %}</title>
+
+    <link
+      rel="shortcut icon"
+      href="{% static 'assets/images/animated_logo.svg' %}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'assets/css/libs.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/socialv1fc6.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/custom_theme.css' %}?v=2.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxst.icons8.com/vue-static/landen/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css"
+    />
+
+    {% block extra_css %}{% endblock %}
+    <style>
+      :root {
+        {% if user_settings.theme_color == 'purple' %}
+        --bs-primary: rgb(102, 51, 153) !important;
+        --bs-primary-rgb: 102, 51, 153 !important;
+        {% elif user_settings.theme_color == 'green' %}
+        --bs-primary: rgb(34, 139, 34) !important;
+        --bs-primary-rgb: 34, 139, 34 !important;
+        {% else %}
+        --bs-primary: rgb(15, 40, 84) !important;
+        --bs-primary-rgb: 15, 40, 84 !important;
+        {% endif %}
+      }
+      
+      html {
+        {% if user_settings.font_size == 'small' %}
+        font-size: 14px;
+        {% elif user_settings.font_size == 'large' %}
+        font-size: 18px;
+        {% else %}
+        font-size: 16px;
+        {% endif %}
+      }
+      
+      body {
+        font-size: 1rem;
+      }
+
+      .btn-primary {
+        background-color: var(--bs-primary) !important;
+        border-color: var(--bs-primary) !important;
+        color: #fff !important;
+      }
+      
+      .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
+        opacity: 0.8 !important;
+        background-color: var(--bs-primary) !important;
+        border-color: var(--bs-primary) !important;
+        box-shadow: 0 4px 10px rgba(var(--bs-primary-rgb), 0.3) !important;
+      }
+      
+      .text-primary {
+        color: var(--bs-primary) !important;
+      }
+      
+      .bg-primary {
+        background-color: var(--bs-primary) !important;
+      }
+      
+      .border-primary {
+        border-color: var(--bs-primary) !important;
+      }
+      
+      .bg-soft-primary {
+        background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+      }
+      
+      /* Dark Mode Overrides */
+      body.dark-mode, body.dark-mode .wrapper, body.dark-mode #content-page {
+        background-color: #121212 !important;
+        background-image: none !important;
+        color: #e0e0e0 !important;
+      }
+      body.dark-mode .card, body.dark-mode .iq-top-navbar, body.dark-mode .iq-sidebar, body.dark-mode .iq-footer, body.dark-mode .bg-white, body.dark-mode .modal-content {
+        background-color: #1e1e1e !important;
+        color: #e0e0e0 !important;
+        border-color: #333 !important;
+      }
+      body.dark-mode .bg-light {
+        background-color: #2a2a2a !important;
+      }
+      body.dark-mode .text-dark {
+        color: #e0e0e0 !important;
+        }
+      body.dark-mode .text-muted {
+        color: #a0a0a0 !important;
+      }
+      body.dark-mode input.form-control, body.dark-mode textarea.form-control, body.dark-mode select.form-select {
+        background-color: #2a2a2a !important;
+        color: #e0e0e0 !important;
+        border-color: #444 !important;
+      }
+      body.dark-mode .border-light {
+        border-color: #333 !important;
+      }
+      body.dark-mode .sidebar-link {
+        color: #a0a0a0 !important;
+      }
+      body.dark-mode .sidebar-link:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: var(--bs-primary) !important;
+      }
+      
+      /* Hide Google Translate UI */
+      div#google_translate_element { display: none; }
+      .goog-te-banner-frame.skiptranslate { display: none !important; }
+      body { top: 0px !important; }
+
+      .sidebar-link {
+        display: flex !important;
+        align-items: center !important;
+        padding: 10px 20px !important;
+        transition: all 0.3s ease !important;
+        border-radius: 10px !important;
+        margin: 5px 15px !important;
+        color: #555 !important;
+        text-decoration: none !important;
+      }
+      .sidebar-link i {
+        font-size: 1.25rem !important;
+        width: 30px !important;
+        text-align: center !important;
+        color: var(--bs-primary) !important;
+        transition: transform 0.2s ease !important;
+      }
+      .sidebar-link:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.08) !important;
+        color: var(--bs-primary) !important;
+        transform: translateX(5px) !important;
+      }
+      .sidebar-link:hover i {
+        transform: scale(1.1) !important;
+      }
+      .sidebar-link span {
+        font-weight: 500 !important;
+      }
+
+      /* Instagram-style Likes/Comments */
+      .btn-interaction {
+        background: transparent !important;
+        border: none !important;
+        padding: 8px 12px !important;
+        border-radius: 12px !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        color: #65676b !important;
+        font-weight: 600 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+
+      .btn-interaction:hover {
+        background-color: rgba(15, 40, 84, 0.05) !important;
+        color: var(--bs-primary) !important;
+      }
+
+      .btn-interaction.liked {
+        color: #ff3040 !important;
+      }
+
+      .btn-interaction.liked:hover {
+        background-color: rgba(255, 48, 64, 0.05) !important;
+      }
+
+      .btn-interaction i {
+        font-size: 1.4rem !important;
+        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+      }
+
+      .btn-interaction:active i {
+        transform: scale(1.3) !important;
+      }
+
+      .liked i {
+        animation: heart-pop 0.4s ease-out;
+      }
+
+      @keyframes heart-pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.3); }
+        100% { transform: scale(1); }
+      }
+
+      /* Instagram Big Heart Overlay Animation */
+      .post-img-wrapper {
+        position: relative;
+        cursor: pointer;
+        display: block;
+      }
+      
+      .heart-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 100px;
+        color: rgba(255,255,255,0.9);
+        text-shadow: 0 0 30px rgba(0,0,0,0.5);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 1000;
+        transition: none;
+      }
+      
+      .heart-burst {
+        animation: heart-burst-anim 0.8s ease-out forwards;
+      }
+      
+      @keyframes heart-burst-anim {
+        0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        30% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        45% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+      }
+    </style>
+  </head>
+
+  <body class="{% if user_settings and user_settings.dark_mode %}dark-mode{% endif %}">
+    <!-- loader Start -->
+    <!-- loader END -->
+
+    <!-- Wrapper Start -->
+    <div class="wrapper">
+      <div class="iq-top-navbar">
+        <div class="iq-navbar-custom">
+          <nav class="navbar navbar-expand-lg navbar-light p-0">
+            <div class="iq-navbar-logo d-flex justify-content-between">
+              <a href="{% url 'home' %}">
+                <img
+                  src="{% static 'assets/images/animated_logo.svg' %}"
+                  class="img-fluid rotating-logo"
+                  alt="UniVo Logo"
+                  style="max-height: 30px"
+                />
+                <span>UniVo</span>
+              </a>
+            </div>
+
+            <button
+              class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-label="Toggle navigation"
+            >
+              <i class="ri-menu-3-line"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav ms-auto navbar-list align-items-center">
+                {% if current_user %}
+                <li class="nav-item">
+                  <a
+                    href="{% url 'chats' %}"
+                    class="d-flex align-items-center px-2 position-relative"
+                    title="Community Chats"
+                  >
+                    <i class="ri-chat-3-line fs-5 text-white"></i>
+                    {% if unread_chat_count > 0 %}
+                    <span
+                      class="position-absolute bg-danger border border-light rounded-circle d-flex align-items-center justify-content-center text-white"
+                      style="
+                        width: 14px;
+                        height: 14px;
+                        top: 0px;
+                        right: 0px;
+                        font-size: 8px;
+                      "
+                    >
+                      {{ unread_chat_count }}
+                    </span>
+                    {% endif %}
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a
+                    href="{% url 'activity' %}"
+                    class="d-flex align-items-center px-2 position-relative"
+                    title="Notifications"
+                  >
+                    <i class="ri-notification-line fs-5 text-white"></i>
+                    {% if activity_count > 0 %}
+                    <span
+                      class="position-absolute bg-warning border border-light rounded-circle d-flex align-items-center justify-content-center text-dark"
+                      style="
+                        width: 14px;
+                        height: 14px;
+                        top: 0px;
+                        right: 0px;
+                        font-size: 8px;
+                      "
+                    >
+                      {{ activity_count }}
+                    </span>
+                    {% endif %}
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a
+                    href="{% url 'invitations_list' %}"
+                    class="d-flex align-items-center px-2 position-relative"
+                    title="Friend Requests"
+                  >
+                    <i class="ri-user-add-line fs-5 text-white"></i>
+                    {% if invitation_count > 0 %}
+                    <span
+                      class="position-absolute bg-success border border-light rounded-circle d-flex align-items-center justify-content-center text-white"
+                      style="
+                        width: 14px;
+                        height: 14px;
+                        top: 0px;
+                        right: 0px;
+                        font-size: 8px;
+                      "
+                    >
+                      {{ invitation_count }}
+                    </span>
+                    {% endif %}
+                  </a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a
+                    href="#"
+                    class="d-flex align-items-center dropdown-toggle"
+                    id="drop-down-arrow"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    {% if current_user.profile %}
+                    <img
+                      src="{{ current_user.profile.url }}"
+                      class="img-fluid rounded-circle me-3"
+                      alt="user"
+                      style="width: 40px; height: 40px; object-fit: cover"
+                    />
+                    {% else %}
+                    <img
+                      src="{% static 'assets/images/user/1.jpg' %}"
+                      class="img-fluid rounded-circle me-3"
+                      alt="user"
+                    />
+                    {% endif %}
+                    <div class="caption">
+                      <h6 class="mb-0 line-height">
+                        {{ current_user.username|default:"User" }}
+                      </h6>
+                    </div>
+                  </a>
+                  <div
+                    class="sub-drop dropdown-menu dropdown-menu-end caption-menu p-0 border-0 shadow-none bg-transparent"
+                    aria-labelledby="drop-down-arrow"
+                    style="background: transparent !important; box-shadow: none !important; border: none !important;"
+                  >
+                    <div class="card shadow m-0 bg-white" style="min-width: 240px;">
+                      <div class="card-body p-0 bg-white">
+                        <a href="{% url 'my_profile' %}" class="iq-sub-card iq-bg-primary-hover border-bottom">
+                          <div class="d-flex align-items-center">
+                            <div class="bg-transparent me-3">
+                              <i class="ri-user-3-line text-primary" style="font-size: 22px;"></i>
+                            </div>
+                            <div class="ms-1">
+                              <h6 class="mb-0 fw-bold">My Profile</h6>
+                            </div>
+                          </div>
+                        </a>
+                        <a href="{% url 'settings' %}" class="iq-sub-card iq-bg-primary-hover">
+                          <div class="d-flex align-items-center">
+                            <div class="bg-transparent me-3">
+                              <i class="ri-settings-3-line text-primary" style="font-size: 22px;"></i>
+                            </div>
+                            <div class="ms-1">
+                              <h6 class="mb-0 fw-bold">Settings</h6>
+                            </div>
+                          </div>
+                        </a>
+                        <div class="p-3 border-top text-center bg-white">
+                          <a class="btn btn-primary iq-sign-btn w-100 rounded-pill" href="{% url 'logout' %}" role="button">
+                            Sign out <i class="ri-login-box-line ms-2"></i>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                {% else %}
+                <li class="nav-item pe-3 d-flex align-items-center">
+                  <a href="{% url 'signup' %}" class="d-flex align-items-center text-dark text-decoration-none" style="height: 40px; font-weight: 500;">
+                    <i class="ri-login-box-line me-2 fs-5"></i> Login
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </div>
+      <div class="iq-sidebar sidebar-default">
+        <div id="sidebar-scrollbar">
+          <nav class="iq-sidebar-menu">
+            <ul id="iq-sidebar-toggle" class="iq-menu">
+              {% block sidebar %}
+              <!-- 1. Home -->
+              <li class="">
+                <a href="{% url 'home' %}" class="sidebar-link">
+                  <i class="fas fa-home me-2"></i><span>Home</span>
+                </a>
+              </li>
+              <!-- 2. Chats -->
+              <li class="">
+                <a href="{% url 'chats' %}" class="sidebar-link">
+                  <i class="ri-chat-3-line me-2"></i><span>Chats</span>
+                </a>
+              </li>
+              <!-- 3. Community -->
+              <li class="">
+                <a href="{% url 'group' %}" class="sidebar-link">
+                  <i class="fas fa-users me-2"></i><span>Community</span>
+                </a>
+              </li>
+              <!-- 3. Buzz -->
+              <li class="">
+                <a href="{% url 'buzz' %}" class="sidebar-link">
+                  <i class="fas fa-bolt me-2"></i><span>Buzz</span>
+                </a>
+              </li>
+              <!-- 4. Explore -->
+              <li class="">
+                <a href="{% url 'blog_list' %}" class="sidebar-link">
+                  <i class="fas fa-compass me-2"></i><span>Explore</span>
+                </a>
+              </li>
+              <!-- 5. Meetup -->
+              <li class="">
+                <a href="{% url 'meetup_list' %}" class="sidebar-link">
+                  <i class="fas fa-handshake me-2"></i><span>Meetups</span>
+                </a>
+              </li>
+              <!-- 6. Add Post -->
+              <li class="">
+                <a href="{% url 'unified_add_post' %}" class="sidebar-link">
+                  <i class="fas fa-plus-circle me-2"></i><span>Add Post</span>
+                </a>
+              </li>
+              <!-- 7. Find Friends -->
+              <li class="">
+                <a href="{% url 'users_list' %}" class="sidebar-link">
+                  <i class="fas fa-user-friends me-2"></i><span>Find Friends</span>
+                </a>
+              </li>
+              <!-- 8. Calendar -->
+              <li class="">
+                <a href="{% url 'calendar' %}" class="sidebar-link">
+                  <i class="fas fa-calendar-alt me-2"></i><span>Calendar</span>
+                </a>
+              </li>
+              <!-- 9. Contact Us -->
+              <li class="">
+                <a href="{% url 'contact_us' %}" class="sidebar-link">
+                  <i class="fas fa-envelope me-2"></i><span>Contact Us</span>
+                </a>
+              </li>
+              <!-- 11. Profile -->
+              <li class="">
+                <a href="{% url 'my_profile' %}" class="sidebar-link">
+                  <i class="fas fa-user-circle me-2"></i><span>Profile</span>
+                </a>
+              </li>
+              {% endblock sidebar %}
+            </ul>
+          </nav>
+          <div class="p-5"></div>
+        </div>
+      </div>
+
+      {% block right_sidebar %}{% endblock %}
+
+      <div id="content-page" class="content-page {% block content_class %}{% endblock %}">
+        <div class="container-fluid">
+          {% block content %} {% endblock %}
+        </div>
+      </div>
+      <footer class="iq-footer bg-transparent border-top py-0" style="line-height: normal;">
+        <div class="container-fluid">
+          <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+              <ul class="list-inline mb-0">
+                <li class="list-inline-item">
+                  <a href="#" class="text-secondary small text-decoration-none">Privacy Policy</a>
+                </li>
+                <li class="list-inline-item">
+                  <a href="#" class="text-secondary small text-decoration-none">Terms of Use</a>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6 text-center text-md-end text-secondary small">
+              &copy; 2026 <strong>UniVo</strong>. All Rights Reserved.
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <!-- Wrapper End-->
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Vanillajs Datepicker -->
+    <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker.min.js"></script>
+
+    {% block extra_js %}{% endblock %}
+
+    <!-- Share Post Modal -->
+    <div class="modal fade" id="sharePostModal" tabindex="-1" aria-labelledby="sharePostModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 rounded-4 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h6 class="modal-title fw-bold" id="sharePostModalLabel">Share Post</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0">
+            <div class="px-3 pt-3 pb-2">
+                <div class="search-bar-container d-flex align-items-center rounded-pill px-3" style="background-color: #f8f9fa; border: 1px solid #eef0f2; height: 50px; transition: all 0.3s ease;">
+                    <i class="ri-search-line text-muted fs-5 me-2"></i>
+                    <input type="text" id="shareSearch" class="form-control border-0 bg-transparent shadow-none p-0 share-search-input" 
+                           placeholder="Search friends..." onkeyup="filterShareTargets()" 
+                           style="height: 100%; font-size: 0.95rem;">
+                </div>
+            </div>
+            <style>
+                .search-bar-container:focus-within {
+                    background-color: #fff !important;
+                    border-color: var(--bs-primary) !important;
+                    box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.12) !important;
+                    transform: translateY(-1px);
+                }
+                .share-item-wrapper {
+                    transition: all 0.2s ease;
+                    border-radius: 12px;
+                    padding: 8px 12px;
+                }
+                .share-item-wrapper:hover {
+                    background-color: rgba(var(--bs-primary-rgb), 0.04);
+                }
+            </style>
+            <div id="shareTargetsList" style="max-height: 300px; overflow-y: auto;" class="px-3 pb-3">
+              <div class="text-center py-4">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Post Modal -->
+    <div
+      class="modal fade"
+      id="editPostModal"
+      tabindex="-1"
+      aria-labelledby="editPostModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+          <div class="modal-header border-bottom-0 pb-0">
+            <h5 class="modal-title fw-bold" id="editPostModalLabel">
+              Edit Post
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form id="editPostForm" method="POST" action="">
+            {% csrf_token %}
+            <div class="modal-body p-4">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  id="editPostTitle"
+                  class="form-control rounded-3 bg-light border-0"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Description</label>
+                <textarea
+                  name="description"
+                  id="editPostDescription"
+                  class="form-control rounded-3 bg-light border-0"
+                  rows="4"
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <div class="modal-footer border-top-0 pt-0 p-4">
+              <button
+                type="button"
+                class="btn btn-soft-secondary rounded-pill px-4"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary rounded-pill px-4 fw-bold"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function openEditModal(postId, title, description, communityId = null) {
+        if (communityId && communityId !== "None" && communityId !== "") {
+          document.getElementById("editPostForm").action =
+            `/community/${communityId}/post/${postId}/edit/`;
+        } else {
+          document.getElementById("editPostForm").action =
+            `/buzz/post/${postId}/edit/`;
+        }
+        document.getElementById("editPostTitle").value = title;
+        document.getElementById("editPostDescription").value = description;
+        var editModalEl = document.getElementById("editPostModal");
+        var editModal =
+          bootstrap.Modal.getInstance(editModalEl) ||
+          new bootstrap.Modal(editModalEl);
+        editModal.show();
+      }
+
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1),
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+      let currentSharePostId = null;
+      let allShareTargets = [];
+
+      function openShareModal(postId) {
+        currentSharePostId = postId;
+        const modalEl = document.getElementById('sharePostModal');
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+        
+        const list = document.getElementById('shareTargetsList');
+        list.innerHTML = '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary" role="status"></div></div>';
+        
+        fetch('/api/share-targets/')
+          .then(res => res.json())
+          .then(data => {
+            if(data.success) {
+              allShareTargets = data.targets;
+              renderShareTargets(allShareTargets);
+            }
+          });
+      }
+
+      function renderShareTargets(targets) {
+        const list = document.getElementById('shareTargetsList');
+        if(targets.length === 0) {
+            list.innerHTML = '<p class="text-center text-muted py-4">No friends found.</p>';
+            return;
+        }
+        
+        list.innerHTML = targets.map(t => `
+          <div class="d-flex align-items-center justify-content-between mb-2 share-item-wrapper">
+            <div class="d-flex align-items-center">
+              <img src="${t.profile_url}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+              <div>
+                <div class="fw-bold text-dark small" style="line-height: 1.2;">${t.username}</div>
+                <div class="text-muted" style="font-size: 0.75rem;">Friend</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm rounded-pill px-3 py-1 fw-bold fs-7" style="font-size: 0.75rem !important;" onclick="sendPostToUser(this, ${t.id})">Send</button>
+          </div>
+        `).join('');
+      }
+
+      function filterShareTargets() {
+        const q = document.getElementById('shareSearch').value.toLowerCase();
+        const filtered = allShareTargets.filter(t => t.username.toLowerCase().includes(q));
+        renderShareTargets(filtered);
+      }
+
+      function sendPostToUser(btn, receiverId) {
+        if(!currentSharePostId) return;
+        
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ri-check-line"></i> Sent';
+        btn.classList.replace('btn-primary', 'btn-light');
+        
+        fetch(`/post/${currentSharePostId}/share/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: JSON.stringify({ receiverId: receiverId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(!data.success) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                btn.classList.replace('btn-light', 'btn-primary');
+                alert('Error sharing post: ' + data.error);
+            }
+        });
+      }
+
+      function toggleLike(postId, showOverlay = false) {
+        const btn = document.getElementById(`like-btn-${postId}`);
+        const icon = document.getElementById(`like-icon-${postId}`);
+        const countSpan = document.getElementById(`like-count-${postId}`);
+        const heartOverlay = document.getElementById(`heart-overlay-${postId}`);
+
+        fetch(`/post/${postId}/like/`, {
+          method: "POST",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              if (response.status === 403) {
+                window.location.href = '{% url "signin" %}';
+              }
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data.liked) {
+              btn.classList.add("liked");
+              icon.classList.remove("ri-heart-line");
+              icon.classList.add("ri-heart-fill");
+              
+              if(showOverlay && heartOverlay) {
+                heartOverlay.classList.remove('heart-burst');
+                void heartOverlay.offsetWidth; // Trigger reflow
+                heartOverlay.classList.add('heart-burst');
+              }
+            } else {
+              btn.classList.remove("liked");
+              icon.classList.remove("ri-heart-fill");
+              icon.classList.add("ri-heart-line");
+            }
+            countSpan.innerText = data.like_count;
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function toggleDesc(postId) {
+        const shortDesc = document.getElementById(`desc-short-${postId}`);
+        const fullDesc = document.getElementById(`desc-full-${postId}`);
+        const btn = document.getElementById(`desc-toggle-${postId}`);
+
+        if (fullDesc.classList.contains("d-none")) {
+          fullDesc.classList.remove("d-none");
+          fullDesc.classList.add("d-inline");
+          shortDesc.classList.add("d-none");
+          btn.innerText = "View less";
+        } else {
+          fullDesc.classList.add("d-none");
+          fullDesc.classList.remove("d-inline");
+          shortDesc.classList.remove("d-none");
+          btn.innerText = "View more";
+        }
+      }
+    </script>
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 5000;">
+      <div id="liveToast" class="toast align-items-center text-white border-0 rounded-4 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body d-flex align-items-center gap-2">
+            <i id="toastIcon" class="fs-5"></i>
+            <span id="toastMessage"></span>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showToast(message, type = 'success') {
+        const toastEl = document.getElementById('liveToast');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = document.getElementById('toastIcon');
+        
+        // Set message
+        toastMessage.innerText = message;
+        
+        // Set type
+        toastEl.className = `toast align-items-center text-white border-0 rounded-4 shadow-lg bg-${type}`;
+        
+        // Set icon
+        if(type === 'success') toastIcon.className = 'ri-checkbox-circle-fill';
+        else if(type === 'danger') toastIcon.className = 'ri-error-warning-fill';
+        else if(type === 'warning') toastIcon.className = 'ri-alert-fill';
+        else toastIcon.className = 'ri-information-fill';
+        
+        const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+        toast.show();
+      }
+      
+      // Auto-show Django messages as toasts if they exist on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        {% if messages %}
+          {% for message in messages %}
+            let type = 'success';
+            {% if message.tags == 'error' %} type = 'danger';
+            {% elif message.tags == 'warning' %} type = 'warning';
+            {% elif message.tags == 'info' %} type = 'info';
+            {% endif %}
+            showToast("{{ message }}", type);
+          {% endfor %}
+        {% endif %}
+      });
+    </script>
+    
+    <!-- Google Translate Script -->
+    <div id="google_translate_element"></div>
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({pageLanguage: 'en', autoDisplay: false, includedLanguages: 'hi,gu,es,en'}, 'google_translate_element');
+      }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      // Automatically trigger translation based on UserSettings
+      document.addEventListener("DOMContentLoaded", function() {
+          const targetLang = "{{ user_settings.language|default:'English' }}";
+          let langCode = 'en';
+          
+          if (targetLang === 'Hindi') langCode = 'hi';
+          else if (targetLang === 'Gujarati') langCode = 'gu';
+          else if (targetLang === 'Spanish') langCode = 'es';
+          
+          if (langCode !== 'en') {
+              const triggerTranslate = setInterval(function() {
+                  const selectEl = document.querySelector('select.goog-te-combo');
+                  if (selectEl) {
+                      selectEl.value = langCode;
+                      selectEl.dispatchEvent(new Event('change'));
+                      clearInterval(triggerTranslate);
+                  }
+              }, 500);
+              
+              // Fallback clear
+              setTimeout(() => clearInterval(triggerTranslate), 5000);
+          }
+      });
+    </script>
+  </body>
+</html>

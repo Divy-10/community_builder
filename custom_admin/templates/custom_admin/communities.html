@@ -1,0 +1,178 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Manage Communities | Univo Super admin{% endblock %}
+{% block page_title %}Communities Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+    }
+
+    .modern-table th {
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .modern-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        vertical-align: middle;
+    }
+
+    .modern-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .modern-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .comm-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .comm-thumb {
+        width: 64px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+        background: rgba(255,255,255,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .comm-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .comm-title {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 1rem;
+    }
+
+    .comm-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .cat-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--accent-color);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .action-btn {
+        padding: 0.5rem;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        color: var(--text-secondary);
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        background: rgba(255,255,255,0.1);
+        color: var(--text-primary);
+    }
+
+    .action-btn.delete:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; align-items: center;">
+        <h2 style="font-size: 1.25rem; font-weight: 600;">Active Communities</h2>
+        <div style="position: relative;">
+            <i class="fa-solid fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+            <input type="text" id="searchInput" placeholder="Search communities..." style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.5rem 1rem 0.5rem 2.5rem; border-radius: 8px; outline: none; width: 250px;">
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Community</th>
+                    <th>Category</th>
+                    <th>Creator</th>
+                    <th>Created On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comm in communities %}
+                <tr>
+                    <td>
+                        <div class="comm-info">
+                            {% if comm.thumbnail %}
+                            <img src="{{ comm.thumbnail.url }}" alt="{{ comm.communitytitle }}" class="comm-thumb">
+                            {% else %}
+                            <div class="comm-thumb"><i class="fa-solid fa-layer-group"></i></div>
+                            {% endif %}
+                            <div class="comm-details">
+                                <span class="comm-title">{{ comm.communitytitle }}</span>
+                                <span class="comm-desc">{{ comm.discription }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="cat-badge">{{ comm.categoryid.categoryname }}</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-weight: 500;">{{ comm.userid.username }}</span>
+                        </div>
+                    </td>
+                    <td>{{ comm.createddt|date:"M d, Y" }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'admin:user_community_change' comm.communityid %}" class="action-btn" title="View"><i class="fa-solid fa-eye"></i></a>
+                            <a href="{% url 'admin:user_community_delete' comm.communityid %}" class="action-btn delete" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        No communities found in the system.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

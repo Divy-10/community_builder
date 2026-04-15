@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* 1. Make the main section take up the full screen and stay fixed */
+    .sign-in-page {
+        height: 100vh;
+        overflow: hidden;
+        /* Prevents the whole background from scrolling */
+        position: relative;
+    }
+
+    /* 2. Create the "Scroll View" for the form side */
+    .sign-in-from {
+        max-height: 85vh;
+        /* Limits the height so it doesn't go off-screen */
+        overflow-y: auto;
+        /* This creates the scrollbar */
+        overflow-x: hidden;
+        padding-right: 15px;
+        /* Space for the scrollbar */
+        margin-top: 20px;
+    }
+
+    /* 3. Modern Scrollbar Styling (Optional but recommended) */
+    .sign-in-from::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sign-in-from::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .sign-in-from::-webkit-scrollbar-thumb {
+        background: #506fe4;
+        /* Matches primary blue */
+        border-radius: 10px;
+    }
+
+    .sign-in-from::-webkit-scrollbar-thumb:hover {
+        background: #3e5bc4;
+    }
+
+    /* Ensure circles stay in the background */
+    #container-inside {
+        position: absolute;
+        z-index: 0;
+    }
+</style>
+
+<div class="wrapper">
+    <section class="sign-in-page">
+        <div id="container-inside">
+            <div id="circle-small"></div>
+            <div id="circle-medium"></div>
+            <div id="circle-large"></div>
+            <div id="circle-xlarge"></div>
+            <div id="circle-xxlarge"></div>
+        </div>
+        <div class="container p-0">
+            <div class="row no-gutters">
+                <div class="col-md-6 text-center pt-5">
+                    <div class="sign-in-detail text-white">
+                        <a class="sign-in-logo mb-5" href="#"><img src="../assets/images/logo.png" class="img-fluid"
+                                alt="logo"></a>
+                        <div class="sign-slider overflow-hidden">
+                            <ul class="swiper-wrapper list-inline m-0 p-0">
+                                <li class="swiper-slide">
+                                    <img src="../assets/images/logo.png" class="img-fluid mb-4" alt="logo">
+                                    <h4 class="mb-1 text-white">Find new friends</h4>
+                                    <p>It is a long established fact that a reader will be distracted.</p>
+                                </li>
+                                <li class="swiper-slide">
+                                    <img src="../assets/images/logo.png" class="img-fluid mb-4" alt="logo">
+                                    <h4 class="mb-1 text-white">Connect with the world</h4>
+                                    <p>It is a long established fact that a reader will be distracted.</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 bg-white pt-5 pb-lg-0 pb-5" style="z-index: 1;">
+                    <div class="sign-in-from">
+                        <h1 class="mb-0">Sign Up</h1>
+                        <p>Create a new account.</p>
+
+                        <form class="mt-4" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label">Your Full Name</label>
+                                <input type="text" class="form-control mb-0" id="name" placeholder="Your Full Name"
+                                    name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email address</label>
+                                <input type="email" class="form-control mb-0" id="email" placeholder="Enter email"
+                                    name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-control mb-0" id="password" placeholder="Password"
+                                    name="password" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Enter Profile Image</label>
+                                <input type="file" class="form-control mb-0" id="profile" name="fup" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Enter Bio</label>
+                                <input type="text" class="form-control mb-0" id="bio" placeholder="Your Bio" name="bio"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Enter Your Gender</label><br>
+                                <input type="radio" name="gender" value="male" checked> Male
+                                <input type="radio" name="gender" value="female"> Female
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Enter Date of Birth</label>
+                                <input type="date" class="form-control mb-0" id="dob" name="dob" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Select City</label>
+
+
+                                <select name="city" class="form-control">
+                                    {% for c in cities %}
+                                    <option value="{{ c.cityid }}">{{ c.cityname }}</option>
+                                    {% endfor %}
+                                </select>
+
+
+
+
+                            </div>
+
+                            <!-- <div class="form-group">
+                                <label class="form-label">Enter Register Date</label>
+                                <input type="date" class="form-control mb-0" id="register_date" name="register_date"
+                                    required>
+                            </div> -->
+
+                            <div class="d-inline-block w-100">
+                                <div class="form-check d-inline-block mt-2 pt-1">
+                                    <input type="checkbox" class="form-check-input" id="customCheck1">
+                                    <label class="form-check-label" for="customCheck1">I accept <a href="#">Terms and
+                                            Conditions</a></label>
+                                </div>
+                                <input type="submit" class="btn btn-primary float-end" id="sign-up-btn"
+                                    name="sign-up-btn" value="Sign Up">
+                            </div>
+
+                            <div class="sign-info mt-3">
+                                <span class="dark-color d-inline-block line-height-2">Already Have Account? <a
+                                        href="sign-in.html">Log In</a></span>
+                                <ul class="iq-social-media">
+                                    <li><a href="#"><i class="ri-facebook-box-line"></i></a></li>
+                                    <li><a href="#"><i class="ri-twitter-line"></i></a></li>
+                                    <li><a href="#"><i class="ri-instagram-line"></i></a></li>
+                                </ul>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

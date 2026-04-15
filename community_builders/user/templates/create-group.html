@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-inner" id="page_layout">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Create New Group</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>Fill out the form below to start a new community.</p>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label" for="title">Group Title:</label>
+                                <input type="text" class="form-control" id="title" name="title" required placeholder="Enter group title">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="thumbnail">Group Thumbnail:</label>
+                                <input type="file" class="form-control" id="thumbnail" name="thumbnail" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="description">Description:</label>
+                                <textarea class="form-control" id="description" name="description" rows="4" required placeholder="What is this group about?"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="category">Category:</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <option value="" disabled selected>Select a category</option>
+                                    {% for cat in categories %}
+                                    <option value="{{ cat.categoryid }}">{{ cat.categoryname }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3">Create Group</button>
+                            <a href="{% url 'group' %}" class="btn bg-danger-subtle mt-3 text-danger">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

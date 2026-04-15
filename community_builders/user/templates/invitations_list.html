@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Invitations{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <div class="header-title">
+                    <h4 class="card-title">Pending Community Invitations</h4>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for inv in invites %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1"><strong>{{ inv.sender_name }}</strong> invited you to join <strong>{{ inv.communityid.communitytitle }}</strong></h6>
+                            <small class="text-muted">{{ inv.createddt|timesince }} ago</small>
+                        </div>
+                        <div>
+                            <a href="{% url 'respond_invite' inv.inviteid 'accept' %}" class="btn btn-primary btn-sm me-2">Accept</a>
+                            <a href="{% url 'respond_invite' inv.inviteid 'decline' %}" class="btn btn-outline-danger btn-sm">Decline</a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center">
+                        <p class="mb-0">You have no pending invitations.</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

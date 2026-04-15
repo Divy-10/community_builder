@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ user_profile.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <div class="header-title">
+                    <h4 class="card-title">User Profile</h4>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        {% if user_profile.profile %}
+                        <img src="{{ user_profile.profile.url }}" alt="profile-img" class="rounded-circle img-fluid mb-3 shadow" style="width: 250px; height: 250px; object-fit: cover; border: 5px solid #fff;">
+                        {% else %}
+                        <img src="{% static 'assets/images/user/1.jpg' %}" alt="profile-img" class="rounded-circle img-fluid mb-3 shadow" style="width: 250px; height: 250px; object-fit: cover; border: 5px solid #fff;">
+                        {% endif %}
+                        <h2 class="mt-2 font-weight-bold">{{ user_profile.username }}</h2>
+                        
+                        <!-- Follow/Unfollow Button -->
+                        {% if is_own_profile %}
+                            <div class="d-flex justify-content-center gap-2 mt-3">
+                                <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary px-4 rounded-pill">Edit Profile</a>
+                                <form action="{% url 'delete_profile' %}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete your profile? This action cannot be undone.');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger px-4 rounded-pill">Delete Profile</button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <form action="{% url 'toggle_follow' user_profile.userid %}" method="POST" class="d-inline mt-3">
+                                {% csrf_token %}
+                                {% if is_following %}
+                                    <button type="submit" class="btn btn-secondary px-4 rounded-pill">Unfollow</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-primary px-4 rounded-pill">Follow</button>
+                                {% endif %}
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8 mt-4 mt-md-0">
+                        <ul class="nav nav-pills mb-4 nav-fill custom-nav-pills" id="profile-pills-tab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active rounded-pill fw-bold" id="pills-posts-tab" data-bs-toggle="pill" data-bs-target="#pills-posts" type="button" role="tab" aria-controls="pills-posts" aria-selected="true"><i class="ri-article-line me-2"></i>Posts</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link rounded-pill fw-bold" id="pills-communities-tab" data-bs-toggle="pill" data-bs-target="#pills-communities" type="button" role="tab" aria-controls="pills-communities" aria-selected="false"><i class="ri-group-line me-2"></i>Communities</button>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content" id="profile-pills-tabContent">
+                            <!-- Posts Tab -->
+                            <div class="tab-pane fade show active" id="pills-posts" role="tabpanel" aria-labelledby="pills-posts-tab">
+                                {% for p in user_posts %}
+                                <div class="card mb-4 shadow-sm border">
+                                    <div class="card-header d-flex align-items-center bg-transparent border-bottom-0 pb-0 pt-3">
+                                        {% if user_profile.profile %}
+                                        <img src="{{ user_profile.profile.url }}" class="rounded-circle me-2" alt="user" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                        <img src="{% static 'assets/images/user/1.jpg' %}" class="rounded-circle me-2" alt="user" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="mb-0">{{ user_profile.username }}</h6>
+                                            <small class="text-muted">{{ p.createddt|timesince }} ago</small>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ p.posttitle }}</h5>
+                                        <p class="card-text">{{ p.description }}</p>
+                                    </div>
+                                    {% if p.thumbnail %}
+                                    <img src="{{ p.thumbnail.url }}" class="card-img-bottom img-fluid rounded-bottom" alt="post image" style="max-height: 400px; object-fit: cover;">
+                                    {% endif %}
+                                    <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between text-muted pt-0 pb-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span><i class="ri-heart-line me-1"></i> {{ p.like_set.count }} Likes</span>
+                                            <span><i class="ri-chat-3-line me-1"></i> {{ p.comment_set.count }} Comments</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="text-center py-5 bg-light rounded border">
+                                    <i class="ri-article-line fs-1 text-muted mb-3 d-block"></i>
+                                    <h5 class="text-muted">No posts yet</h5>
+                                    <p class="text-muted small">When {{ user_profile.username }} shares posts, they'll appear here.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Communities Tab -->
+                            <div class="tab-pane fade" id="pills-communities" role="tabpanel" aria-labelledby="pills-communities-tab">
+                                <div class="row">
+                                    {% for c in user_communities %}
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100 shadow-sm border text-center">
+                                            <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+                                                {% if c.thumbnail %}
+                                                <img src="{{ c.thumbnail.url }}" alt="community-img" class="rounded-circle mb-3 border" style="width: 80px; height: 80px; object-fit: cover;">
+                                                {% else %}
+                                                <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; font-size: 32px;">
+                                                    {{ c.communitytitle|make_list|first|upper }}
+                                                </div>
+                                                {% endif %}
+                                                <h5 class="card-title mb-1">{{ c.communitytitle }}</h5>
+                                                <span class="badge bg-secondary mb-3">{{ c.categoryid.categoryname }}</span>
+                                                <p class="text-muted small mb-0">{{ c.communitymember_set.count }} Members</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="col-12 text-center py-5 bg-light rounded border">
+                                        <i class="ri-group-line fs-1 text-muted mb-3 d-block"></i>
+                                        <h5 class="text-muted">No communities yet</h5>
+                                        <p class="text-muted small">{{ user_profile.username }} hasn't joined any communities.</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
