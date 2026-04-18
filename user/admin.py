@@ -89,3 +89,10 @@ class MeetupAdmin(admin.ModelAdmin):
     list_display = ('meetupid', 'title', 'meetup_type', 'communityid', 'meeting_date', 'created_by', 'createddt')
     search_fields = ('title', 'description')
     list_filter = ('meetup_type', 'communityid')
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'subject', 'is_read', 'created_at')
+    list_editable = ('is_read',)
+    list_filter = ('is_read', 'created_at')
+    search_fields = ('name', 'email', 'subject', 'message')
+    readonly_fields = ('created_at',)

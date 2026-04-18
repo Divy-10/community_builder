@@ -1597,6 +1597,8 @@ def reject_post_permission(request, community_id, member_id):
 def add_comment(request, post_id):
     userid = request.session.get('userid')
     if not userid:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Not logged in'}, status=403)
         return redirect('signin')
         
     if request.method == 'POST':
@@ -1610,10 +1612,84 @@ def add_comment(request, post_id):
             userid=u
         )
         c.save()
+        
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'comment': c.comment,
+                'comment_id': c.commentid,
+                'username': u.username,
+                'user_id': u.userid,
+                'profile_url': u.profile.url if u.profile else '/static/assets/images/user/1.jpg',
+                'created_at': 'Just now'
+            })
+            
         referer = request.META.get('HTTP_REFERER', 'home')
         return redirect(f"{referer}#post-{post_id}")
         
     return redirect('group')
+
+def delete_comment(request, comment_id):
+    userid = request.session.get('userid')
+    if not userid:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Not logged in'}, status=403)
+        return redirect('signin')
+    
+    c = get_object_or_404(comment, pk=comment_id)
+    p = c.postid
+    can_delete = False
+    uid = int(userid)
+    
+    if uid == c.userid.userid:
+        can_delete = True
+    elif uid == p.userid.userid:
+        can_delete = True
+    elif p.communityid:
+        is_admin = communitymember.objects.filter(communityid=p.communityid, userid_id=uid, role='admin').exists()
+        if is_admin:
+            can_delete = True
+            
+    if can_delete:
+        c.delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        messages.success(request, "Comment deleted.")
+    else:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+        messages.error(request, "You don't have permission to delete this comment.")
+        
+    referer = request.META.get('HTTP_REFERER', 'home')
+    return redirect(referer)
+
+def edit_comment(request, comment_id):
+    userid = request.session.get('userid')
+    if not userid:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Not logged in'}, status=403)
+        return redirect('signin')
+    
+    c = get_object_or_404(comment, pk=comment_id)
+    if int(userid) != c.userid.userid:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+        messages.error(request, "You can only edit your own comments.")
+        return redirect('home')
+        
+    if request.method == 'POST':
+        new_text = request.POST.get('comment')
+        if new_text:
+            c.comment = new_text
+            c.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'new_text': new_text})
+            messages.success(request, "Comment updated.")
+        
+    referer = request.META.get('HTTP_REFERER', 'home')
+    return redirect(referer)
+
+
 
 def toggle_like(request, post_id):
     userid = request.session.get('userid')
@@ -2130,6 +2206,24 @@ def contact_us(request):
     if userid:
         u = user.objects.get(pk=userid)
     
+    if request.method == "POST":
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        
+        if name and email and message:
+            ContactMessage.objects.create(
+                name=name,
+                email=email,
+                subject=subject,
+                message=message
+            )
+            messages.success(request, "Your message has been sent successfully!")
+            return redirect('contact_us')
+        else:
+            messages.error(request, "Please fill in all required fields.")
+
     return render(request, 'contact_us.html', {'current_user': u})
 
 def settings_view(request):
@@ -2168,14 +2262,10 @@ def settings_view(request):
                 elif action == 'update_privacy':
                     settings.profile_visibility = data.get('profile_visibility', settings.profile_visibility)
                     settings.data_usage_consent = data.get('data_usage_consent', settings.data_usage_consent)
-                    settings.ai_recommendations = data.get('ai_recommendations', settings.ai_recommendations)
+
                     settings.save()
                     return JsonResponse({'success': True, 'msg': 'Privacy settings updated.'})
                 
-                elif action == 'update_security_settings':
-                    settings.two_factor_auth = data.get('two_factor_auth', settings.two_factor_auth)
-                    settings.save()
-                    return JsonResponse({'success': True, 'msg': 'Security settings updated.'})
                     
                 elif action == 'update_regional':
                     settings.language = data.get('language', settings.language)

@@ -431,6 +431,9 @@ body.change-list div.actions span.action-counter {
 #nav-sidebar .module tr.model-storyseen th a::before { content: "\f06e"; } /* eye (Story Seen) */
 #nav-sidebar .module tr.model-blog th a::before { content: "\f1ea"; } /* newspaper (Blogs) */
 #nav-sidebar .module tr.model-usersettings th a::before { content: "\f085"; } /* cogs (User Settings) */
+#nav-sidebar .module tr.model-contactmessage th a::before,
+#nav-sidebar .module tr.model-contact_message th a::before { content: "\f0e0"; } /* envelope (Contact Messages) */
+
 
 /* Styling for the 'Add' and 'Change' links (Side actions) */
 #nav-sidebar .module a.addlink, 

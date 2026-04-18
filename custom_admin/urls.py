@@ -9,4 +9,6 @@ urlpatterns = [
     path('communities/', views.communities_manage, name='communities'),
     path('posts/', views.posts_manage, name='posts'),
     path('meetups/', views.meetups_manage, name='meetups'),
+    path('contact-messages/', views.contact_messages_manage, name='contact_messages'),
+
 ]

@@ -51,7 +51,10 @@ urlpatterns = [
     path('community/<int:community_id>/members/<int:member_id>/approve-post-permission/', views.approve_post_permission, name='approve_post_permission'),
     path('community/<int:community_id>/members/<int:member_id>/reject-post-permission/', views.reject_post_permission, name='reject_post_permission'),
     path('post/<int:post_id>/comment/', views.add_comment, name='add_comment'),
+    path('comment/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
+    path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
     path('post/<int:post_id>/like/', views.toggle_like, name='toggle_like'),
+
     path('post/<int:post_id>/share/', views.share_post_to_user, name='share_post'),
     path('api/share-targets/', views.get_share_targets, name='get_share_targets'),
     path('api/cities/<int:state_id>/', views.get_cities_by_state, name='get_cities_by_state'),

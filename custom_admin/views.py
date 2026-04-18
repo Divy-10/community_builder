@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
-from user.models import user, community, post, communitymember, like, comment, follow, meetup
+from user.models import user, community, post, communitymember, like, comment, follow, meetup, ContactMessage
 
 @staff_member_required
 def dashboard(request):
@@ -54,3 +54,11 @@ def meetups_manage(request):
         'meetups': meetups
     }
     return render(request, 'custom_admin/meetups.html', context)
+
+@staff_member_required
+def contact_messages_manage(request):
+    messages = ContactMessage.objects.all().order_by('-created_at')
+    context = {
+        'messages': messages
+    }
+    return render(request, 'custom_admin/contact_messages.html', context)

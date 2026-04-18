@@ -15,8 +15,8 @@
                 <div class="row">
                     {% for u in users %}
                     <div class="col-md-6 col-lg-6 mb-3">
-                        <div class="card shadow-none border">
-                            <div class="card-body text-center">
+                        <div class="card shadow-none border h-100 transition hover-shadow">
+                            <div class="card-body text-center d-flex flex-column p-4">
                                 <a href="{% url 'user_profile' u.userid %}">
                                     {% if u.profile %}
                                     <img src="{{ u.profile.url }}" alt="profile-img" class="rounded-circle img-fluid avatar-100 mb-3" style="width: 100px; height: 100px; object-fit: cover;">
@@ -27,11 +27,19 @@
                                 <a href="{% url 'user_profile' u.userid %}" class="text-dark fade-in text-decoration-none">
                                     <h5 class="fw-bold">{{ u.username }}</h5>
                                 </a>
-                                {% if u.bio %}
-                                    <p class="text-muted small mb-3 px-2">{{ u.bio|truncatechars:90 }}</p>
-                                {% else %}
-                                    <p class="text-muted small mb-3 px-2 fst-italic">No bio available</p>
-                                {% endif %}
+                                <div class="bio-section mb-4" style="min-height: 50px;">
+                                    {% if u.bio %}
+                                        <p class="text-muted small mb-0 px-2 line-clamp-2">
+                                            {{ u.bio|truncatechars:100 }}
+                                            {% if u.bio|length > 100 %}
+                                                <a href="javascript:void(0)" class="text-primary fw-bold text-decoration-none ms-1" 
+                                                   onclick="showBioModal('{{ u.username|escapejs }}', '{{ u.bio|escapejs }}')">Read more</a>
+                                            {% endif %}
+                                        </p>
+                                    {% else %}
+                                        <p class="text-muted small mb-0 px-2 fst-italic">No bio available</p>
+                                    {% endif %}
+                                </div>
                                 
                                 <div class="d-flex justify-content-center gap-2 mt-auto">
                                     {% if u.userid in following_ids %}
@@ -131,6 +139,24 @@
                 </div>
             </div>
         </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bio Detail Modal -->
+<div class="modal fade" id="bioModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-primary text-white border-0 py-3 px-4">
+                <h5 class="modal-title fw-bold" id="bioModalUserName">User Bio</h5>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p id="bioModalContent" class="text-muted mb-0" style="line-height: 1.6;"></p>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -235,6 +261,12 @@ function submitInvite(event, targetId) {
                 });
             })
             .catch(err => console.error('Error fetching cities:', err));
+    }
+
+    function showBioModal(username, bio) {
+        document.getElementById('bioModalUserName').innerText = username + "'s Bio";
+        document.getElementById('bioModalContent').innerText = bio;
+        new bootstrap.Modal(document.getElementById('bioModal')).show();
     }
 </script>
 {% endblock %}
@@ -453,5 +485,22 @@ function submitInvite(event, targetId) {
     }
 
     .fs-7 { font-size: 0.75rem; }
+    
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .hover-shadow:hover {
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+        transform: translateY(-5px);
+    }
+
+    .transition {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 </style>
 {% endblock %}

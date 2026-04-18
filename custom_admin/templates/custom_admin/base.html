@@ -278,6 +278,11 @@
                 <i class="fa-solid fa-calendar-days"></i>
                 Meetups
             </a>
+            <a href="{% url 'custom_admin:contact_messages' %}" class="nav-item {% if request.resolver_match.url_name == 'contact_messages' %}active{% endif %}">
+                <i class="fa-solid fa-envelope-open-text"></i>
+                Contact Messages
+            </a>
+
             
             <a href="/admin/" class="nav-item" style="color: #f59e0b;">
                 <i class="fa-solid fa-sliders"></i>
