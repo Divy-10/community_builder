@@ -2576,10 +2576,6 @@ def delete_expired_meetups():
 
 def calendar_view(request):
     """View to display the calendar with all meetups."""
-    userid = request.session.get('userid')
-    if not userid:
-        return redirect('signin')
-    
     delete_expired_meetups()
 
     # Show only upcoming meetups on the calendar as requested

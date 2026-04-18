@@ -10,6 +10,7 @@ def user_context(request):
     """
     context = {
         'current_user': None,
+        'user_settings': None,
         'joined_community_chats': [],
         'unread_chat_count': 0,
         'activity_count': 0,
