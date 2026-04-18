@@ -19,7 +19,22 @@
         <div class="row mb-4 mt-4 px-4">
             {% for c in communities %}
             <div class="col-lg-6 col-md-6 mb-4">
-                <div class="card group-box h-100 mb-0">
+                <div class="card group-box h-100 mb-0 position-relative">
+                    {% if request.session.userid == c.userid.userid or c.communityid in admin_ids %}
+                    <div class="dropdown position-absolute" style="top: 10px; right: 10px; z-index: 10;">
+                        <button class="btn btn-light btn-sm rounded-circle shadow-sm border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px);">
+                            <i class="ri-more-2-fill text-dark"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 text-danger py-2" href="javascript:void(0);" onclick="confirmDelete('{{ c.communityid }}', '{{ c.communitytitle|escapejs }}')">
+                                    <i class="ri-delete-bin-line"></i>
+                                    <span>Delete Community</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
                     <div class="top-bg-image">
                         {% if c.background_image %}
                         <img src="{{ c.background_image.url }}" class="img-fluid w-100" alt="group-bg" loading="lazy"
@@ -337,4 +352,14 @@
 
     .fs-7 { font-size: 0.75rem; }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function confirmDelete(communityId, communityTitle) {
+        if (confirm(`Are you sure you want to delete the community "${communityTitle}"? This action cannot be undone.`)) {
+            window.location.href = `/community/${communityId}/delete/`;
+        }
+    }
+</script>
 {% endblock %}

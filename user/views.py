@@ -803,12 +803,12 @@ def verify_payment(request, community_id):
 def create_group(request):
     allowed_categories = ['Event', 'Music', 'Programming', 'Sports', 'Gaming', 'Technology', 'Art', 'Education']
     
-    # Let's ensure these categories exist, and only pass them to the template
+    # Let's ensure these basic categories exist
     for cat_name in allowed_categories:
         category.objects.get_or_create(categoryname=cat_name)
         
     data = {
-        "categories": category.objects.filter(categoryname__in=allowed_categories),
+        "categories": category.objects.all().order_by('categoryname'),
     }
     if request.method == "POST":
         title = request.POST.get('title')
@@ -877,7 +877,7 @@ def edit_community(request, community_id):
     allowed_categories = ['Event', 'Music', 'Programming', 'Sports', 'Gaming', 'Technology', 'Art', 'Education']
     data = {
         "community": c,
-        "categories": category.objects.filter(categoryname__in=allowed_categories),
+        "categories": category.objects.all().order_by('categoryname'),
     }
 
     if request.method == "POST":
@@ -902,6 +902,24 @@ def edit_community(request, community_id):
         return redirect('group_members', community_id=community_id)
         
     return render(request, 'edit-group.html', data)
+
+def delete_community(request, community_id):
+    userid = request.session.get('userid')
+    if not userid:
+        return redirect('signin')
+
+    c = get_object_or_404(community, pk=community_id)
+
+    # Only allow creator or community admins to delete
+    is_admin = _is_community_admin(userid, c)
+    if is_admin or c.userid.userid == int(userid):
+        title = c.communitytitle
+        c.delete()
+        messages.success(request, f"Community '{title}' has been deleted successfully.")
+    else:
+        messages.error(request, "You do not have permission to delete this community.")
+
+    return redirect('group')
 
 
 def users_list(request):

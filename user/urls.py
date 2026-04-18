@@ -32,6 +32,7 @@ urlpatterns = [
     path('chats/edit/<int:chat_id>/', views.edit_chat, name='edit_chat'),
     # Group Member Management
     path('community/<int:community_id>/edit/', views.edit_community, name='edit_community'),
+    path('community/<int:community_id>/delete/', views.delete_community, name='delete_community'),
     path('community/<int:community_id>/members/', views.group_members, name='group_members'),
     path('community/<int:community_id>/members/add/', views.add_member, name='add_member'),
     path('community/<int:community_id>/members/<int:member_id>/promote/', views.promote_member, name='promote_member'),
