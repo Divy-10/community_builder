@@ -80,7 +80,7 @@
                             <!-- Price Input -->
                             <div class="form-group mb-4" id="price_group" style="{% if not community.is_paid %}display: none;{% endif %} transition: all 0.3s ease;">
                                 <label class="form-label fw-bold" for="price">Community Price (₹):</label>
-                                <input type="number" class="form-control rounded-3 bg-light border-light shadow-sm" id="price" name="price" min="1" placeholder="Enter amount" value="{{ community.price }}">
+                                <input type="number" class="form-control rounded-3 bg-light border-light shadow-sm" id="price" name="price" min="1" placeholder="Enter amount" value="{% if community.price > 0 %}{{ community.price }}{% endif %}" {% if not community.is_paid %}disabled{% endif %}>
                             </div>
                             
                             <script>
@@ -90,9 +90,11 @@
                                     if (this.checked) {
                                         priceGroup.style.display = 'block';
                                         priceInput.required = true;
+                                        priceInput.disabled = false;
                                     } else {
                                         priceGroup.style.display = 'none';
                                         priceInput.required = false;
+                                        priceInput.disabled = true;
                                     }
                                 });
                             </script>

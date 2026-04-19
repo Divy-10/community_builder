@@ -898,6 +898,12 @@ def edit_community(request, community_id):
         if cat_id:
             c.categoryid = category.objects.get(pk=cat_id)
             
+        is_paid = request.POST.get('is_paid') == 'on'
+        price = request.POST.get('price')
+        
+        c.is_paid = is_paid
+        c.price = price if (is_paid and price) else 0
+            
         c.save()
         return redirect('group_members', community_id=community_id)
         
@@ -2596,8 +2602,8 @@ def calendar_view(request):
     """View to display the calendar with all meetups."""
     delete_expired_meetups()
 
-    # Show only upcoming meetups on the calendar as requested
-    meetups = meetup.objects.filter(meeting_date__gte=timezone.now())
+    # Show active and future meetups on the calendar (garbage collected automatically)
+    meetups = meetup.objects.all()
     events = []
     
     for m in meetups:
@@ -2606,6 +2612,7 @@ def calendar_view(request):
             'start': m.meeting_date.isoformat(),
             'end': m.meeting_end_date.isoformat() if m.meeting_end_date else None,
             'allDay': False,
+            'className': f'event-{m.meetup_type}',
             'extendedProps': {
                 'meetupid': m.meetupid,
                 'meetup_type': m.meetup_type,

@@ -95,7 +95,7 @@
 
                     <!-- Footer: Community info + CTA -->
                     <div class="card-footer bg-soft-primary border-0 p-3" style="background: rgba(0, 85, 255, 0.03);">
-                        <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                             <div class="d-flex align-items-center gap-2">
                                 {% if m.communityid.thumbnail %}
                                 <img src="{{ m.communityid.thumbnail.url }}" class="rounded-circle border border-2 border-white" 
@@ -110,17 +110,17 @@
                                     <p class="text-muted mb-0" style="font-size: 10px;">{{ m.communityid.communitymember_set.count }} members</p>
                                 </div>
                             </div>
-                            <div class="d-flex gap-2 align-items-center">
+                            <div class="d-flex gap-2 align-items-center ms-auto">
                                 {% if m.meetup_type == 'internal' %}
-                                <a href="{% url 'join_meeting' m.meetupid %}" class="btn btn-primary rounded-pill px-2 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center" style="font-size: 0.8rem; white-space: nowrap; min-width: 85px;">
+                                <a href="{% url 'join_meeting' m.meetupid %}" class="btn btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm d-flex align-items-center justify-content-center" style="font-size: 0.8rem; white-space: nowrap;">
                                     Join Room
                                 </a>
                                 {% elif m.meeting_link %}
-                                <a href="{{ m.meeting_link }}" target="_blank" class="btn btn-info text-white rounded-pill px-2 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center" style="font-size: 0.8rem; white-space: nowrap; min-width: 70px;">
+                                <a href="{{ m.meeting_link }}" target="_blank" class="btn btn-info text-white rounded-pill px-3 py-1 fw-bold shadow-sm d-flex align-items-center justify-content-center" style="font-size: 0.8rem; white-space: nowrap;">
                                     Join
                                 </a>
                                 {% endif %}
-                                <a href="{% url 'meetup_detail' m.meetupid %}" class="btn btn-outline-primary rounded-pill px-2 py-2 fw-bold d-flex align-items-center justify-content-center" style="font-size: 0.8rem; white-space: nowrap; min-width: 75px;">
+                                <a href="{% url 'meetup_detail' m.meetupid %}" class="btn btn-outline-primary rounded-pill px-3 py-1 fw-bold d-flex align-items-center justify-content-center" style="font-size: 0.8rem; white-space: nowrap;">
                                     Details
                                 </a>
                             </div>
