@@ -1,4 +1,4 @@
-﻿from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count
@@ -420,13 +420,20 @@ def create_group(request):
         u = user.objects.get(pk=userid)
         cat = category.objects.get(pk=cat_id)
 
+        is_paid = request.POST.get('is_paid') == 'on'
+        price = request.POST.get('price')
+        if not is_paid or not price:
+            price = 0
+
         c = community.objects.create(
             communitytitle=title, 
             discription=desc, 
             thumbnail=thumb, 
             background_image=bg_image,
             categoryid=cat, 
-            userid=u
+            userid=u,
+            is_paid=is_paid,
+            price=price
         )
         c.save()
 
@@ -484,6 +491,12 @@ def edit_community(request, community_id):
         if cat_id:
             c.categoryid = category.objects.get(pk=cat_id)
             
+        is_paid = request.POST.get('is_paid') == 'on'
+        price = request.POST.get('price')
+        
+        c.is_paid = is_paid
+        c.price = price if (is_paid and price) else 0
+
         c.save()
         return redirect('group_members', community_id=community_id)
         

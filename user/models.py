@@ -105,7 +105,7 @@ class community(models.Model):
     categoryid=models.ForeignKey(category,on_delete=models.CASCADE)
     userid=models.ForeignKey(user,on_delete=models.CASCADE)
     is_paid=models.BooleanField(default=False)
-    price=models.IntegerField(default=0)
+    price=models.IntegerField(default=0, blank=True)
     
     def __str__(self):
         return "%d-%s"%(self.communityid,self.communitytitle)

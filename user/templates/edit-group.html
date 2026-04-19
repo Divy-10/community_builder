@@ -67,6 +67,35 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Paid Community Toggle -->
+                            <div class="form-group mb-4 mt-4 border-top pt-4">
+                                <div class="form-check form-switch d-flex align-items-center">
+                                    <input class="form-check-input mt-0 me-2" type="checkbox" id="is_paid" name="is_paid" style="width: 40px; height: 20px; cursor: pointer;" {% if community.is_paid %}checked{% endif %}>
+                                    <label class="form-check-label fw-bold mb-0 text-dark" for="is_paid" style="cursor: pointer;">Paid Community</label>
+                                </div>
+                                <small class="text-muted d-block mt-1 ms-5">Require a payment to join this community.</small>
+                            </div>
+
+                            <!-- Price Input -->
+                            <div class="form-group mb-4" id="price_group" style="{% if not community.is_paid %}display: none;{% endif %} transition: all 0.3s ease;">
+                                <label class="form-label fw-bold" for="price">Community Price (₹):</label>
+                                <input type="number" class="form-control rounded-3 bg-light border-light shadow-sm" id="price" name="price" min="1" placeholder="Enter amount" value="{{ community.price }}">
+                            </div>
+                            
+                            <script>
+                                document.getElementById('is_paid').addEventListener('change', function() {
+                                    var priceGroup = document.getElementById('price_group');
+                                    var priceInput = document.getElementById('price');
+                                    if (this.checked) {
+                                        priceGroup.style.display = 'block';
+                                        priceInput.required = true;
+                                    } else {
+                                        priceGroup.style.display = 'none';
+                                        priceInput.required = false;
+                                    }
+                                });
+                            </script>
                             
                             <div class="d-flex gap-2 pt-3 border-top mt-4">
                                 <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Save Changes</button>

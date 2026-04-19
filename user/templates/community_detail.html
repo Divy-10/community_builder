@@ -274,7 +274,8 @@
                         <h4 class="fw-bold mb-2" style="overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">{{ post.posttitle }}</h4>
                         
                         {% if post.thumbnail %}
-                        <div class="post-img mb-4 rounded-3 overflow-hidden shadow-sm border bg-light">
+                        <div class="post-img-wrapper mb-4 rounded-3 overflow-hidden shadow-sm border bg-light" ondblclick="toggleLike({{ post.postid }}, true)">
+                            <i class="ri-heart-fill heart-overlay" id="heart-overlay-{{ post.postid }}"></i>
                             {% if post.is_video %}
                             <video src="{{ post.thumbnail.url }}" class="img-fluid w-100" controls style="max-height: 600px; object-fit: contain;"></video>
                             {% else %}
@@ -288,18 +289,23 @@
                             <div class="d-flex align-items-center gap-3">
                                 <!-- Like Button -->
                                 <button type="button" id="like-btn-{{ post.postid }}"
-                                    onclick="toggleLike({{ post.postid }})"
-                                    class="btn {% if post.postid in user_likes %}btn-primary-subtle text-primary{% else %}btn-light text-muted{% endif %} rounded-pill px-3 py-1 d-flex align-items-center gap-2 fw-semibold border-0 transition hover-shadow"
+                                    onclick="toggleLike({{ post.postid }}, true)"
+                                    class="btn-interaction {% if post.postid in user_likes %}liked{% endif %}"
                                     style="font-size: 0.95rem;">
                                     <i id="like-icon-{{ post.postid }}"
-                                        class="{% if post.postid in user_likes %}las la-thumbs-up{% else %}lar la-thumbs-up{% endif %} fs-4 m-0"></i>
-                                    <span id="like-count-{{ post.postid }}">{{ post.like_set.count }} Likes</span>
+                                        class="{% if post.postid in user_likes %}ri-heart-fill{% else %}ri-heart-line{% endif %} m-0"></i>
+                                    <span id="like-count-{{ post.postid }}">{{ post.like_set.count }}</span>
                                 </button>
 
                                 <!-- Comment Count -->
-                                <button class="btn btn-light text-muted rounded-pill px-3 py-1 d-flex align-items-center gap-2 fw-semibold border-0 transition hover-shadow hover-primary" type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.postid }}" aria-expanded="{% if post.comment_set.count > 0 %}true{% else %}false{% endif %}" aria-controls="comments-{{ post.postid }}" style="font-size: 0.95rem;">
-                                    <i class="lar la-comment fs-4 m-0"></i>
-                                    <span>{{ post.comment_set.count }} Comments</span>
+                                <button class="btn-interaction" type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.postid }}" aria-expanded="{% if post.comment_set.count > 0 %}true{% else %}false{% endif %}" aria-controls="comments-{{ post.postid }}" style="font-size: 0.95rem;">
+                                    <i class="ri-chat-3-line m-0"></i>
+                                    <span>{{ post.comment_set.count }}</span>
+                                </button>
+
+                                <!-- Share Button -->
+                                <button type="button" class="btn-interaction" onclick="openShareModal({{ post.postid }})" style="font-size: 0.95rem;">
+                                    <i class="ri-send-plane-2-line m-0"></i>
                                 </button>
                             </div>
                         </div>

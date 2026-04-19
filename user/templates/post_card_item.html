@@ -1,6 +1,7 @@
 <div class="card shadow-sm border-0 rounded-4 h-100">
     {% if p.thumbnail %}
-    <div class="position-relative overflow-hidden rounded-top-4">
+    <div class="position-relative overflow-hidden rounded-top-4 post-img-wrapper" ondblclick="toggleLike({{ p.postid }}, true)">
+        <i class="ri-heart-fill heart-overlay" id="heart-overlay-{{ p.postid }}"></i>
         {% if p.is_video %}
         <video src="{{ p.thumbnail.url }}" class="card-img-top post-img-standard bg-light" controls style="width: 100%; height: 280px !important; object-fit: cover !important; transition: transform 0.5s ease;"></video>
         {% else %}
@@ -45,31 +46,32 @@
             </span>
         </div>
 
-        <!-- Interactions (Like, Comment) -->
+        <!-- Interactions (Like, Comment, Share) -->
         <div class="d-flex align-items-center justify-content-between border-top py-3 mt-auto">
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2">
                 <!-- Like Button -->
-                <div class="d-flex align-items-center gap-1" id="like-container-{{ p.postid }}">
-                    <button type="button" id="like-btn-{{ p.postid }}"
-                        onclick="toggleLike({{ p.postid }})"
-                        class="btn-interaction-circular {% if p.postid in user_likes %}liked{% endif %}"
-                        title="Like">
-                        <i id="like-icon-{{ p.postid }}"
-                            class="{% if p.postid in user_likes %}ri-heart-fill{% else %}ri-heart-line{% endif %} fs-4"></i>
-                    </button>
-                    <span id="like-count-{{ p.postid }}" class="fw-bold small text-muted">{{ p.like_set.count }}</span>
-                </div>
+                <button type="button" id="like-btn-{{ p.postid }}"
+                    onclick="toggleLike({{ p.postid }}, true)"
+                    class="btn-interaction {% if p.postid in user_likes %}liked{% endif %}"
+                    style="font-size: 0.9rem; padding: 6px 10px !important;">
+                    <i id="like-icon-{{ p.postid }}"
+                        class="{% if p.postid in user_likes %}ri-heart-fill{% else %}ri-heart-line{% endif %} m-0" style="font-size: 1.2rem !important;"></i>
+                    <span id="like-count-{{ p.postid }}" class="small">{{ p.like_set.count }}</span>
+                </button>
 
                 <!-- Comment Count -->
-                <div class="d-flex align-items-center gap-1">
-                    <button
-                        class="btn-interaction-circular"
-                        type="button" onclick="window.location.href='{% if p.communityid %}{% url 'community_detail' p.communityid.communityid %}{% else %}{% url 'buzz' %}{% endif %}#post-{{ p.postid }}'"
-                        title="Comment">
-                        <i class="ri-chat-3-line fs-4"></i>
-                    </button>
-                    <span class="fw-bold small text-muted">{{ p.comment_set.count }}</span>
-                </div>
+                <button class="btn-interaction" type="button" 
+                    onclick="window.location.href='{% if p.communityid %}{% url 'community_detail' p.communityid.communityid %}{% else %}{% url 'buzz' %}{% endif %}#post-{{ p.postid }}'"
+                    style="font-size: 0.9rem; padding: 6px 10px !important;">
+                    <i class="ri-chat-3-line m-0" style="font-size: 1.2rem !important;"></i>
+                    <span class="small">{{ p.comment_set.count }}</span>
+                </button>
+
+                <!-- Share Button -->
+                <button type="button" class="btn-interaction" onclick="openShareModal({{ p.postid }})" style="font-size: 0.9rem; padding: 6px 10px !important;">
+                    <i class="ri-send-plane-2-line m-0" style="font-size: 1.2rem !important;"></i>
+                </button>
+            </div>
 
                 <!-- Post Actions (Edit/Delete) -->
                 {% if request.session.userid|add:"0" == p.userid.userid %}
@@ -107,30 +109,10 @@
 </div>
 
 <style>
-    .btn-interaction-circular {
-        background: transparent;
-        border: none;
-        padding: 8px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        color: #64748b;
-        cursor: pointer;
-    }
-    .btn-interaction-circular:hover {
-        background: rgba(15, 40, 84, 0.05);
-        color: #0f2854;
-        transform: scale(1.15);
-    }
-    .btn-interaction-circular.liked {
-        color: #e11d48 !important;
-    }
     .post-img-standard {
         transition: transform 0.5s ease;
     }
-    .overflow-hidden:hover .post-img-standard {
+    .post-img-wrapper:hover .post-img-standard {
         transform: scale(1.05);
     }
 </style>
