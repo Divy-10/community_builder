@@ -24,10 +24,13 @@ admin.site.site_title = "UniVo Admin Portal"
 admin.site.index_title = "Welcome to UniVo Administration Portal"
 
 
+from django.views.generic.base import RedirectView
+
 urlpatterns = [
+    path('favicon.ico', RedirectView.as_view(url='/static/assets/images/logo.png')),
     path('admin/', admin.site.urls),
     path('custom-admin/', include('custom_admin.urls')),
-    path('',include('user.urls')),
+    path('', include('user.urls')),
 ]
 
 if settings.DEBUG:
