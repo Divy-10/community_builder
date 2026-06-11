@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-59ucw-v67kmrv8d1j1b35a8%$i8tl=9(d397nxlnx8-m3^9&(z'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-59ucw-v67kmrv8d1j1b35a8%$i8tl=9(d397nxlnx8-m3^9&(z')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
 
 
 # Application definition
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,12 +79,28 @@ WSGI_APPLICATION = 'community_builders.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DATABASE_URL = config('DATABASE_URL', default='')
+
+if DATABASE_URL:
+    import urllib.parse as urlparse
+    url = urlparse.urlparse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql' if url.scheme in ('postgres', 'postgresql') else 'django.db.backends.sqlite3',
+            'NAME': url.path[1:] if url.scheme in ('postgres', 'postgresql') else os.path.join(BASE_DIR, 'db.sqlite3'),
+            'USER': url.username,
+            'PASSWORD': url.password,
+            'HOST': url.hostname,
+            'PORT': url.port,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -120,18 +138,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Optimize static files storage with WhiteNoise compression & caching
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL="/media/"
-# MEDIA_ROOT=BASE_DIR/'media'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Google OAuth 2.0 Settings
-GOOGLE_CLIENT_ID = '677894118761-83a21aqe5hughn35va94rphg7sihbb4o.apps.googleusercontent.com'
-GOOGLE_CLIENT_SECRET = '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'
-GOOGLE_REDIRECT_URI = 'http://127.0.0.1:8000/auth/google/callback/'
+GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='677894118761-83a21aqe5hughn35va94rphg7sihbb4o.apps.googleusercontent.com')
+GOOGLE_CLIENT_SECRET = config('GOOGLE_CLIENT_SECRET', default='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')
+GOOGLE_REDIRECT_URI = config('GOOGLE_REDIRECT_URI', default='http://127.0.0.1:8000/auth/google/callback/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Razorpay Payment Gateway (Test Mode)
-RAZORPAY_KEY_ID = 'rzp_test_SWzT9bAFLwy2VR'
-RAZORPAY_KEY_SECRET = 'wD1bo5d3aXMuhT8eXfjZfoZZ'
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='rzp_test_SWzT9bAFLwy2VR')
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET', default='wD1bo5d3aXMuhT8eXfjZfoZZ')
