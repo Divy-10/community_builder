@@ -287,28 +287,63 @@ body {
   text-decoration: none !important;
 }
 
-/* Social media list styling */
+/* Social media list styling & Info container */
+.auth-card-clean .sign-info {
+  border-top: none !important;
+  margin-top: 25px !important;
+  padding-top: 0 !important;
+  text-align: center !important;
+}
+
+.auth-card-clean .sign-info span {
+  display: block !important;
+  text-align: center !important;
+  margin-bottom: 10px !important;
+}
+
 .auth-card-clean .iq-social-media {
-  margin-top: 20px !important;
+  margin-top: 15px !important;
   padding: 0 !important;
   display: flex !important;
   justify-content: center !important;
   gap: 15px !important;
+  float: none !important;
+  clear: both !important;
 }
 
 .auth-card-clean .iq-social-media li {
   list-style: none !important;
+  float: none !important;
+  margin: 0 !important;
+}
+
+.auth-card-clean .iq-social-media li a {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 40px !important;
+  width: 40px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.3s ease !important;
 }
 
 .auth-card-clean .iq-social-media li a i {
   color: rgba(255, 255, 255, 0.8) !important;
-  font-size: 24px !important;
-  transition: all 0.3s ease !important;
+  font-size: 20px !important;
+  margin: 0 !important;
+}
+
+.auth-card-clean .iq-social-media li a:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  text-decoration: none !important;
 }
 
 .auth-card-clean .iq-social-media li a:hover i {
   color: #ffffff !important;
-  transform: scale(1.15) !important;
+  transform: scale(1.1) !important;
 }
 
 @keyframes rotateLogo {
