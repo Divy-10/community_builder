@@ -1477,6 +1477,16 @@ body.auth-page-body {
 
 /* Mobile responsive styling for community members page */
 @media (max-width: 767px) {
+  body {
+    background-color: #ffffff !important;
+  }
+  
+  .content-page {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    background-color: #ffffff !important;
+  }
+
   .bg-light-subtle {
     background-color: rgba(15, 40, 84, 0.02) !important;
   }
