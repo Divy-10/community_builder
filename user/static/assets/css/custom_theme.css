@@ -1461,6 +1461,18 @@ body.auth-page-body {
   }
 }
 
+/* Mobile responsive styling for community members page */
+@media (max-width: 767px) {
+  .bg-light-subtle {
+    background-color: rgba(15, 40, 84, 0.02) !important;
+  }
+  
+  .card-body p-0 .d-block.d-md-none {
+    padding-top: 10px !important;
+  }
+}
+
+
 
 
 
