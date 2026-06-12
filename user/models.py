@@ -134,7 +134,7 @@ class communitymember(models.Model):
 #post
 class post(models.Model):
     postid=models.AutoField(primary_key=True)
-    posttitle=models.CharField(max_length=50)
+    posttitle=models.CharField(max_length=200)
     thumbnail=models.ImageField(upload_to="images/")
     description=models.TextField(max_length=1000)
     createddt=models.DateTimeField(auto_now=True)
