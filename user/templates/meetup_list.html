@@ -11,7 +11,14 @@
             <div class="col-12">
                 <h2 class="fw-bold mb-1" style="color: #0f2854;">Upcoming Meetups</h2>
                 <p class="text-muted mb-0">Discover events from communities and join the ones you love.</p>
-            </div>
+        </div>
+        
+        <!-- Mobile Filter Button (visible only when right sidebar is hidden) -->
+        <div class="d-filter-btn-mobile mb-3 px-4">
+            <button class="btn btn-outline-primary rounded-pill w-100 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" data-bs-toggle="modal" data-bs-target="#filterMeetupsModal">
+                <i class="ri-sound-module-line fs-5"></i>
+                <span>Filter Meetups</span>
+            </button>
         </div>
 
         <!-- Active Filters -->
@@ -144,6 +151,71 @@
     </div>
 </div>
 
+<!-- Mobile Filter Modal -->
+<div class="modal fade" id="filterMeetupsModal" tabindex="-1" aria-labelledby="filterMeetupsModalLabel" aria-hidden="true" style="z-index: 2200 !important;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-primary text-white border-0 py-3 px-4">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="filterMeetupsModalLabel">
+                    <i class="ri-sound-module-line fs-4"></i> Filter Meetups
+                </h5>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-white text-dark">
+                <form method="get" action="{% url 'meetup_list' %}">
+                    <!-- Search -->
+                    <div class="mb-4 pt-1">
+                        <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                            <i class="ri-search-line me-2 text-primary opacity-75"></i> Search
+                        </label>
+                        <input type="text" 
+                               class="premium-input-field" 
+                               name="q" 
+                               value="{{ search_q }}" 
+                               placeholder="Search meetups...">
+                    </div>
+                    
+                    <!-- Type Filter -->
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                            <i class="ri-video-line me-2 text-primary opacity-75"></i> Meeting Type
+                        </label>
+                        <select class="premium-input-field premium-select-field" name="type">
+                            <option value="">All Types</option>
+                            <option value="online" {% if filter_type == 'online' %}selected{% endif %}>🖥️ Online</option>
+                            <option value="offline" {% if filter_type == 'offline' %}selected{% endif %}>📍 Offline</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Category Filter -->
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                            <i class="ri-grid-line me-2 text-primary opacity-75"></i> Category
+                        </label>
+                        <select class="premium-input-field premium-select-field" name="category">
+                            <option value="">All Categories</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.categoryid }}" {% if filter_category == cat.categoryid|stringformat:"i" %}selected{% endif %}>{{ cat.categoryname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary rounded-pill w-100 py-3 fw-bold mb-2">
+                            Apply Filters
+                        </button>
+                        
+                        <a href="{% url 'meetup_list' %}" class="btn btn-light rounded-pill w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2">
+                            <i class="ri-restart-line"></i>
+                            <span>RESET ALL</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block right_sidebar %}

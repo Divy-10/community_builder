@@ -927,3 +927,179 @@ hr {
   left: -30px;
   animation-duration: 20s;
 }
+
+/* ==========================================================================
+   Responsiveness, Bottom Navigation, Drawer Sidebar, and Mobile Overrides
+   ========================================================================== */
+
+/* Mobile Bottom Navigation Bar */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 -4px 20px rgba(15, 40, 84, 0.08) !important;
+  display: none;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1500 !important;
+  padding: 0 10px;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--bs-text-muted) !important;
+  text-decoration: none !important;
+  font-family: var(--bs-font-heading);
+  font-weight: 600;
+  font-size: 0.7rem;
+  transition: all 0.2s ease;
+  position: relative;
+  flex: 1;
+  height: 100%;
+}
+
+.bottom-nav-item i {
+  font-size: 1.45rem;
+  margin-bottom: 2px;
+  color: var(--bs-text-muted);
+  transition: all 0.2s ease;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item.active {
+  color: var(--bs-primary) !important;
+}
+
+.bottom-nav-item:hover i,
+.bottom-nav-item.active i {
+  color: var(--bs-primary) !important;
+  transform: translateY(-2px);
+}
+
+/* Sidebar Backdrop */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 40, 84, 0.4) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1900 !important;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+body.sidebar-open .sidebar-backdrop {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Close button for sidebar on mobile */
+.sidebar-close-btn {
+  display: none;
+}
+
+/* Inline Header Fixes on Mobile */
+@media (max-width: 991px) {
+  /* Prevent top navbar from collapsing vertically and wasting space */
+  .iq-top-navbar .navbar-collapse {
+    display: flex !important;
+    flex-basis: auto;
+  }
+  
+  .iq-top-navbar .navbar-toggler {
+    display: none !important; /* hide hamburger collapse button */
+  }
+
+  .iq-top-navbar .navbar-list {
+    flex-direction: row !important;
+    gap: 15px !important;
+  }
+
+  .iq-top-navbar .navbar-list li {
+    display: block !important;
+  }
+
+  /* Adjust sidebar to slide in/out as drawer */
+  .iq-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: -340px !important; /* completely offscreen */
+    height: 100vh !important;
+    width: 280px !important;
+    border-radius: 0 24px 24px 0 !important; /* rounded right corners */
+    z-index: 2100 !important; /* above header */
+    margin: 0 !important;
+    box-shadow: 10px 0 30px rgba(15, 40, 84, 0.2) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(30px) !important;
+    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    padding-top: 10px !important;
+  }
+
+  .sidebar-close-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    color: var(--bs-primary);
+    cursor: pointer;
+  }
+
+  body.sidebar-open .iq-sidebar {
+    left: 0 !important;
+  }
+
+  .content-page {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    /* Extra spacing for header */
+    height: calc(100vh - 75px - 45px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex !important;
+  }
+
+  .content-page {
+    /* Accommodate bottom navigation bar */
+    height: calc(100vh - 75px - 65px) !important;
+    padding-bottom: 80px !important;
+  }
+
+  /* Hide footer on mobile screens */
+  .iq-footer {
+    display: none !important;
+  }
+}
+
+/* Visibility helper for mobile/tablet filter buttons */
+.d-filter-btn-mobile {
+  display: block;
+}
+
+@media (min-width: 1291px) {
+  .d-filter-btn-mobile {
+    display: none !important;
+  }
+}
+

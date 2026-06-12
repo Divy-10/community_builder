@@ -16,6 +16,13 @@
                 </a>
             </div>
         </div>
+        <!-- Mobile Filter Button (visible only when right sidebar is hidden) -->
+        <div class="d-filter-btn-mobile mb-4 px-4">
+            <button class="btn btn-outline-primary rounded-pill w-100 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" data-bs-toggle="modal" data-bs-target="#filterCommunitiesModal">
+                <i class="ri-sound-module-line fs-5"></i>
+                <span>Filter Communities</span>
+            </button>
+        </div>
         <div class="row mb-4 mt-4 px-4">
             {% for c in communities %}
             <div class="col-lg-6 col-md-6 mb-4">
@@ -125,6 +132,84 @@
     </div>
 </div>
 
+<!-- Mobile Filter Modal -->
+<div class="modal fade" id="filterCommunitiesModal" tabindex="-1" aria-labelledby="filterCommunitiesModalLabel" aria-hidden="true" style="z-index: 2200 !important;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-primary text-white border-0 py-3 px-4">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="filterCommunitiesModalLabel">
+                    <i class="ri-sound-module-line fs-4"></i> Filter Communities
+                </h5>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-white text-dark">
+                <form method="get" action="{% url 'group' %}">
+                    <!-- Community Name -->
+                    <div class="mb-4 pt-1">
+                        <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                            <i class="ri-group-line me-2 text-primary opacity-75"></i> Community Name
+                        </label>
+                        <input type="text" 
+                               class="premium-input-field" 
+                               name="search_name" 
+                               value="{{ search_name }}" 
+                               placeholder="Search by name...">
+                    </div>
+                    
+                    <!-- Category Filter -->
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                            <i class="ri-grid-line me-2 text-primary opacity-75"></i> Category
+                        </label>
+                        <select class="premium-input-field premium-select-field" name="search_category">
+                            <option value="">All Categories</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.categoryid }}" {% if search_category == cat.categoryid|stringformat:"i" %}selected{% endif %}>{{ cat.categoryname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- City Filter -->
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                            <i class="ri-map-pin-line me-2 text-primary opacity-75"></i> City
+                        </label>
+                        <select class="premium-input-field premium-select-field" name="search_city">
+                            <option value="">All Cities</option>
+                            {% for city in cities %}
+                            <option value="{{ city.cityid }}" {% if search_city == city.cityid|stringformat:"i" %}selected{% endif %}>{{ city.cityname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Min Members -->
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-bold mb-3 d-block" style="font-family: var(--bs-font-heading); font-size: 0.9rem;">
+                            <i class="ri-user-line me-2 text-primary opacity-75"></i> Min. Members
+                        </label>
+                        <input type="number" 
+                               class="premium-input-field" 
+                               name="search_members" 
+                               value="{{ search_members }}" 
+                               placeholder="e.g. 5" min="0">
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary rounded-pill w-100 py-3 fw-bold mb-2">
+                            Apply Filters
+                        </button>
+                        
+                        <a href="{% url 'group' %}" class="btn btn-light rounded-pill w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2">
+                            <i class="ri-restart-line"></i>
+                            <span>RESET ALL</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block right_sidebar %}
