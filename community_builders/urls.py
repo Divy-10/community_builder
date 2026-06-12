@@ -15,22 +15,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
+from django.views.generic.base import RedirectView
 
 admin.site.site_header = "UniVo administration"
 admin.site.site_title = "UniVo Admin Portal"
 admin.site.index_title = "Welcome to UniVo Administration Portal"
 
 
-from django.views.generic.base import RedirectView
-
 urlpatterns = [
     path('favicon.ico', RedirectView.as_view(url='/static/assets/images/logo.png')),
     path('admin/', admin.site.urls),
     path('custom-admin/', include('custom_admin.urls')),
     path('', include('user.urls')),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
 if settings.DEBUG:
