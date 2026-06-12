@@ -1113,7 +1113,7 @@
         </span>
         {% endif %}
       </a>
-      <a href="{% url 'my_profile' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'my_profile' %}active{% endif %}">
+      <a href="{% url 'user_profile' request.session.userid %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'my_profile' or request.resolver_match.url_name == 'user_profile' %}active{% endif %}">
         <i class="ri-user-3-line"></i>
         <span>Profile</span>
       </a>
