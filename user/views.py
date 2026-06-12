@@ -55,6 +55,16 @@ def home(request):
         userid_id__in=story_user_ids, 
         createddt__gte=last_24h
     ).order_by('createddt').select_related('userid')
+
+    import os
+    valid_stories = []
+    for s in recent_stories:
+        try:
+            if s.image and os.path.exists(s.image.path):
+                valid_stories.append(s)
+        except Exception:
+            pass
+    recent_stories = valid_stories
     
     # Group stories by user and check if they are "seen"
     stories_by_user = {}

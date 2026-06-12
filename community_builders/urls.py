@@ -20,6 +20,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
 from django.views.generic.base import RedirectView
+from django.http import Http404
+
+def safe_serve(request, path, document_root=None, **kwargs):
+    try:
+        return serve(request, path, document_root, **kwargs)
+    except (UnicodeError, ValueError, OSError):
+        raise Http404("File not found or invalid filename encoding")
 
 admin.site.site_header = "UniVo administration"
 admin.site.site_title = "UniVo Admin Portal"
@@ -31,7 +38,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('custom-admin/', include('custom_admin.urls')),
     path('', include('user.urls')),
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    re_path(r'^media/(?P<path>.*)$', safe_serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
 if settings.DEBUG:

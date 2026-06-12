@@ -1,10 +1,41 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from datetime import date
+import os
+import uuid
+from django.utils.text import slugify
 
 def no_future_date(value):
     if value > date.today():
         raise ValidationError('Date of birth cannot be in the future.')
+
+def sanitize_filename(filename):
+    name, ext = os.path.splitext(filename)
+    safe_name = slugify(name)
+    if not safe_name:
+        safe_name = uuid.uuid4().hex[:10]
+    return f"{safe_name}{ext.lower()}"
+
+def user_profile_path(instance, filename):
+    return os.path.join("assets/images/user/", sanitize_filename(filename))
+
+def images_path(instance, filename):
+    return os.path.join("images/", sanitize_filename(filename))
+
+def background_images_path(instance, filename):
+    return os.path.join("images/backgrounds/", sanitize_filename(filename))
+
+def chat_images_path(instance, filename):
+    return os.path.join("chat_images/", sanitize_filename(filename))
+
+def stories_path(instance, filename):
+    return os.path.join("stories/", sanitize_filename(filename))
+
+def blogs_path(instance, filename):
+    return os.path.join("blogs/", sanitize_filename(filename))
+
+def meetups_path(instance, filename):
+    return os.path.join("meetups/", sanitize_filename(filename))
 
 # Create your models here.
 
@@ -52,7 +83,7 @@ class user(models.Model):
     username=models.CharField(max_length=50)
     email=models.CharField(max_length=50)
     password=models.CharField(max_length=50) 
-    profile=models.ImageField(upload_to="assets/images/user/")
+    profile=models.ImageField(upload_to=user_profile_path)
     bio=models.TextField(max_length=1000)
     gender=models.CharField(max_length=10)
     dob=models.DateField(validators=[no_future_date])
@@ -98,8 +129,8 @@ class UserSettings(models.Model):
 class community(models.Model):
     communityid=models.AutoField(primary_key=True)
     communitytitle=models.CharField(max_length=50)
-    thumbnail=models.ImageField(upload_to="images/")
-    background_image=models.ImageField(upload_to="images/backgrounds/", null=True, blank=True)
+    thumbnail=models.ImageField(upload_to=images_path)
+    background_image=models.ImageField(upload_to=background_images_path, null=True, blank=True)
     discription=models.TextField(max_length=1000)
     createddt=models.DateTimeField(auto_now=True)
     categoryid=models.ForeignKey(category,on_delete=models.CASCADE)
@@ -135,7 +166,7 @@ class communitymember(models.Model):
 class post(models.Model):
     postid=models.AutoField(primary_key=True)
     posttitle=models.CharField(max_length=200)
-    thumbnail=models.ImageField(upload_to="images/")
+    thumbnail=models.ImageField(upload_to=images_path)
     description=models.TextField(max_length=1000)
     createddt=models.DateTimeField(auto_now=True)
     communityid=models.ForeignKey(community,on_delete=models.CASCADE, null=True, blank=True)
@@ -189,7 +220,7 @@ class communityMessage(models.Model):
     communityMessageid=models.AutoField(primary_key=True)
     senderid=models.IntegerField()
     message=models.TextField(max_length=1000)
-    image=models.ImageField(upload_to="chat_images/", null=True, blank=True)
+    image=models.ImageField(upload_to=chat_images_path, null=True, blank=True)
     senddt=models.DateTimeField(auto_now=True)
     communityid=models.ForeignKey(community,on_delete=models.CASCADE)
     
@@ -217,7 +248,7 @@ class chat(models.Model):
     senderid=models.IntegerField(max_length=50)
     receiverid=models.IntegerField()#userid
     message=models.TextField(max_length=1000)
-    image=models.ImageField(upload_to="chat_images/", null=True, blank=True)
+    image=models.ImageField(upload_to=chat_images_path, null=True, blank=True)
     senddt=models.DateTimeField(auto_now=True)
     status=models.IntegerField(max_length=50)
     shared_post=models.ForeignKey(post, on_delete=models.SET_NULL, null=True, blank=True)
@@ -231,7 +262,7 @@ class images(models.Model):
     communityid=models.ForeignKey(community,on_delete=models.CASCADE)
     userid=models.ForeignKey(user,on_delete=models.CASCADE)
     addeddt=models.DateTimeField(auto_now=True)
-    image=models.ImageField(upload_to="images/")
+    image=models.ImageField(upload_to=images_path)
 
     def __str__(self):
         return "%d-%d"%(self.imageid,self.userid.pk)
@@ -251,7 +282,7 @@ class CommunityInvite(models.Model):
 class story(models.Model):
     storyid = models.AutoField(primary_key=True)
     userid = models.ForeignKey(user, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="stories/")
+    image = models.ImageField(upload_to=stories_path)
     createddt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -272,7 +303,7 @@ class blog(models.Model):
     blogid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=10000)
-    image = models.ImageField(upload_to="blogs/")
+    image = models.ImageField(upload_to=blogs_path)
     author = models.ForeignKey(user, on_delete=models.CASCADE)
     categoryid = models.ForeignKey(category, on_delete=models.SET_NULL, null=True, blank=True)
     createddt = models.DateTimeField(auto_now_add=True)
@@ -297,7 +328,7 @@ class meetup(models.Model):
     meeting_date = models.DateTimeField()
     meeting_end_date = models.DateTimeField(null=True, blank=True)
 
-    thumbnail = models.ImageField(upload_to="meetups/", null=True, blank=True)
+    thumbnail = models.ImageField(upload_to=meetups_path, null=True, blank=True)
     communityid = models.ForeignKey(community, on_delete=models.CASCADE)
     created_by = models.ForeignKey(user, on_delete=models.CASCADE)
     member_limit = models.IntegerField(default=0)  # 0 or Null for unlimited
