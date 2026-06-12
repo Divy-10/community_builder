@@ -1512,8 +1512,9 @@ body.auth-page-body {
 
   /* Improve Sidebar layout on mobile */
   .iq-sidebar-menu .iq-menu li a {
-    margin: 4px 12px !important;
-    padding: 10px 14px !important;
+    margin: 4px 0 !important;
+    padding: 14px 24px !important;
+    border-radius: 0 !important;
   }
   
   .iq-sidebar-menu .iq-menu li a i {
