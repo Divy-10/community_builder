@@ -1014,6 +1014,14 @@ body.sidebar-open .sidebar-backdrop {
 /* Inline Header Fixes on Mobile */
 @media (max-width: 991px) {
   /* Prevent top navbar from collapsing vertically and wasting space */
+  .iq-top-navbar .navbar {
+    flex-wrap: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+  }
+
   .iq-top-navbar .navbar-collapse {
     display: flex !important;
     flex-basis: auto !important;
@@ -1023,6 +1031,8 @@ body.sidebar-open .sidebar-backdrop {
     box-shadow: none !important;
     margin: 0 !important;
     padding: 0 !important;
+    height: 100% !important;
+    flex-grow: 0 !important;
   }
   
   .iq-top-navbar .navbar-toggler {
@@ -1030,12 +1040,58 @@ body.sidebar-open .sidebar-backdrop {
   }
 
   .iq-top-navbar .navbar-list {
+    display: flex !important;
     flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100% !important;
     gap: 15px !important;
   }
 
   .iq-top-navbar .navbar-list li {
-    display: block !important;
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    margin: 0 !important;
+  }
+
+  .iq-top-navbar .navbar-list li > a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 10px !important;
+    color: var(--bs-primary) !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .iq-top-navbar .navbar-list li > a:hover {
+    color: var(--color-med-blue) !important;
+    transform: translateY(-2px) !important;
+  }
+
+  .iq-top-navbar .navbar-list li > a span.position-absolute {
+    top: 15px !important;
+    right: 2px !important;
+    padding: 2px 4px !important;
+    font-size: 8px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Make sure mobile logo doesn't wrap or get cut off */
+  .iq-navbar-logo {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  .iq-navbar-logo a {
+    display: flex !important;
+    align-items: center !important;
   }
 
   /* Adjust sidebar to slide in/out as drawer */
