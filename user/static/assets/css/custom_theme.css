@@ -182,36 +182,138 @@ body {
   box-shadow: var(--shadow-md) !important;
 }
 
-/* Dedicated Class for Auth Pages (No Box) */
+/* Dedicated Class for Auth Pages (Modern Glassmorphism) */
 .auth-card-clean {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border: none !important;
-  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 20px 40px rgba(15, 30, 70, 0.3) !important;
+  border-radius: 24px !important;
 }
 
 .auth-card-clean .form-control,
 .auth-card-clean .form-select {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: none !important;
-  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-radius: 12px !important;
+  padding: 10px 16px !important;
+  transition: all 0.3s ease !important;
+}
+
+.auth-card-clean .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.auth-card-clean .form-control:focus,
+.auth-card-clean .form-select:focus {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  outline: none !important;
 }
 
 /* Fix for invisible dropdown options on some browsers */
 .auth-card-clean .form-control option,
 .auth-card-clean .form-select option {
-  color: #fff !important;
-  background-color: var(--color-dark-navy) !important;
+  color: #ffffff !important;
+  background-color: #0b1a4a !important;
 }
 
 .auth-card-clean .form-label {
-  color: #fff !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  margin-bottom: 8px !important;
 }
 
 .auth-card-clean h1,
-.auth-card-clean p {
-  color: #fff !important;
+.auth-card-clean h2,
+.auth-card-clean h3 {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px !important;
+}
+
+.auth-card-clean p,
+.auth-card-clean span,
+.auth-card-clean label {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.auth-card-clean a {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  text-decoration: underline !important;
+}
+
+.auth-card-clean a:hover {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Primary buttons styling on Auth Pages */
+.auth-card-clean .btn-primary {
+  background: #ffffff !important;
+  color: #1e3bb3 !important;
+  border: none !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  padding: 10px 24px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2) !important;
+}
+
+.auth-card-clean .btn-primary:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Google Sign-in button styling */
+.auth-card-clean #google-signin-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  border-radius: 99px !important;
+  transition: all 0.3s ease !important;
+}
+
+.auth-card-clean #google-signin-btn:hover {
+  background: #ffffff !important;
+  color: #1e3bb3 !important;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2) !important;
+  text-decoration: none !important;
+}
+
+/* Social media list styling */
+.auth-card-clean .iq-social-media {
+  margin-top: 20px !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 15px !important;
+}
+
+.auth-card-clean .iq-social-media li {
+  list-style: none !important;
+}
+
+.auth-card-clean .iq-social-media li a i {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 24px !important;
+  transition: all 0.3s ease !important;
+}
+
+.auth-card-clean .iq-social-media li a:hover i {
+  color: #ffffff !important;
+  transform: scale(1.15) !important;
+}
+
+@keyframes rotateLogo {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* -------------------------------------
@@ -1189,6 +1291,34 @@ body.sidebar-open .sidebar-backdrop {
   .iq-top-navbar .navbar-collapse {
     padding-right: 0 !important;
     margin-right: -10px !important;
+  }
+}
+
+/* Responsive Login & Signup Pages on Mobile */
+@media (max-width: 767px) {
+  .sign-in-page {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    padding: 40px 15px !important;
+  }
+  
+  .sign-in-from {
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding: 30px 20px !important;
+    margin-top: 10px !important;
+    margin-bottom: 20px !important;
+  }
+  
+  .sign-in-page .vh-100 {
+    height: auto !important;
+    min-height: 100vh !important;
+  }
+  
+  /* Make Google button center text properly */
+  #google-signin-btn {
+    font-size: 14px !important;
   }
 }
 
