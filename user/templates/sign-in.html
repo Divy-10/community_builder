@@ -321,12 +321,17 @@
                     if (data.success) {
                         // Play animation
                         const formContainer = document.querySelector('.sign-in-from');
-                        if(formContainer) formContainer.parentElement.classList.add('hide-form-anim');
+                        if(formContainer) {
+                            formContainer.parentElement.classList.add('hide-form-anim');
+                            // After animation starts, hide it completely so left column can center
+                            setTimeout(() => formContainer.parentElement.style.display = 'none', 800);
+                        }
                         
                         // Expand logo to take full width and apply animation
                         const leftCol = document.querySelector('.sign-in-detail').parentElement;
-                        leftCol.classList.remove('col-md-6');
-                        leftCol.classList.add('col-md-12');
+                        leftCol.classList.remove('d-none', 'd-md-block', 'col-md-6');
+                        leftCol.classList.add('col-12');
+                        leftCol.style.display = 'block';
                         
                         const logo = document.getElementById('main-rotating-logo');
                         if (logo) logo.classList.add('success-logo-anim');
