@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid px-4 py-2" style="height: calc(100vh - 150px);">
-    <div class="row g-0 h-100 bg-white shadow-sm overflow-hidden" style="border-radius: 30px; border: 1px solid #f1f1f1;">
+<div class="container-fluid px-0 px-md-4 py-0 py-md-2 chat-page-container">
+    <div class="row g-0 h-100 bg-white shadow-sm overflow-hidden chat-card-wrapper">
         
         <!-- Left Sidebar: Contacts List -->
         <div class="col-md-4 col-lg-3 border-end h-100 d-flex flex-column" style="background: white;">
@@ -365,5 +365,28 @@
     .btn-icon { display: flex; align-items: center; justify-content: center; padding: 0; }
     #message-container::-webkit-scrollbar { width: 6px; }
     #message-container::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
+    
+    .chat-page-container {
+        height: calc(100vh - 150px);
+    }
+    .chat-card-wrapper {
+        border-radius: 30px;
+        border: 1px solid #f1f1f1;
+    }
+    
+    @media (max-width: 768px) {
+        .chat-page-container {
+            height: calc(100vh - 75px - 65px) !important; /* Account for top header and bottom nav */
+        }
+        .chat-card-wrapper {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+        .content-page {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+    }
 </style>
 {% endblock %}
