@@ -1509,4 +1509,20 @@ body.auth-page-body {
   .post-card .post-img-wrapper, .post-card .rounded-top-4, .post-card .post-img-standard {
     border-radius: 0 !important;
   }
+
+  /* Improve Sidebar layout on mobile */
+  .iq-sidebar-menu .iq-menu li a {
+    margin: 4px 12px !important;
+    padding: 10px 14px !important;
+  }
+  
+  .iq-sidebar-menu .iq-menu li a i {
+    font-size: 1.15rem !important;
+    width: 24px;
+    text-align: center;
+  }
+  
+  .iq-sidebar-menu .iq-menu li a span {
+    font-size: 0.95rem !important;
+  }
 }
