@@ -143,38 +143,6 @@
         .feed-post-card .comment-item {
             margin-bottom: 10px !important;
         }
-
-        /* Full screen story viewer on mobile */
-        #storyViewerModal .modal-content {
-            height: 100vh !important;
-            width: 100vw !important;
-        }
-        #storyViewerImage {
-            width: 100vw !important;
-            height: 100vh !important;
-            max-height: 100vh !important;
-            max-width: 100vw !important;
-            object-fit: cover !important;
-            box-shadow: none !important;
-        }
-        #storyDeleteContainer .bg-danger {
-            width: 45px !important;
-            height: 45px !important;
-            border-radius: 50% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            background-color: #ff6b6b !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-        #storyDeleteContainer .bg-danger i {
-            margin-right: 0 !important;
-        }
-        #storyViewCountContainer .bg-dark {
-            background-color: rgba(0, 0, 0, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        }
     }
 </style>
 {% endblock %}
@@ -190,20 +158,20 @@
                     <!-- Current User Story / Add Button -->
                     <div class="text-center story-item" style="min-width: 80px;">
                         <div class="position-relative d-inline-block mb-1">
-                            <!-- Ring/Avatar for Viewing or Adding -->
+                            <!-- Ring/Avatar for Viewing (if exists) -->
                             <div id="ring-{{ current_user.username }}"
                                 class="{% if my_stories != '[]' and not my_all_seen %}story-ring{% endif %} rounded-circle p-1"
-                                data-stories="{{ my_stories }}"
+                                {% if my_stories != '[]' %} data-stories="{{ my_stories }}"
                                 data-username="{{ current_user.username }}"
                                 data-avatar="{% if current_user.profile %}{{ current_user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}"
-                                onclick="handleMyStoryClick(this)" style="cursor: pointer;">
+                                onclick='openStoryFromElement(this)' style="cursor: pointer;" {% endif %}>
                                 <img src="{% if current_user.profile %}{{ current_user.profile.url }}{% else %}/static/assets/images/user/1.jpg{% endif %}"
                                     class="rounded-circle border border-2 border-white shadow-sm"
                                     style="width: 60px; height: 60px; object-fit: cover;">
                             </div>
                             <!-- Plus Icon for Adding -->
                             <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle d-flex align-items-center justify-content-center border border-2 border-white shadow-sm story-add-btn"
-                                onclick="handleMyStoryClick(document.getElementById('ring-{{ current_user.username }}'))"
+                                data-bs-toggle="modal" data-bs-target="#addStoryModal"
                                 style="width: 24px; height: 24px; margin-right: 2px; margin-bottom: 2px; cursor: pointer; z-index: 10;">
                                 <i class="fas fa-plus text-white" style="font-size: 12px;"></i>
                             </div>
@@ -259,20 +227,6 @@
                             onclick="document.getElementById('story_image').click()">Choose File</button>
                     </div>
                 </form>
-            </div>
-</div>
-
-<!-- My Story Options Modal (Glassmorphic Selection) -->
-<div class="modal fade" id="myStoryOptionsModal" tabindex="-1" aria-hidden="true" style="z-index: 2050 !important;">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content border-0 rounded-4 shadow bg-dark bg-opacity-95 text-white" style="backdrop-filter: blur(10px);">
-            <div class="modal-body text-center p-4">
-                <h6 class="fw-bold mb-4">Your Story</h6>
-                <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-outline-light rounded-pill fw-semibold py-2" onclick="viewMyStoryDirectly()">View Story</button>
-                    <button type="button" class="btn btn-primary rounded-pill fw-semibold py-2" onclick="addNewStoryDirectly()">Add to Story</button>
-                    <button type="button" class="btn btn-link text-white-50 text-decoration-none small mt-2" data-bs-dismiss="modal">Cancel</button>
-                </div>
             </div>
         </div>
     </div>
@@ -862,39 +816,6 @@
     let currentStoryOwner = "";
     let storyTimer = null;
     const STORY_DURATION = 5000;
-
-    let optionsModalElementRef = null;
-    let myStoryOptionsModalObj = null;
-
-    function handleMyStoryClick(el) {
-        const storiesStr = el.getAttribute('data-stories') || '[]';
-        const stories = JSON.parse(storiesStr);
-        if (stories.length === 0) {
-            const addModal = new bootstrap.Modal(document.getElementById('addStoryModal'));
-            addModal.show();
-        } else {
-            optionsModalElementRef = el;
-            myStoryOptionsModalObj = new bootstrap.Modal(document.getElementById('myStoryOptionsModal'));
-            myStoryOptionsModalObj.show();
-        }
-    }
-
-    function viewMyStoryDirectly() {
-        if (myStoryOptionsModalObj) {
-            myStoryOptionsModalObj.hide();
-        }
-        if (optionsModalElementRef) {
-            openStoryFromElement(optionsModalElementRef);
-        }
-    }
-
-    function addNewStoryDirectly() {
-        if (myStoryOptionsModalObj) {
-            myStoryOptionsModalObj.hide();
-        }
-        const addModal = new bootstrap.Modal(document.getElementById('addStoryModal'));
-        addModal.show();
-    }
 
     function getRelativeTime(timestamp) {
         const now = new Date();
