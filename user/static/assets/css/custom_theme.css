@@ -1303,6 +1303,14 @@ body.sidebar-open .sidebar-backdrop {
     padding: 40px 15px !important;
   }
   
+  /* Override absolute container positioning on mobile */
+  .sign-in-page .container {
+    position: static !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    padding: 0 !important;
+  }
+  
   .sign-in-from {
     max-height: none !important;
     overflow-y: visible !important;
