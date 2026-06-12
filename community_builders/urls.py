@@ -25,21 +25,9 @@ admin.site.index_title = "Welcome to UniVo Administration Portal"
 
 
 from django.views.generic.base import RedirectView
-from django.core.management import call_command
-from django.http import HttpResponse
-
-def temp_import_data(request):
-    try:
-        # Run database migrations first to ensure columns are resized
-        call_command('migrate')
-        call_command('loaddata', 'db_dump.json')
-        return HttpResponse("<h3>UniVo Data Import Success!</h3><p>Your local SQLite database data has been successfully imported to live PostgreSQL database.</p>")
-    except Exception as e:
-        return HttpResponse(f"<h3>Data Import Failed</h3><p>Error details: {e}</p>")
 
 urlpatterns = [
     path('favicon.ico', RedirectView.as_view(url='/static/assets/images/logo.png')),
-    path('import-data-temp/', temp_import_data),
     path('admin/', admin.site.urls),
     path('custom-admin/', include('custom_admin.urls')),
     path('', include('user.urls')),
