@@ -1484,9 +1484,18 @@ body.auth-page-body {
   .card-body p-0 .d-block.d-md-none {
     padding-top: 10px !important;
   }
+  
+  /* Instagram-like mobile feed layout for all post cards */
+  .post-card {
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid #efefef !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .post-card .post-img-wrapper, .post-card .rounded-top-4, .post-card .post-img-standard {
+    border-radius: 0 !important;
+  }
 }
-
-
-
-
-
