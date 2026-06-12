@@ -1458,6 +1458,20 @@ body.auth-page-body {
   .post-community-badge {
     font-size: 0.65rem !important;
     padding: 3px 8px !important;
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .post-img-wrapper .badge {
+    font-size: 0.7rem !important;
+    padding: 5px 10px !important;
+  }
+
+  .card-header .badge {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
   }
 }
 
