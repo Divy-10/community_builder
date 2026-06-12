@@ -111,9 +111,16 @@
             border-left: none !important;
             border-right: none !important;
             width: 100vw !important;
-            margin-left: -12px !important;
+            margin-left: calc(-50vw + 50%) !important;
+            margin-right: calc(-50vw + 50%) !important;
             max-width: 100vw !important;
             margin-bottom: 12px !important;
+        }
+        
+        .feed-post-card .post-img-wrapper img,
+        .feed-post-card .post-img-wrapper video {
+            width: 100% !important;
+            object-fit: cover !important;
         }
         
         /* Reduce gap in community badge for better fit */
