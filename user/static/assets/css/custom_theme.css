@@ -1491,9 +1491,9 @@ body.auth-page-body {
     border-left: none !important;
     border-right: none !important;
     box-shadow: none !important;
-    border-bottom: 1px solid #e0e0e0 !important;
-    border-top: 1px solid #e0e0e0 !important;
-    margin-bottom: 12px !important;
+    border-bottom: 1px solid #efefef !important;
+    border-top: none !important;
+    margin-bottom: 0 !important;
   }
   
   .post-card .post-img-wrapper, .post-card .rounded-top-4, .post-card .post-img-standard {
