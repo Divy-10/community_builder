@@ -52,14 +52,14 @@
                             
                             {% if not is_private_account or is_own_profile or is_following %}
                             <!-- Tabbed Navigation Buttons -->
-                            <ul class="nav nav-pills gap-2 m-0" role="tablist" id="profilePills">
+                            <ul class="nav nav-pills nav-justified gap-2 m-0 w-100 flex-nowrap" role="tablist" id="profilePills" style="overflow-x: auto; overflow-y: hidden;">
                                 <li class="nav-item m-0" role="presentation">
-                                    <button class="nav-link active px-4 rounded-pill fw-bold d-flex align-items-center justify-content-center" id="posts-tab" data-bs-toggle="pill" data-bs-target="#user-posts" type="button" role="tab" aria-controls="user-posts" aria-selected="true" style="transition: all 0.2s ease;">
+                                    <button class="nav-link active px-3 rounded-pill fw-bold d-flex align-items-center justify-content-center w-100" id="posts-tab" data-bs-toggle="pill" data-bs-target="#user-posts" type="button" role="tab" aria-controls="user-posts" aria-selected="true" style="transition: all 0.2s ease;">
                                         <i class="las la-newspaper fs-5 me-1"></i> Posts
                                     </button>
                                 </li>
                                 <li class="nav-item m-0" role="presentation">
-                                    <button class="nav-link px-4 rounded-pill fw-bold text-muted hover-bg-light d-flex align-items-center justify-content-center" id="communities-tab" data-bs-toggle="pill" data-bs-target="#user-communities" type="button" role="tab" aria-controls="user-communities" aria-selected="false" style="transition: all 0.2s ease;">
+                                    <button class="nav-link px-3 rounded-pill fw-bold text-muted hover-bg-light d-flex align-items-center justify-content-center w-100" id="communities-tab" data-bs-toggle="pill" data-bs-target="#user-communities" type="button" role="tab" aria-controls="user-communities" aria-selected="false" style="transition: all 0.2s ease;">
                                         <i class="las la-users fs-5 me-1"></i> Communities
                                     </button>
                                 </li>
@@ -96,18 +96,18 @@
     <div class="tab-pane fade show active" id="user-posts" role="tabpanel" aria-labelledby="posts-tab">
         <div class="row mt-4">
             <div class="col-sm-12">
-                <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between mb-4 gap-3">
                     <h4 class="mb-0">Posts <span class="badge bg-primary ms-1 fs-6">{{ user_posts|length }}</span></h4>
                     
                     <!-- Sub-tabs for Post Types -->
-                    <ul class="nav nav-pills bg-light p-1 rounded-pill" id="postSubTabs" role="tablist">
+                    <ul class="nav nav-pills bg-light p-1 rounded-pill flex-nowrap" id="postSubTabs" role="tablist" style="overflow-x: auto; overflow-y: hidden; max-width: 100%;">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active rounded-pill px-4 fw-bold small" id="buzz-posts-tab" data-bs-toggle="pill" data-bs-target="#buzz-posts-content" type="button" role="tab" aria-controls="buzz-posts-content" aria-selected="true">
+                            <button class="nav-link active rounded-pill px-3 fw-bold small text-nowrap" id="buzz-posts-tab" data-bs-toggle="pill" data-bs-target="#buzz-posts-content" type="button" role="tab" aria-controls="buzz-posts-content" aria-selected="true">
                                 Buzz <span class="badge bg-white text-primary ms-1">{{ buzz_posts|length }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link rounded-pill px-4 fw-bold small" id="community-posts-tab" data-bs-toggle="pill" data-bs-target="#community-posts-content" type="button" role="tab" aria-controls="community-posts-content" aria-selected="false">
+                            <button class="nav-link rounded-pill px-3 fw-bold small text-nowrap" id="community-posts-tab" data-bs-toggle="pill" data-bs-target="#community-posts-content" type="button" role="tab" aria-controls="community-posts-content" aria-selected="false">
                                 Community <span class="badge bg-white text-primary ms-1">{{ community_posts|length }}</span>
                             </button>
                         </li>
