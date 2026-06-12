@@ -282,7 +282,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav ms-auto navbar-list align-items-center">
                 {% if current_user %}
-                <li class="nav-item">
+                <li class="nav-item d-none d-lg-block">
                   <a
                     href="{% url 'chats' %}"
                     class="d-flex align-items-center px-2 position-relative"
@@ -305,7 +305,7 @@
                     {% endif %}
                   </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item d-none d-lg-block">
                   <a
                     href="{% url 'activity' %}"
                     class="d-flex align-items-center px-2 position-relative"
@@ -328,7 +328,7 @@
                     {% endif %}
                   </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item d-none d-lg-block">
                   <a
                     href="{% url 'invitations_list' %}"
                     class="d-flex align-items-center px-2 position-relative"
@@ -351,6 +351,66 @@
                     {% endif %}
                   </a>
                 </li>
+                <!-- Mobile Quick Actions Dropdown (Chat, Notification, Friend Requests) -->
+                <li class="nav-item dropdown d-lg-none">
+                  <a
+                    href="#"
+                    class="d-flex align-items-center dropdown-toggle px-2 position-relative"
+                    id="mobile-quick-actions"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <i class="ri-more-2-fill fs-4 text-primary"></i>
+                    {% if unread_chat_count > 0 or activity_count > 0 or invitation_count > 0 %}
+                    <span class="position-absolute bg-danger border border-light rounded-circle"
+                          style="width: 8px; height: 8px; top: 12px; right: 2px;"></span>
+                    {% endif %}
+                  </a>
+                  <div
+                    class="sub-drop dropdown-menu dropdown-menu-end caption-menu p-0 border-0 shadow-none bg-transparent"
+                    aria-labelledby="mobile-quick-actions"
+                  >
+                    <div class="card shadow m-0 bg-white" style="min-width: 240px; border-radius: 16px;">
+                      <div class="card-body p-0 bg-white" style="border-radius: 16px;">
+                        
+                        <!-- Chats Link -->
+                        <a href="{% url 'chats' %}" class="iq-sub-card iq-bg-primary-hover border-bottom d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none">
+                          <div class="d-flex align-items-center">
+                            <i class="ri-chat-3-line text-primary me-3 fs-5"></i>
+                            <h6 class="mb-0 fw-bold text-dark">Chats</h6>
+                          </div>
+                          {% if unread_chat_count > 0 %}
+                          <span class="badge bg-danger text-white rounded-pill px-2 py-1" style="font-size: 10px;">{{ unread_chat_count }}</span>
+                          {% endif %}
+                        </a>
+
+                        <!-- Notifications Link -->
+                        <a href="{% url 'activity' %}" class="iq-sub-card iq-bg-primary-hover border-bottom d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none">
+                          <div class="d-flex align-items-center">
+                            <i class="ri-notification-line text-warning me-3 fs-5"></i>
+                            <h6 class="mb-0 fw-bold text-dark">Notifications</h6>
+                          </div>
+                          {% if activity_count > 0 %}
+                          <span class="badge bg-warning text-dark rounded-pill px-2 py-1" style="font-size: 10px;">{{ activity_count }}</span>
+                          {% endif %}
+                        </a>
+
+                        <!-- Friend Requests Link -->
+                        <a href="{% url 'invitations_list' %}" class="iq-sub-card iq-bg-primary-hover d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none">
+                          <div class="d-flex align-items-center">
+                            <i class="ri-user-add-line text-success me-3 fs-5"></i>
+                            <h6 class="mb-0 fw-bold text-dark">Friend Requests</h6>
+                          </div>
+                          {% if invitation_count > 0 %}
+                          <span class="badge bg-success text-white rounded-pill px-2 py-1" style="font-size: 10px;">{{ invitation_count }}</span>
+                          {% endif %}
+                        </a>
+
+                      </div>
+                    </div>
+                  </div>
+                </li>
                 <li class="nav-item dropdown">
                   <a
                     href="#"
@@ -363,18 +423,18 @@
                     {% if current_user.profile %}
                     <img
                       src="{{ current_user.profile.url }}"
-                      class="img-fluid rounded-circle me-3"
+                      class="img-fluid rounded-circle me-0 me-lg-3"
                       alt="user"
                       style="width: 40px; height: 40px; object-fit: cover"
                     />
                     {% else %}
                     <img
                       src="{% static 'assets/images/user/1.jpg' %}"
-                      class="img-fluid rounded-circle me-3"
+                      class="img-fluid rounded-circle me-0 me-lg-3"
                       alt="user"
                     />
                     {% endif %}
-                    <div class="caption">
+                    <div class="caption d-none d-lg-block">
                       <h6 class="mb-0 line-height">
                         {{ current_user.username|default:"User" }}
                       </h6>

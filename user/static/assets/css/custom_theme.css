@@ -1082,6 +1082,11 @@ body.sidebar-open .sidebar-backdrop {
     height: 16px !important;
   }
 
+  /* Hide dropdown caret on mobile for custom quick actions and profile dropdown */
+  .iq-top-navbar .navbar-list .dropdown-toggle::after {
+    display: none !important;
+  }
+
   /* Make sure mobile logo doesn't wrap or get cut off */
   .iq-navbar-logo {
     display: flex !important;
