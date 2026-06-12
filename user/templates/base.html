@@ -305,14 +305,14 @@
                     {% endif %}
                   </a>
                 </li>
-                <li class="nav-item d-none d-lg-block">
+                <li class="nav-item">
                   <a
                     href="{% url 'activity' %}"
                     class="d-flex align-items-center px-2 position-relative"
-                    title="Notifications"
+                    title="Activity"
                   >
-                    <i class="ri-notification-line fs-5 text-white"></i>
-                    {% if activity_count > 0 %}
+                    <i class="ri-heart-line fs-5 text-white"></i>
+                    {% if activity_count > 0 or invitation_count > 0 %}
                     <span
                       class="position-absolute bg-warning border border-light rounded-circle d-flex align-items-center justify-content-center text-dark"
                       style="
@@ -323,82 +323,10 @@
                         font-size: 8px;
                       "
                     >
-                      {{ activity_count }}
+                      {{ activity_count|add:invitation_count }}
                     </span>
                     {% endif %}
                   </a>
-                </li>
-                <li class="nav-item d-none d-lg-block">
-                  <a
-                    href="{% url 'invitations_list' %}"
-                    class="d-flex align-items-center px-2 position-relative"
-                    title="Friend Requests"
-                  >
-                    <i class="ri-user-add-line fs-5 text-white"></i>
-                    {% if invitation_count > 0 %}
-                    <span
-                      class="position-absolute bg-success border border-light rounded-circle d-flex align-items-center justify-content-center text-white"
-                      style="
-                        width: 14px;
-                        height: 14px;
-                        top: 0px;
-                        right: 0px;
-                        font-size: 8px;
-                      "
-                    >
-                      {{ invitation_count }}
-                    </span>
-                    {% endif %}
-                  </a>
-                </li>
-                <!-- Mobile Quick Actions Dropdown (Notification, Friend Requests) -->
-                <li class="nav-item dropdown d-lg-none">
-                  <a
-                    href="#"
-                    class="d-flex align-items-center dropdown-toggle px-2 position-relative"
-                    id="mobile-quick-actions"
-                    data-bs-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <i class="ri-more-2-fill fs-4 text-primary"></i>
-                    {% if activity_count > 0 or invitation_count > 0 %}
-                    <span class="position-absolute bg-danger border border-light rounded-circle"
-                          style="width: 8px; height: 8px; top: 12px; right: 2px;"></span>
-                    {% endif %}
-                  </a>
-                  <div
-                    class="sub-drop dropdown-menu dropdown-menu-end caption-menu p-0 border-0 shadow-none bg-transparent"
-                    aria-labelledby="mobile-quick-actions"
-                  >
-                    <div class="card shadow m-0 bg-white" style="min-width: 240px; border-radius: 16px;">
-                      <div class="card-body p-0 bg-white" style="border-radius: 16px;">
-                        
-                        <!-- Notifications Link -->
-                        <a href="{% url 'activity' %}" class="iq-sub-card iq-bg-primary-hover border-bottom d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none">
-                          <div class="d-flex align-items-center">
-                            <i class="ri-notification-line text-warning me-3 fs-5"></i>
-                            <h6 class="mb-0 fw-bold text-dark">Notifications</h6>
-                          </div>
-                          {% if activity_count > 0 %}
-                          <span class="badge bg-warning text-dark rounded-pill px-2 py-1" style="font-size: 10px;">{{ activity_count }}</span>
-                          {% endif %}
-                        </a>
-
-                        <!-- Friend Requests Link -->
-                        <a href="{% url 'invitations_list' %}" class="iq-sub-card iq-bg-primary-hover d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none">
-                          <div class="d-flex align-items-center">
-                            <i class="ri-user-add-line text-success me-3 fs-5"></i>
-                            <h6 class="mb-0 fw-bold text-dark">Friend Requests</h6>
-                          </div>
-                          {% if invitation_count > 0 %}
-                          <span class="badge bg-success text-white rounded-pill px-2 py-1" style="font-size: 10px;">{{ invitation_count }}</span>
-                          {% endif %}
-                        </a>
-
-                      </div>
-                    </div>
-                  </div>
                 </li>
                 <li class="nav-item dropdown">
                   <a
@@ -534,25 +462,14 @@
                   <i class="fas fa-user-friends me-2"></i><span>Find Friends</span>
                 </a>
               </li>
-              <!-- 7.5. Friend Requests (Mobile/Sidebar Access) -->
-              <li class="">
-                <a href="{% url 'invitations_list' %}" class="sidebar-link d-flex align-items-center justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <i class="ri-user-add-line me-2"></i><span>Friend Requests</span>
-                  </div>
-                  {% if invitation_count > 0 %}
-                  <span class="badge bg-success text-white rounded-pill px-2 py-1" style="font-size: 10px;">{{ invitation_count }}</span>
-                  {% endif %}
-                </a>
-              </li>
-              <!-- 7.6. Notifications (Mobile/Sidebar Access) -->
+              <!-- 7.5. Activity (Mobile/Sidebar Access) -->
               <li class="">
                 <a href="{% url 'activity' %}" class="sidebar-link d-flex align-items-center justify-content-between">
                   <div class="d-flex align-items-center">
-                    <i class="ri-notification-line me-2"></i><span>Notifications</span>
+                    <i class="ri-heart-line me-2"></i><span>Activity</span>
                   </div>
-                  {% if activity_count > 0 %}
-                  <span class="badge bg-warning text-dark rounded-pill px-2 py-1" style="font-size: 10px;">{{ activity_count }}</span>
+                  {% if activity_count > 0 or invitation_count > 0 %}
+                  <span class="badge bg-warning text-dark rounded-pill px-2 py-1" style="font-size: 10px;">{{ activity_count|add:invitation_count }}</span>
                   {% endif %}
                 </a>
               </li>

@@ -1095,21 +1095,7 @@ def invite_user(request, target_userid):
     return redirect(request.META.get('HTTP_REFERER', 'users_list'))
 
 def invitations_list(request):
-    userid = request.session.get('userid')
-    if not userid:
-        return redirect('signin')
-        
-    current_user = user.objects.get(pk=userid)
-    current_user.last_checked_invites = timezone.now()
-    current_user.save()
-    invites = CommunityInvite.objects.filter(receiverid=current_user, status=0).order_by('-createddt')
-    
-    for inv in invites:
-        sender = user.objects.filter(pk=inv.senderid).first()
-        inv.sender_name = sender.username if sender else "Unknown User"
-        
-    data = {"invites": invites}
-    return render(request, 'invitations_list.html', data)
+    return redirect('activity')
 
 def respond_invite(request, inviteid, action):
     userid = request.session.get('userid')
@@ -1134,7 +1120,7 @@ def respond_invite(request, inviteid, action):
             inv.status = 2
             inv.save()
             
-    return redirect('invitations_list')
+    return redirect('activity')
 
 def user_profile(request, target_userid=None):
     userid = request.session.get('userid')
@@ -2069,6 +2055,7 @@ def activity(request):
         
     u = user.objects.get(pk=userid)
     u.last_checked_activity = timezone.now()
+    u.last_checked_invites = timezone.now()
     u.save()
     
     # Get all posts created by the user
@@ -2087,6 +2074,9 @@ def activity(request):
     # 4. Get pending follow requests for the user
     follow_requests = FollowRequest.objects.filter(receiver=u, status=0)
     
+    # 5. Get pending community invitations for the user
+    community_invites = CommunityInvite.objects.filter(receiverid=u, status=0)
+    
     # Create a unified activity list
     activities = []
     
@@ -2096,6 +2086,16 @@ def activity(request):
             'user': fr.sender,
             'date': fr.createddt,
             'id': fr.requestid
+        })
+
+    for ci in community_invites:
+        sender = user.objects.filter(pk=ci.senderid).first()
+        activities.append({
+            'type': 'community_invite',
+            'user': sender,
+            'community': ci.communityid,
+            'date': ci.createddt,
+            'id': ci.inviteid
         })
 
     for l in likes:
