@@ -1108,4 +1108,19 @@ body.sidebar-open .sidebar-backdrop {
     display: none !important;
   }
 }
+
+/* Fix spacing for mobile screens under 575px to keep navbar items inline */
+@media (max-width: 575px) {
+  .iq-top-navbar .navbar-list li > a {
+    padding: 0 8px !important;
+  }
+  .iq-top-navbar .navbar-list {
+    gap: 8px !important;
+  }
+  .iq-top-navbar .navbar-collapse {
+    padding-right: 0 !important;
+    margin-right: -10px !important;
+  }
+}
+
 
