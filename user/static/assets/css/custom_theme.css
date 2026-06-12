@@ -1334,7 +1334,8 @@ body.sidebar-open .sidebar-backdrop {
   .sign-in-page {
     height: auto !important;
     min-height: 100vh !important;
-    overflow: visible !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
     padding: 40px 15px !important;
   }
   
@@ -1344,11 +1345,13 @@ body.sidebar-open .sidebar-backdrop {
     height: auto !important;
     min-height: 100vh !important;
     padding: 0 !important;
+    overflow-x: hidden !important;
   }
   
   .sign-in-from {
     max-height: none !important;
     overflow-y: visible !important;
+    overflow-x: hidden !important;
     padding: 30px 20px !important;
     margin-top: 10px !important;
     margin-bottom: 20px !important;
@@ -1370,7 +1373,8 @@ html.auth-page-html,
 body.auth-page-body {
   height: auto !important;
   min-height: 100vh !important;
-  overflow: auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   overscroll-behavior: auto !important;
 }
 
@@ -1378,7 +1382,8 @@ html.auth-page-html .wrapper,
 body.auth-page-body .wrapper {
   height: auto !important;
   min-height: 100vh !important;
-  overflow: visible !important;
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
 }
 
 /* Beautiful frosted-glass styled scrollbar for the auth page body */
