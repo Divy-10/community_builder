@@ -1365,4 +1365,43 @@ body.sidebar-open .sidebar-backdrop {
   }
 }
 
+/* Enable scrolling on auth pages */
+html.auth-page-html,
+body.auth-page-body {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: auto !important;
+  overscroll-behavior: auto !important;
+}
+
+html.auth-page-html .wrapper,
+body.auth-page-body .wrapper {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+}
+
+/* Beautiful frosted-glass styled scrollbar for the auth page body */
+body.auth-page-body::-webkit-scrollbar {
+  width: 8px !important;
+  background-color: transparent !important;
+}
+
+body.auth-page-body::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  border-radius: 4px !important;
+  border: 2px solid transparent !important;
+  background-clip: padding-box !important;
+}
+
+body.auth-page-body::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+body.auth-page-body {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent !important;
+}
+
+
 
