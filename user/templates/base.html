@@ -351,7 +351,7 @@
                     {% endif %}
                   </a>
                 </li>
-                <!-- Mobile Quick Actions Dropdown (Chat, Notification, Friend Requests) -->
+                <!-- Mobile Quick Actions Dropdown (Notification, Friend Requests) -->
                 <li class="nav-item dropdown d-lg-none">
                   <a
                     href="#"
@@ -362,7 +362,7 @@
                     aria-expanded="false"
                   >
                     <i class="ri-more-2-fill fs-4 text-primary"></i>
-                    {% if unread_chat_count > 0 or activity_count > 0 or invitation_count > 0 %}
+                    {% if activity_count > 0 or invitation_count > 0 %}
                     <span class="position-absolute bg-danger border border-light rounded-circle"
                           style="width: 8px; height: 8px; top: 12px; right: 2px;"></span>
                     {% endif %}
@@ -374,17 +374,6 @@
                     <div class="card shadow m-0 bg-white" style="min-width: 240px; border-radius: 16px;">
                       <div class="card-body p-0 bg-white" style="border-radius: 16px;">
                         
-                        <!-- Chats Link -->
-                        <a href="{% url 'chats' %}" class="iq-sub-card iq-bg-primary-hover border-bottom d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none">
-                          <div class="d-flex align-items-center">
-                            <i class="ri-chat-3-line text-primary me-3 fs-5"></i>
-                            <h6 class="mb-0 fw-bold text-dark">Chats</h6>
-                          </div>
-                          {% if unread_chat_count > 0 %}
-                          <span class="badge bg-danger text-white rounded-pill px-2 py-1" style="font-size: 10px;">{{ unread_chat_count }}</span>
-                          {% endif %}
-                        </a>
-
                         <!-- Notifications Link -->
                         <a href="{% url 'activity' %}" class="iq-sub-card iq-bg-primary-hover border-bottom d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none">
                           <div class="d-flex align-items-center">
