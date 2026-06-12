@@ -1057,6 +1057,14 @@ body.sidebar-open .sidebar-backdrop {
     margin: 0 !important;
   }
 
+  /* Support responsive hiding for top navbar items */
+  .iq-top-navbar .navbar-list li.d-none,
+  .iq-top-navbar .navbar-list li.d-sm-none,
+  .iq-top-navbar .navbar-list li.d-md-none,
+  .iq-top-navbar .navbar-list li.d-lg-none {
+    display: none !important;
+  }
+
   .iq-top-navbar .navbar-list li > a {
     display: flex !important;
     align-items: center !important;
