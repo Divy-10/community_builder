@@ -30,6 +30,8 @@ from django.http import HttpResponse
 
 def temp_import_data(request):
     try:
+        # Run database migrations first to ensure columns are resized
+        call_command('migrate')
         call_command('loaddata', 'db_dump.json')
         return HttpResponse("<h3>UniVo Data Import Success!</h3><p>Your local SQLite database data has been successfully imported to live PostgreSQL database.</p>")
     except Exception as e:
