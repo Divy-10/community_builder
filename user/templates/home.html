@@ -238,30 +238,29 @@
                 </div>
                 {% endif %}
                 <div class="ms-3">
-                    <h6 class="mb-0 fw-bold text-dark d-inline-block">{{ post.userid.username }}</h6>
-                    <p class="mb-0 text-muted small"><i class="las la-clock me-1"></i>{{ post.createddt|timesince }} ago
-                    </p>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <h6 class="mb-0 fw-bold text-dark">{{ post.userid.username }}</h6>
+                        {% if post.communityid %}
+                        <a href="{% url 'community_detail' post.communityid.communityid %}"
+                            class="badge bg-light text-primary border rounded-pill px-2.5 py-1 fw-semibold d-inline-flex align-items-center gap-1.5 hover-shadow transition text-decoration-none post-community-badge"
+                            style="font-size: 0.75rem; border-color: rgba(var(--bs-primary-rgb), 0.2) !important;">
+                            {% if post.communityid.thumbnail %}
+                            <img src="{{ post.communityid.thumbnail.url }}" class="avatar-15 rounded-circle"
+                                style="object-fit:cover; width: 14px; height: 14px;">
+                            {% endif %}
+                            <span>{{ post.communityid.communitytitle }}</span>
+                        </a>
+                        {% else %}
+                        <span class="badge bg-soft-primary px-2.5 py-1 fw-semibold post-community-badge"
+                            style="font-size: 0.7rem;">Buzz Feed</span>
+                        {% endif %}
+                    </div>
+                    <p class="mb-0 text-muted small mt-0.5"><i class="las la-clock me-1"></i>{{ post.createddt|timesince }} ago</p>
                 </div>
             </div>
 
-            <!-- Community Info Badge & Action Menu -->
-            <div class="position-absolute d-flex align-items-center gap-2" style="top: 15px; right: 20px; z-index: 10;">
-                {% if post.communityid %}
-                <a href="{% url 'community_detail' post.communityid.communityid %}"
-                    class="btn btn-sm btn-light rounded-pill px-3 fw-semibold d-flex align-items-center gap-2 hover-shadow transition text-decoration-none"
-                    style="font-size: 0.8rem; background: rgba(255,255,255,0.8);">
-                    {% if post.communityid.thumbnail %}
-                    <img src="{{ post.communityid.thumbnail.url }}" class="avatar-20 rounded-circle"
-                        style="object-fit:cover;">
-                    {% endif %}
-                    <span class="text-primary">{{ post.communityid.communitytitle }}</span>
-                </a>
-                {% else %}
-                <span class="badge bg-soft-primary px-3 py-2 fw-semibold d-flex align-items-center gap-2"
-                    style="font-size: 0.75rem;">Buzz Feed</span>
-                {% endif %}
-
-                <!-- Post Action Menu (3 dots) -->
+            <!-- Post Action Menu (3 dots) -->
+            <div class="position-absolute" style="top: 15px; right: 20px; z-index: 10;">
                 <div class="dropdown">
                     <a href="#" class="text-secondary" id="postActionMenu{{ post.postid }}" data-bs-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">

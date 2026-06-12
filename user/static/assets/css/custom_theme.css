@@ -1403,5 +1403,64 @@ body.auth-page-body {
   scrollbar-color: rgba(255, 255, 255, 0.25) transparent !important;
 }
 
+/* Release global layout scrolling constraints on mobile devices for smooth native scroll */
+@media (max-width: 991px) {
+  html,
+  body {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: auto !important;
+  }
+  
+  .wrapper {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+  
+  .content-page {
+    height: auto !important;
+    min-height: calc(100vh - 75px) !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-page {
+    min-height: calc(100vh - 75px - 65px) !important;
+    padding-bottom: 100px !important;
+  }
+}
+
+/* Premium styling for inline community badge on post cards */
+.post-community-badge {
+  background: rgba(var(--bs-primary-rgb), 0.05) !important;
+  color: var(--bs-primary) !important;
+  border: 1px solid rgba(var(--bs-primary-rgb), 0.15) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  transition: all 0.3s ease !important;
+  vertical-align: middle !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.post-community-badge:hover {
+  background: rgba(var(--bs-primary-rgb), 0.12) !important;
+  border-color: rgba(var(--bs-primary-rgb), 0.3) !important;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 576px) {
+  .post-community-badge {
+    font-size: 0.65rem !important;
+    padding: 3px 8px !important;
+  }
+}
+
+
 
 
