@@ -415,19 +415,19 @@
             <ul id="iq-sidebar-toggle" class="iq-menu">
               {% block sidebar %}
               <!-- 1. Home -->
-              <li class="">
+              <li class="d-none d-md-block">
                 <a href="{% url 'home' %}" class="sidebar-link">
                   <i class="fas fa-home me-2"></i><span>Home</span>
                 </a>
               </li>
               <!-- 2. Chats -->
-              <li class="">
+              <li class="d-none d-md-block">
                 <a href="{% url 'chats' %}" class="sidebar-link">
                   <i class="ri-chat-3-line me-2"></i><span>Chats</span>
                 </a>
               </li>
               <!-- 3. Community -->
-              <li class="">
+              <li class="d-none d-md-block">
                 <a href="{% url 'group' %}" class="sidebar-link">
                   <i class="fas fa-users me-2"></i><span>Community</span>
                 </a>
@@ -451,7 +451,7 @@
                 </a>
               </li>
               <!-- 6. Add Post -->
-              <li class="">
+              <li class="d-none d-md-block">
                 <a href="{% url 'unified_add_post' %}" class="sidebar-link">
                   <i class="fas fa-plus-circle me-2"></i><span>Add Post</span>
                 </a>
@@ -486,7 +486,7 @@
                 </a>
               </li>
               <!-- 11. Profile -->
-              <li class="">
+              <li class="d-none d-md-block">
                 <a href="{% url 'my_profile' %}" class="sidebar-link">
                   <i class="fas fa-user-circle me-2"></i><span>Profile</span>
                 </a>
