@@ -270,7 +270,7 @@
             </div>
 
             <button
-              class="navbar-toggler"
+              class="navbar-toggler d-none"
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#navbarSupportedContent"
@@ -282,7 +282,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav ms-auto navbar-list align-items-center">
                 {% if current_user %}
-                <li class="nav-item">
+                <li class="nav-item d-none d-lg-block">
                   <a
                     href="{% url 'chats' %}"
                     class="d-flex align-items-center px-2 position-relative"
@@ -305,7 +305,7 @@
                     {% endif %}
                   </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item d-none d-lg-block">
                   <a
                     href="{% url 'activity' %}"
                     class="d-flex align-items-center px-2 position-relative"
@@ -328,7 +328,7 @@
                     {% endif %}
                   </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item d-none d-lg-block">
                   <a
                     href="{% url 'invitations_list' %}"
                     class="d-flex align-items-center px-2 position-relative"
@@ -483,6 +483,28 @@
               <li class="">
                 <a href="{% url 'users_list' %}" class="sidebar-link">
                   <i class="fas fa-user-friends me-2"></i><span>Find Friends</span>
+                </a>
+              </li>
+              <!-- 7.5. Friend Requests (Mobile/Sidebar Access) -->
+              <li class="">
+                <a href="{% url 'invitations_list' %}" class="sidebar-link d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <i class="ri-user-add-line me-2"></i><span>Friend Requests</span>
+                  </div>
+                  {% if invitation_count > 0 %}
+                  <span class="badge bg-success text-white rounded-pill px-2 py-1" style="font-size: 10px;">{{ invitation_count }}</span>
+                  {% endif %}
+                </a>
+              </li>
+              <!-- 7.6. Notifications (Mobile/Sidebar Access) -->
+              <li class="">
+                <a href="{% url 'activity' %}" class="sidebar-link d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <i class="ri-notification-line me-2"></i><span>Notifications</span>
+                  </div>
+                  {% if activity_count > 0 %}
+                  <span class="badge bg-warning text-dark rounded-pill px-2 py-1" style="font-size: 10px;">{{ activity_count }}</span>
+                  {% endif %}
                 </a>
               </li>
               <!-- 8. Calendar -->

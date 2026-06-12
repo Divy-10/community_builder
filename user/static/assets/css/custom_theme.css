@@ -1016,7 +1016,13 @@ body.sidebar-open .sidebar-backdrop {
   /* Prevent top navbar from collapsing vertically and wasting space */
   .iq-top-navbar .navbar-collapse {
     display: flex !important;
-    flex-basis: auto;
+    flex-basis: auto !important;
+    position: static !important;
+    width: auto !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   .iq-top-navbar .navbar-toggler {
