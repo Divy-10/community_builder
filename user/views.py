@@ -506,7 +506,15 @@ GOOGLE_SCOPES = [
     'openid',
 ]
 
-def _build_google_flow(state=None):
+def _build_google_flow(state=None, request=None):
+    if request:
+        # Detect if we are on HTTPS (on Render behind reverse proxy or direct)
+        scheme = 'https' if request.is_secure() or request.META.get('HTTP_X_FORWARDED_PROTO') == 'https' else 'http'
+        host = request.get_host()
+        redirect_uri = f"{scheme}://{host}/auth/google/callback/"
+    else:
+        redirect_uri = settings.GOOGLE_REDIRECT_URI
+
     flow = Flow.from_client_config(
         {
             "web": {
@@ -517,7 +525,7 @@ def _build_google_flow(state=None):
             }
         },
         scopes=GOOGLE_SCOPES,
-        redirect_uri=settings.GOOGLE_REDIRECT_URI,
+        redirect_uri=redirect_uri,
         state=state
     )
     return flow
@@ -525,7 +533,7 @@ def _build_google_flow(state=None):
 def google_login(request):
     """Redirect the user to Google's OAuth 2.0 consent screen."""
     _os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # Allow HTTP for local dev
-    flow = _build_google_flow()
+    flow = _build_google_flow(request=request)
     auth_url, state = flow.authorization_url(prompt='select_account')
     request.session['google_oauth_state'] = state
     # Save the code_verifier for PKCE (Proof Key for Code Exchange)
@@ -547,7 +555,7 @@ def google_callback(request):
         print(f"GOOGLE AUTH ERROR: State mismatch. Session: {state}, GET: {request.GET.get('state')}")
         return redirect('signin')
 
-    flow = _build_google_flow(state=state)
+    flow = _build_google_flow(state=state, request=request)
     # Restore the code_verifier to the flow object
     if code_verifier:
         flow.code_verifier = code_verifier
