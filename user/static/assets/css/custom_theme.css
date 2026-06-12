@@ -1294,8 +1294,43 @@ body.sidebar-open .sidebar-backdrop {
   }
 }
 
-/* Responsive Login & Signup Pages on Mobile */
-@media (max-width: 767px) {
+/* Core layouts for all Auth Pages */
+.sign-in-page {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.sign-in-from {
+  max-height: 85vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-right: 15px !important;
+  margin-top: 20px !important;
+}
+
+/* Beautiful modern scrollbar for auth form */
+.sign-in-from::-webkit-scrollbar {
+  width: 6px !important;
+  background-color: transparent !important;
+}
+
+.sign-in-from::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  border-radius: 4px !important;
+}
+
+.sign-in-from::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.sign-in-from {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent !important;
+}
+
+/* Responsive Login & Signup Pages on Mobile/Tablet */
+@media (max-width: 991px) {
   .sign-in-page {
     height: auto !important;
     min-height: 100vh !important;

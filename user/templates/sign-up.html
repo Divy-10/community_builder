@@ -3,43 +3,6 @@
 
 {% block content %}
 <style>
-    /* 1. Make the main section take up the full screen and stay fixed */
-    .sign-in-page {
-        height: 100vh;
-        overflow: hidden;
-        /* Prevents the whole background from scrolling */
-        position: relative;
-    }
-
-    /* 2. Create the "Scroll View" for the form side */
-    .sign-in-from {
-        max-height: 85vh;
-        /* Limits the height so it doesn't go off-screen */
-        overflow-y: auto;
-        /* This creates the scrollbar */
-        overflow-x: hidden;
-        padding-right: 15px;
-        /* Space for the scrollbar */
-        margin-top: 20px;
-    }
-
-    /* 3. Modern Scrollbar Styling */
-    .sign-in-from::-webkit-scrollbar {
-        width: 6px;
-        background-color: transparent;
-    }
-    .sign-in-from::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.25);
-        border-radius: 4px;
-    }
-    .sign-in-from::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(255, 255, 255, 0.4);
-    }
-    .sign-in-from {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
-    }
-
     /* Ensure circles stay in the background */
     #container-inside {
         position: absolute;
